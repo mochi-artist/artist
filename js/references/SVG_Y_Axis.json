@@ -1104,6 +1104,12 @@
             "SVGYAXIS": 1834,
             "TERMINAL": ""
         },
+           {
+            "ID": "3355",
+            "DSC": "大肚溪南 ",
+            "SVGYAXIS": 1917,
+            "TERMINAL": ""
+        },
         {
             "ID": "3360",
             "DSC": "彰化 ",
@@ -1633,6 +1639,12 @@
             "TERMINAL": ""
         },
         {
+            "ID": "2115",
+            "DSC": "談文南 ",
+            "SVGYAXIS": 174,
+            "TERMINAL": ""
+        },
+        {
             "ID": "2120",
             "DSC": "大山 ",
             "SVGYAXIS": 248,
@@ -1720,6 +1732,12 @@
             "ID": "2260",
             "DSC": "追分 ",
             "SVGYAXIS": 1843,
+            "TERMINAL": ""
+        },
+            {
+            "ID": "3355",
+            "DSC": "大肚溪南 ",
+            "SVGYAXIS": 1917,
             "TERMINAL": ""
         },
         {
