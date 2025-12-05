@@ -134,7 +134,7 @@
         },
         {
             "ID": "7350",
-            "DSC": "侯硐",
+            "DSC": "猴硐",
             "SVGYAXIS": 1712,
             "TERMINAL": ""
         },
@@ -625,7 +625,7 @@
             "TERMINAL": ""
         },
         {
-            "ID": "NA",
+            "ID": "5175",
             "DSC": "中央號誌",
             "SVGYAXIS": 481,
             "TERMINAL": ""
@@ -637,7 +637,7 @@
             "TERMINAL": ""
         },
         {
-            "ID": "NA",
+            "ID": "5180",
             "DSC": "古莊號誌",
             "SVGYAXIS": 825,
             "TERMINAL": ""
