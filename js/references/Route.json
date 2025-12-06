@@ -927,11 +927,11 @@
     "CW_BRANCH": "",
     "CHENG_ZHUI_CCW": "3355",
     "CHENG_ZHUI_CW": "2250",
-    "CCW_KM": "2.1",
+    "CCW_KM": "2.6",
     "CW_KM": "5.0",
     "CCW_BRANCH_KM": "2.2",
     "CW_BRANCH_KM": "",
-    "CHENG_ZHUI_CCW_KM": "2.1",
+    "CHENG_ZHUI_CCW_KM": "2.6",
     "CHENG_ZHUI_CW_KM": "5.0"
   },
   "3140": {
@@ -1288,8 +1288,8 @@
     "CW_KM": "2.5",
     "CCW_BRANCH_KM": "",
     "CW_BRANCH_KM": "2.2",
-    "CHENG_ZHUI_CCW_KM": "2.5",
-    "CHENG_ZHUI_CW_KM": "2.2"
+    "CHENG_ZHUI_CCW_KM": "2.1",
+    "CHENG_ZHUI_CW_KM": "2.5"
   },
    "3355": {
     "DSC": "大肚溪南",
@@ -1304,7 +1304,7 @@
     "CCW_KM": "5.0",
     "CW_KM": "2.1",
     "CCW_BRANCH_KM": "",
-    "CW_BRANCH_KM": "2.1",
+    "CW_BRANCH_KM": "2.6",
     "CHENG_ZHUI_CCW_KM": "5.0",
     "CHENG_ZHUI_CW_KM": "2.1"
   },
