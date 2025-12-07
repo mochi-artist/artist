@@ -1628,6 +1628,144 @@
             "ID": "4400",
             "DSC": "高雄",
             "SVGYAXIS": 4000,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4410",
+            "DSC": "民族",
+            "SVGYAXIS": 4034,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4420",
+            "DSC": "科工館",
+            "SVGYAXIS": 4059,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4430",
+            "DSC": "正義",
+            "SVGYAXIS": 4103,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4440",
+            "DSC": "鳳山",
+            "SVGYAXIS": 4142,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4450",
+            "DSC": "後庄",
+            "SVGYAXIS": 4232,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4460",
+            "DSC": "九曲堂",
+            "SVGYAXIS": 4338,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "4470",
+            "DSC": "六塊厝",
+            "SVGYAXIS": 4460,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5000",
+            "DSC": "屏東 ",
+            "SVGYAXIS": 4514,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5010",
+            "DSC": "歸來 ",
+            "SVGYAXIS": 4577,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5020",
+            "DSC": "麟洛 ",
+            "SVGYAXIS": 4634,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5030",
+            "DSC": "西勢 ",
+            "SVGYAXIS": 4692,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5040",
+            "DSC": "竹田 ",
+            "SVGYAXIS": 4783,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5050",
+            "DSC": "潮州 ",
+            "SVGYAXIS": 4883,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5998",
+            "DSC": "潮州機廠(南方小站)",
+            "SVGYAXIS": 4923,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "NA",
+            "DSC": "潮州基地(陽光小站)",
+            "SVGYAXIS": 4962,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5060",
+            "DSC": "崁頂 ",
+            "SVGYAXIS": 5001,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5070",
+            "DSC": "南州 ",
+            "SVGYAXIS": 5060,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5080",
+            "DSC": "鎮安 ",
+            "SVGYAXIS": 5148,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5090",
+            "DSC": "林邊 ",
+            "SVGYAXIS": 5226,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5100",
+            "DSC": "佳冬 ",
+            "SVGYAXIS": 5324,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5110",
+            "DSC": "東海 ",
+            "SVGYAXIS": 5400,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "NA",
+            "DSC": "建興",
+            "SVGYAXIS": 5444,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "5120",
+            "DSC": "枋寮 ",
+            "SVGYAXIS": 5500,
             "TERMINAL": "Y"
         }
     ],
