@@ -21,7 +21,7 @@
         "NAME": "西部幹線南段(彰化-高雄)",
         "FOLDER": "west_link_south",
         "PREFIX": "WESTSOUTH_",
-        "MAX_X_AXIS": 4000
+        "MAX_X_AXIS": 5500
     },
     "LINE_P": {
         "NAME": "屏東線(高雄-枋寮)",
