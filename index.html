@@ -148,7 +148,8 @@
 <script src="js/util.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    const diagram_data = localStorage.getItem('is_confirmed');
+    const today_date = getTodayFormattedDate();
 
     $(document).ready(function () {
         $('#web_name').append(web_name)
