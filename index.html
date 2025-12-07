@@ -148,9 +148,26 @@
 <script src="js/util.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </script>
+  <script>
     const diagram_data = localStorage.getItem('is_confirmed');
     const today_date = getTodayFormattedDate();
+    if (diagram_data == null || typeof (diagram_data) == "undefined" || diagram_data !== "ok") {
+        Swal.fire({
+            
+
+        }).then((result) => {
+
+            Swal.fire({
+                
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                } else if (result.isDenied) {
+                    
+                }
+            })
+        })
+    }
 
     $(document).ready(function () {
         $('#web_name').append(web_name)
