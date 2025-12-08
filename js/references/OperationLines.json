@@ -18,7 +18,7 @@
         "MAX_X_AXIS": 2000
     },
     "LINE_WS": {
-        "NAME": "西部幹線南段(彰化-高雄)",
+        "NAME": "西部幹線南段(彰化-枋寮)",
         "FOLDER": "west_link_south",
         "PREFIX": "WESTSOUTH_",
         "MAX_X_AXIS": 5500
@@ -66,7 +66,7 @@
         "MAX_X_AXIS": 500
     },
     "LINE_NW": {
-        "NAME": "六家線(新竹-六家)",
+        "NAME": "六家/內灣線(新竹-六家/內灣)",
         "FOLDER": "neiwan",
         "PREFIX": "NEIWAN_",
         "MAX_X_AXIS": 1250
