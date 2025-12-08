@@ -8,7 +8,8 @@ function draw_diagram_background(line_kind, date) {
             const text_spacing_factor = 500;
             const draw_date = Date().toLocaleString();
             const now_time_x_axis = get_now_time_x_axis(0);
-
+            
+            let name = value['NAME'].replace("高雄", "枋寮");
             const title = `${value['NAME']} ，日期：${date}，運行圖繪製完成時間：${draw_date}`;        // 運行圖標題文字設定
             add_text(draw, title, 5, 0, null);
 
