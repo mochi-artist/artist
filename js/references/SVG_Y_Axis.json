@@ -1155,6 +1155,12 @@
             "TERMINAL": ""
         },
         {
+            "ID": "0945",
+            "DSC": "五堵貨",
+            "SVGYAXIS": 250,
+            "TERMINAL": ""
+        },
+        {
             "ID": "0950",
             "DSC": "五堵",
             "SVGYAXIS": 280,
@@ -1212,6 +1218,12 @@
             "ID": "1040",
             "DSC": "樹林",
             "SVGYAXIS": 978,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "1045",
+            "DSC": "樹調",
+            "SVGYAXIS": 1002,
             "TERMINAL": ""
         },
         {
@@ -1281,6 +1293,12 @@
             "TERMINAL": ""
         },
         {
+            "ID": "1145",
+            "DSC": "富岡基地",
+            "SVGYAXIS": 2065,
+            "TERMINAL": ""
+        },
+        {
             "ID": "1150",
             "DSC": "北湖",
             "SVGYAXIS": 2084,
@@ -1308,6 +1326,12 @@
             "ID": "1190",
             "DSC": "北新竹",
             "SVGYAXIS": 2512,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "1195",
+            "DSC": "新竹貨場",
+            "SVGYAXIS": 2522,
             "TERMINAL": ""
         },
         {
@@ -1715,7 +1739,7 @@
             "TERMINAL": ""
         },
         {
-            "ID": "NA",
+            "ID": "5999",
             "DSC": "潮州基地(陽光小站)",
             "SVGYAXIS": 4962,
             "TERMINAL": ""
