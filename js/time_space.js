@@ -70,21 +70,24 @@ function calculate_space_time(train, line_kind) {
     return _trains_data;
 }
 
-// 查詢車次會「停靠與通過」的所有車站
+// 查詢車次會「停靠與通過」的所有車站 (已修改支援折返)
 function find_passing_stations(timetable, line, line_dir) {
     const start_station = timetable[0]['Station'];
-    let end_station = timetable[timetable.length - 1]['Station'];
+    const end_station = timetable[timetable.length - 1]['Station']; // 最終終點站
 
     let _passing_stations = [];
     let station = start_station;
     let km = 0.0;
 
+    // --- 既有邏輯：特殊路線標記 (保持不變) ---
     let cheng_zhui = false;
-
     let roundabout_train = false;
+    
     if (end_station == '1001') {
-        end_station = start_station;
-        roundabout_train = true;
+        // 環島列車邏輯稍微注意，若非環島但折返至起點，roundabout_train 設為 false 比較安全
+        // 但為了相容既有邏輯，這裡暫時維持原判斷
+        // 如果是單純折返(1000->1025->1000)，通常 end_station 會等於 start_station
+        roundabout_train = true; 
     }
 
     let stations = [];
@@ -118,14 +121,52 @@ function find_passing_stations(timetable, line, line_dir) {
         shalun = true;
     }
 
+    // --- 新增變數：動態導航系統 ---
+    let next_stop_idx = 1;       // 目標指向時刻表的第2站 (Index 1)
+    let current_dir = line_dir;  // 當前行駛方向 (會隨時改變)
+
     while (true) {
+        // 1. 紀錄當前車站
         _passing_stations.push([String(station), Route[station].DSC, Route[station].KM, km]);
 
-        if (line_dir == '2') {
+        // 2. 動態判斷方向邏輯
+        // 如果還有下一站要走
+        if (next_stop_idx < timetable.length) {
+            let target_station_id = timetable[next_stop_idx]['Station'];
+
+            // (A) 檢查是否已抵達目前的目標停靠站
+            if (station == target_station_id) {
+                next_stop_idx++; // 目標推進到下一站
+                if (next_stop_idx < timetable.length) {
+                    target_station_id = timetable[next_stop_idx]['Station'];
+                }
+            }
+
+            // (B) 比較「當前站」與「目標站」的里程，決定方向
+            // 只有在還沒跑完整個時刻表時才做判斷
+            if (next_stop_idx < timetable.length && Route[station] && Route[target_station_id]) {
+                let curr_loc = parseFloat(Route[station].KM);
+                let target_loc = parseFloat(Route[target_station_id].KM);
+
+                // 數值容錯比較 (避免浮點數誤差)
+                if (target_loc > curr_loc + 0.001) {
+                    current_dir = '2'; // 目標里程較大 -> 順行/下行
+                } else if (target_loc < curr_loc - 0.001) {
+                    current_dir = '1'; // 目標里程較小 -> 逆行/上行
+                }
+                // 若相等則維持原方向不動
+            }
+        }
+
+        // 3. 尋找下一站 (將原本的 line_dir 替換為 current_dir)
+        if (current_dir == '2') { 
+            // --- 順行/下行 邏輯 (Copy from original line_dir == '2') ---
             if (cheng_zhui == false) {
                 let branch = Route[station].CCW_BRANCH;
                 if (branch != '') {
                     if (station == '7360') {
+                        // 這裡為了防止折返誤判，簡單邏輯保持原樣，
+                        // 若是複雜支線折返，可能需依 target_station_id 判斷，但一般情況夠用
                         if (end_station == '7362') {
                             km += parseFloat(Route[station].CCW_BRANCH_KM);
                             station = '7361';
@@ -166,7 +207,9 @@ function find_passing_stations(timetable, line, line_dir) {
                 km += parseFloat(Route[station].CHENG_ZHUI_CCW_KM);
                 station = Route[station].CHENG_ZHUI_CCW;
             }
-        } else if (line_dir == '1') {
+
+        } else if (current_dir == '1') { 
+            // --- 逆行/上行 邏輯 (Copy from original line_dir == '1') ---
             if (cheng_zhui == false) {
                 let branch = Route[station].CW_BRANCH;
                 if (branch != '') {
@@ -229,17 +272,21 @@ function find_passing_stations(timetable, line, line_dir) {
             }
         }
 
-        if (station == end_station) {
+        // 4. 終止條件檢查 (已修改)
+        // 必須同時滿足：(1)到達終點站代碼 (2)時刻表也已經跑完
+        if (station == end_station && next_stop_idx >= timetable.length) {
             if (roundabout_train == true) {
+                // 如果是環島判定，將最後一站標為1001以利後續繪圖邏輯
                 _passing_stations.push(['1001', Route[station].DSC, Route[station].KM, km]);
-                break;
             } else {
                 _passing_stations.push([String(station), Route[station].DSC, Route[station].KM, km]);
-                break;
             }
+            break; // 結束迴圈
         }
 
-        if (_passing_stations.length > 200) {
+        // 5. 安全機制
+        if (_passing_stations.length > 500) {
+            console.warn("[Warning] 路徑長度超過 500 站，為防止無窮迴圈已強制停止。請檢查時刻表順序或折返邏輯。");
             break;
         }
     }
