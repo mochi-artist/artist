@@ -307,10 +307,16 @@
             "TERMINAL": "Y"
         },
         {
+            "ID": "1195",
+            "DSC": "新竹貨場",
+            "SVGYAXIS": 50,
+            "TERMINAL": ""
+        },
+        {
             "ID": "1190",
             "DSC": "北新竹",
             "SVGYAXIS": 63,
-            "TERMINAL": "Y"
+            "TERMINAL": ""
         },
         {
             "ID": "1191",
