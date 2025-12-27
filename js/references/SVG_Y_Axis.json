@@ -605,121 +605,21 @@
         }
     ],
     "LINE_S": [
-        {
-            "ID": "5120",
-            "DSC": "枋寮",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "5130",
-            "DSC": "加祿",
-            "SVGYAXIS": 128,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5140",
-            "DSC": "內獅",
-            "SVGYAXIS": 200,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5160",
-            "DSC": "枋山",
-            "SVGYAXIS": 295,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5170",
-            "DSC": "枋野(號)",
-            "SVGYAXIS": 418,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5175",
-            "DSC": "中央(號)",
-            "SVGYAXIS": 481,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "菩安(號)",
-            "SVGYAXIS": 650,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5180",
-            "DSC": "古莊(號)",
-            "SVGYAXIS": 825,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5190",
-            "DSC": "大武",
-            "SVGYAXIS": 892,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "富山號誌",
-            "SVGYAXIS": 1053,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5200",
-            "DSC": "瀧溪",
-            "SVGYAXIS": 1130,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "多良",
-            "SVGYAXIS": 1240,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5210",
-            "DSC": "金崙",
-            "SVGYAXIS": 1301,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "香蘭",
-            "SVGYAXIS": 1422,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "三和",
-            "SVGYAXIS": 1674,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5220",
-            "DSC": "太麻里",
-            "SVGYAXIS": 1525,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5230",
-            "DSC": "知本",
-            "SVGYAXIS": 1764,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5240",
-            "DSC": "康樂",
-            "SVGYAXIS": 1906,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "6000",
-            "DSC": "台東",
-            "SVGYAXIS": 2000,
-            "TERMINAL": "Y"
-        }
-    ],
+    { "ID": "5120", "DSC": "枋寮", "SVGYAXIS": 0, "TERMINAL": "Y" },
+    { "ID": "5130", "DSC": "加祿", "SVGYAXIS": 115, "TERMINAL": "" },
+    { "ID": "5140", "DSC": "內獅", "SVGYAXIS": 180, "TERMINAL": "" },
+    { "ID": "5160", "DSC": "枋山", "SVGYAXIS": 279, "TERMINAL": "" },
+    { "ID": "5170", "DSC": "枋野", "SVGYAXIS": 443, "TERMINAL": "" },
+    { "ID": "5175", "DSC": "中央", "SVGYAXIS": 525, "TERMINAL": "" },
+    { "ID": "5180", "DSC": "古莊", "SVGYAXIS": 820, "TERMINAL": "" },
+    { "ID": "5190", "DSC": "大武", "SVGYAXIS": 913, "TERMINAL": "" },
+    { "ID": "5200", "DSC": "瀧溪", "SVGYAXIS": 1145, "TERMINAL": "" },
+    { "ID": "5210", "DSC": "金崙", "SVGYAXIS": 1292, "TERMINAL": "" },
+    { "ID": "5220", "DSC": "太麻里", "SVGYAXIS": 1505, "TERMINAL": "" },
+    { "ID": "5230", "DSC": "知本", "SVGYAXIS": 1735, "TERMINAL": "" },
+    { "ID": "5240", "DSC": "康樂", "SVGYAXIS": 1870, "TERMINAL": "" },
+    { "ID": "6000", "DSC": "臺東", "SVGYAXIS": 2000, "TERMINAL": "Y" }
+],
     "LINE_SL": [
         {
             "ID": "4270",
