@@ -458,151 +458,31 @@
   { "ID": "7000", "DSC": "花蓮", "SVGYAXIS": 2000, "TERMINAL": "Y" }
 ],
     "LINE_WM": [
-        {
-            "ID": "1250",
-            "DSC": "竹南 ",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "3140",
-            "DSC": "造橋 ",
-            "SVGYAXIS": 124,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3150",
-            "DSC": "豐富 ",
-            "SVGYAXIS": 262,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3160",
-            "DSC": "苗栗 ",
-            "SVGYAXIS": 356,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3170",
-            "DSC": "南勢 ",
-            "SVGYAXIS": 510,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3180",
-            "DSC": "銅鑼 ",
-            "SVGYAXIS": 608,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3190",
-            "DSC": "三義 ",
-            "SVGYAXIS": 781,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3210",
-            "DSC": "泰安 ",
-            "SVGYAXIS": 1036,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3220",
-            "DSC": "后里 ",
-            "SVGYAXIS": 1097,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3230",
-            "DSC": "豐原 ",
-            "SVGYAXIS": 1256,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3240",
-            "DSC": "栗林",
-            "SVGYAXIS": 1315,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3250",
-            "DSC": "潭子 ",
-            "SVGYAXIS": 1373,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3260",
-            "DSC": "頭家厝",
-            "SVGYAXIS": 1418,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3270",
-            "DSC": "松竹",
-            "SVGYAXIS": 1457,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3280",
-            "DSC": "太原 ",
-            "SVGYAXIS": 1492,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3290",
-            "DSC": "精武",
-            "SVGYAXIS": 1539,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3300",
-            "DSC": "臺中 ",
-            "SVGYAXIS": 1588,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3310",
-            "DSC": "五權",
-            "SVGYAXIS": 1635,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3320",
-            "DSC": "大慶 ",
-            "SVGYAXIS": 1687,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3330",
-            "DSC": "烏日 ",
-            "SVGYAXIS": 1757,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3340",
-            "DSC": "新烏日 ",
-            "SVGYAXIS": 1775,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3350",
-            "DSC": "成功 ",
-            "SVGYAXIS": 1834,
-            "TERMINAL": ""
-        },
-           {
-            "ID": "3355",
-            "DSC": "大肚溪南 ",
-            "SVGYAXIS": 1917,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3360",
-            "DSC": "彰化 ",
-            "SVGYAXIS": 2000,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "1250", "DSC": "竹南", "SVGYAXIS": 0, "TERMINAL": "Y" },
+  { "ID": "3140", "DSC": "造橋", "SVGYAXIS": 124, "TERMINAL": "" },
+  { "ID": "3150", "DSC": "豐富", "SVGYAXIS": 262, "TERMINAL": "" },
+  { "ID": "3160", "DSC": "苗栗", "SVGYAXIS": 356, "TERMINAL": "" },
+  { "ID": "3170", "DSC": "南勢", "SVGYAXIS": 523, "TERMINAL": "" },
+  { "ID": "3180", "DSC": "銅鑼", "SVGYAXIS": 613, "TERMINAL": "" },
+  { "ID": "3190", "DSC": "三義", "SVGYAXIS": 781, "TERMINAL": "" },
+  { "ID": "3210", "DSC": "泰安", "SVGYAXIS": 1036, "TERMINAL": "" },
+  { "ID": "3220", "DSC": "后里", "SVGYAXIS": 1087, "TERMINAL": "" },
+  { "ID": "3230", "DSC": "豐原", "SVGYAXIS": 1256, "TERMINAL": "" },
+  { "ID": "3240", "DSC": "栗林", "SVGYAXIS": 1325, "TERMINAL": "" },
+  { "ID": "3250", "DSC": "潭子", "SVGYAXIS": 1370, "TERMINAL": "" },
+  { "ID": "3260", "DSC": "頭家厝", "SVGYAXIS": 1415, "TERMINAL": "" },
+  { "ID": "3270", "DSC": "松竹", "SVGYAXIS": 1459, "TERMINAL": "" },
+  { "ID": "3280", "DSC": "太原", "SVGYAXIS": 1499, "TERMINAL": "" },
+  { "ID": "3290", "DSC": "精武", "SVGYAXIS": 1541, "TERMINAL": "" },
+  { "ID": "3300", "DSC": "臺中", "SVGYAXIS": 1600, "TERMINAL": "" },
+  { "ID": "3310", "DSC": "五權", "SVGYAXIS": 1663, "TERMINAL": "" },
+  { "ID": "3320", "DSC": "大慶", "SVGYAXIS": 1695, "TERMINAL": "" },
+  { "ID": "3330", "DSC": "烏日", "SVGYAXIS": 1749, "TERMINAL": "" },
+  { "ID": "3340", "DSC": "新烏日", "SVGYAXIS": 1769, "TERMINAL": "" },
+  { "ID": "3350", "DSC": "成功", "SVGYAXIS": 1818, "TERMINAL": "" },
+  { "ID": "3355", "DSC": "大肚溪南", "SVGYAXIS": 1903, "TERMINAL": "" },
+  { "ID": "3360", "DSC": "彰化", "SVGYAXIS": 2000, "TERMINAL": "Y" }
+],
     "LINE_WN": [
   { "ID": "0900", "DSC": "基隆", "SVGYAXIS": 0, "TERMINAL": "Y" },
   { "ID": "0910", "DSC": "三坑", "SVGYAXIS": 57, "TERMINAL": "" },
