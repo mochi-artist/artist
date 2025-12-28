@@ -604,247 +604,47 @@
         }
     ],
     "LINE_WN": [
-        {
-            "ID": "0900",
-            "DSC": "基隆",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "0910",
-            "DSC": "三坑",
-            "SVGYAXIS": 52,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0920",
-            "DSC": "八堵",
-            "SVGYAXIS": 89,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "0930",
-            "DSC": "七堵",
-            "SVGYAXIS": 144,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0940",
-            "DSC": "百福",
-            "SVGYAXIS": 208,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0945",
-            "DSC": "五堵貨",
-            "SVGYAXIS": 250,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0950",
-            "DSC": "五堵",
-            "SVGYAXIS": 280,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0960",
-            "DSC": "汐止",
-            "SVGYAXIS": 313,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0970",
-            "DSC": "汐科",
-            "SVGYAXIS": 349,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0980",
-            "DSC": "南港",
-            "SVGYAXIS": 457,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0990",
-            "DSC": "松山",
-            "SVGYAXIS": 524,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1000",
-            "DSC": "臺北",
-            "SVGYAXIS": 677,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1010",
-            "DSC": "萬華",
-            "SVGYAXIS": 744,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1020",
-            "DSC": "板橋",
-            "SVGYAXIS": 849,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1030",
-            "DSC": "浮洲",
-            "SVGYAXIS": 909,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1040",
-            "DSC": "樹林",
-            "SVGYAXIS": 978,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1045",
-            "DSC": "樹調",
-            "SVGYAXIS": 1002,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1050",
-            "DSC": "南樹林",
-            "SVGYAXIS": 1026,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1060",
-            "DSC": "山佳",
-            "SVGYAXIS": 1072,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1070",
-            "DSC": "鶯歌",
-            "SVGYAXIS": 1177,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1075",
-            "DSC": "鳳鳴",
-            "SVGYAXIS": 1297,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1080",
-            "DSC": "桃園",
-            "SVGYAXIS": 1373,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1090",
-            "DSC": "內壢",
-            "SVGYAXIS": 1514,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1100",
-            "DSC": "中壢",
-            "SVGYAXIS": 1610,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1110",
-            "DSC": "埔心",
-            "SVGYAXIS": 1749,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1120",
-            "DSC": "楊梅",
-            "SVGYAXIS": 1844,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1130",
-            "DSC": "富岡",
-            "SVGYAXIS": 2007,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1140",
-            "DSC": "新富",
-            "SVGYAXIS": 2045,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1145",
-            "DSC": "富岡基地",
-            "SVGYAXIS": 2065,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1150",
-            "DSC": "北湖",
-            "SVGYAXIS": 2084,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1160",
-            "DSC": "湖口",
-            "SVGYAXIS": 2144,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1170",
-            "DSC": "新豐",
-            "SVGYAXIS": 2292,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1180",
-            "DSC": "竹北",
-            "SVGYAXIS": 2407,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1190",
-            "DSC": "北新竹",
-            "SVGYAXIS": 2512,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1195",
-            "DSC": "新竹貨場",
-            "SVGYAXIS": 2522,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1210",
-            "DSC": "新竹",
-            "SVGYAXIS": 2545,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1220",
-            "DSC": "三姓橋",
-            "SVGYAXIS": 2660,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1230",
-            "DSC": "香山",
-            "SVGYAXIS": 2737,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1240",
-            "DSC": "崎頂",
-            "SVGYAXIS": 2890,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "1250",
-            "DSC": "竹南",
-            "SVGYAXIS": 3000,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "0900", "DSC": "基隆", "SVGYAXIS": 0, "TERMINAL": "Y" },
+  { "ID": "0910", "DSC": "三坑", "SVGYAXIS": 57, "TERMINAL": "" },
+  { "ID": "0920", "DSC": "八堵", "SVGYAXIS": 94, "TERMINAL": "" },
+  { "ID": "0930", "DSC": "七堵", "SVGYAXIS": 151, "TERMINAL": "" },
+  { "ID": "0940", "DSC": "百福", "SVGYAXIS": 224, "TERMINAL": "" },
+  { "ID": "0945", "DSC": "五堵貨", "SVGYAXIS": 264, "TERMINAL": "" },
+  { "ID": "0950", "DSC": "五堵", "SVGYAXIS": 284, "TERMINAL": "" },
+  { "ID": "0960", "DSC": "汐止", "SVGYAXIS": 316, "TERMINAL": "" },
+  { "ID": "0970", "DSC": "汐科", "SVGYAXIS": 349, "TERMINAL": "" },
+  { "ID": "0980", "DSC": "南港", "SVGYAXIS": 452, "TERMINAL": "" },
+  { "ID": "0990", "DSC": "松山", "SVGYAXIS": 524, "TERMINAL": "" },
+  { "ID": "1000", "DSC": "臺北", "SVGYAXIS": 677, "TERMINAL": "" },
+  { "ID": "1010", "DSC": "萬華", "SVGYAXIS": 760, "TERMINAL": "" },
+  { "ID": "1020", "DSC": "板橋", "SVGYAXIS": 849, "TERMINAL": "" },
+  { "ID": "1030", "DSC": "浮洲", "SVGYAXIS": 910, "TERMINAL": "" },
+  { "ID": "1040", "DSC": "樹林", "SVGYAXIS": 975, "TERMINAL": "" },
+  { "ID": "1045", "DSC": "樹調", "SVGYAXIS": 999, "TERMINAL": "" },
+  { "ID": "1050", "DSC": "南樹林", "SVGYAXIS": 1023, "TERMINAL": "" },
+  { "ID": "1060", "DSC": "山佳", "SVGYAXIS": 1065, "TERMINAL": "" },
+  { "ID": "1070", "DSC": "鶯歌", "SVGYAXIS": 1164, "TERMINAL": "" },
+  { "ID": "1075", "DSC": "鳳鳴", "SVGYAXIS": 1284, "TERMINAL": "" },
+  { "ID": "1080", "DSC": "桃園", "SVGYAXIS": 1379, "TERMINAL": "" },
+  { "ID": "1090", "DSC": "內壢", "SVGYAXIS": 1518, "TERMINAL": "" },
+  { "ID": "1100", "DSC": "中壢", "SVGYAXIS": 1610, "TERMINAL": "" },
+  { "ID": "1110", "DSC": "埔心", "SVGYAXIS": 1749, "TERMINAL": "" },
+  { "ID": "1120", "DSC": "楊梅", "SVGYAXIS": 1844, "TERMINAL": "" },
+  { "ID": "1130", "DSC": "富岡", "SVGYAXIS": 2012, "TERMINAL": "" },
+  { "ID": "1140", "DSC": "新富", "SVGYAXIS": 2043, "TERMINAL": "" },
+  { "ID": "1145", "DSC": "富岡基地", "SVGYAXIS": 2063, "TERMINAL": "" },
+  { "ID": "1150", "DSC": "北湖", "SVGYAXIS": 2082, "TERMINAL": "" },
+  { "ID": "1160", "DSC": "湖口", "SVGYAXIS": 2144, "TERMINAL": "" },
+  { "ID": "1170", "DSC": "新豐", "SVGYAXIS": 2292, "TERMINAL": "" },
+  { "ID": "1180", "DSC": "竹北", "SVGYAXIS": 2412, "TERMINAL": "" },
+  { "ID": "1190", "DSC": "北新竹", "SVGYAXIS": 2508, "TERMINAL": "" },
+  { "ID": "1195", "DSC": "新竹貨場", "SVGYAXIS": 2524, "TERMINAL": "" },
+  { "ID": "1210", "DSC": "新竹", "SVGYAXIS": 2541, "TERMINAL": "" },
+  { "ID": "1220", "DSC": "三姓橋", "SVGYAXIS": 2678, "TERMINAL": "" },
+  { "ID": "1230", "DSC": "香山", "SVGYAXIS": 2749, "TERMINAL": "" },
+  { "ID": "1240", "DSC": "崎頂", "SVGYAXIS": 2885, "TERMINAL": "" },
+  { "ID": "1250", "DSC": "竹南", "SVGYAXIS": 3000, "TERMINAL": "Y" }
+],
     "LINE_WS": [
         {
             "ID": "3360",
