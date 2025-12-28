@@ -1074,127 +1074,27 @@
         }
     ],
     "LINE_WSEA": [
-        {
-            "ID": "1250",
-            "DSC": "竹南",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "2110",
-            "DSC": "談文 ",
-            "SVGYAXIS": 100,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2115",
-            "DSC": "談文南(號) ",
-            "SVGYAXIS": 174,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2120",
-            "DSC": "大山 ",
-            "SVGYAXIS": 248,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2130",
-            "DSC": "後龍 ",
-            "SVGYAXIS": 333,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2140",
-            "DSC": "龍港 ",
-            "SVGYAXIS": 412,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2150",
-            "DSC": "白沙屯 ",
-            "SVGYAXIS": 592,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2160",
-            "DSC": "新埔 ",
-            "SVGYAXIS": 661,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2170",
-            "DSC": "通霄 ",
-            "SVGYAXIS": 789,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2180",
-            "DSC": "苑裡 ",
-            "SVGYAXIS": 925,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2190",
-            "DSC": "日南 ",
-            "SVGYAXIS": 1095,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2200",
-            "DSC": "大甲 ",
-            "SVGYAXIS": 1197,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2210",
-            "DSC": "臺中港 ",
-            "SVGYAXIS": 1315,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2220",
-            "DSC": "清水 ",
-            "SVGYAXIS": 1448,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2230",
-            "DSC": "沙鹿 ",
-            "SVGYAXIS": 1519,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2240",
-            "DSC": "龍井 ",
-            "SVGYAXIS": 1621,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2250",
-            "DSC": "大肚 ",
-            "SVGYAXIS": 1732,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "2260",
-            "DSC": "追分 ",
-            "SVGYAXIS": 1843,
-            "TERMINAL": ""
-        },
-            {
-            "ID": "3355",
-            "DSC": "大肚溪南(號) ",
-            "SVGYAXIS": 1917,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3360",
-            "DSC": "彰化 ",
-            "SVGYAXIS": 2000,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "1250", "DSC": "竹南", "SVGYAXIS": 0, "TERMINAL": "Y" },
+  { "ID": "2110", "DSC": "談文", "SVGYAXIS": 100, "TERMINAL": "" },
+  { "ID": "2115", "DSC": "談文南(號)", "SVGYAXIS": 142, "TERMINAL": "" },
+  { "ID": "2120", "DSC": "大山", "SVGYAXIS": 248, "TERMINAL": "" },
+  { "ID": "2130", "DSC": "後龍", "SVGYAXIS": 333, "TERMINAL": "" },
+  { "ID": "2140", "DSC": "龍港", "SVGYAXIS": 430, "TERMINAL": "" },
+  { "ID": "2150", "DSC": "白沙屯", "SVGYAXIS": 590, "TERMINAL": "" },
+  { "ID": "2160", "DSC": "新埔", "SVGYAXIS": 663, "TERMINAL": "" },
+  { "ID": "2170", "DSC": "通霄", "SVGYAXIS": 784, "TERMINAL": "" },
+  { "ID": "2180", "DSC": "苑裡", "SVGYAXIS": 925, "TERMINAL": "" },
+  { "ID": "2190", "DSC": "日南", "SVGYAXIS": 1090, "TERMINAL": "" },
+  { "ID": "2200", "DSC": "大甲", "SVGYAXIS": 1197, "TERMINAL": "" },
+  { "ID": "2210", "DSC": "臺中港", "SVGYAXIS": 1315, "TERMINAL": "" },
+  { "ID": "2220", "DSC": "清水", "SVGYAXIS": 1448, "TERMINAL": "" },
+  { "ID": "2230", "DSC": "沙鹿", "SVGYAXIS": 1519, "TERMINAL": "" },
+  { "ID": "2240", "DSC": "龍井", "SVGYAXIS": 1621, "TERMINAL": "" },
+  { "ID": "2250", "DSC": "大肚", "SVGYAXIS": 1713, "TERMINAL": "" },
+  { "ID": "2260", "DSC": "追分", "SVGYAXIS": 1820, "TERMINAL": "" },
+  { "ID": "3355", "DSC": "大肚溪南(號)", "SVGYAXIS": 1910, "TERMINAL": "" },
+  { "ID": "3360", "DSC": "彰化", "SVGYAXIS": 2000, "TERMINAL": "Y" }
+],
     "LINE_LJ": [
         {
             "ID": "1210",
