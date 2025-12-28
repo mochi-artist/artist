@@ -208,97 +208,20 @@
         }
     ],
     "LINE_N": [
-        {
-            "ID": "7000",
-            "DSC": "花蓮",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "7010",
-            "DSC": "北埔",
-            "SVGYAXIS": 85,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7020",
-            "DSC": "景美",
-            "SVGYAXIS": 208,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7030",
-            "DSC": "新城",
-            "SVGYAXIS": 309,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7040",
-            "DSC": "崇德",
-            "SVGYAXIS": 409,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7050",
-            "DSC": "和仁",
-            "SVGYAXIS": 600,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7060",
-            "DSC": "和平",
-            "SVGYAXIS": 746,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7070",
-            "DSC": "漢本",
-            "SVGYAXIS": 826,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "觀音號誌",
-            "SVGYAXIS": 936,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7080",
-            "DSC": "武塔",
-            "SVGYAXIS": 1070,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7090",
-            "DSC": "南澳",
-            "SVGYAXIS": 1140,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7100",
-            "DSC": "東澳",
-            "SVGYAXIS": 1292,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7110",
-            "DSC": "永樂",
-            "SVGYAXIS": 1402,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "永春",
-            "SVGYAXIS": 1426,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7130",
-            "DSC": "蘇澳新",
-            "SVGYAXIS": 1500,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "7000", "DSC": "花蓮", "SVGYAXIS": 0.0, "TERMINAL": "Y" },
+  { "ID": "7010", "DSC": "北埔", "SVGYAXIS": 122.45, "TERMINAL": "" },
+  { "ID": "7020", "DSC": "景美", "SVGYAXIS": 216.29, "TERMINAL": "" },
+  { "ID": "7030", "DSC": "新城", "SVGYAXIS": 306.12, "TERMINAL": "" },
+  { "ID": "7040", "DSC": "崇德", "SVGYAXIS": 397.96, "TERMINAL": "" },
+  { "ID": "7050", "DSC": "和仁", "SVGYAXIS": 734.69, "TERMINAL": "" },
+  { "ID": "7060", "DSC": "和平", "SVGYAXIS": 857.14, "TERMINAL": "" },
+  { "ID": "7070", "DSC": "漢本", "SVGYAXIS": 918.37, "TERMINAL": "" },
+  { "ID": "7080", "DSC": "武塔", "SVGYAXIS": 1117.35, "TERMINAL": "" },
+  { "ID": "7090", "DSC": "南澳", "SVGYAXIS": 1190.88, "TERMINAL": "" },
+  { "ID": "7100", "DSC": "東澳", "SVGYAXIS": 1316.33, "TERMINAL": "" },
+  { "ID": "7110", "DSC": "永樂", "SVGYAXIS": 1408.16, "TERMINAL": "" },
+  { "ID": "7130", "DSC": "蘇澳新", "SVGYAXIS": 1500.0, "TERMINAL": "Y" }
+],
     "LINE_NW": [
         {
             "ID": "1210",
