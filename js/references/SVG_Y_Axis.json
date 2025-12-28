@@ -1,168 +1,33 @@
 {
     "LINE_I": [
-        {
-            "ID": "7120",
-            "DSC": "蘇澳",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "7130",
-            "DSC": "蘇澳新",
-            "SVGYAXIS": 73,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "7140",
-            "DSC": "新馬",
-            "SVGYAXIS": 92,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7150",
-            "DSC": "冬山",
-            "SVGYAXIS": 182,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7160",
-            "DSC": "羅東",
-            "SVGYAXIS": 288,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7170",
-            "DSC": "中里",
-            "SVGYAXIS": 327,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7180",
-            "DSC": "二結",
-            "SVGYAXIS": 353,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7190",
-            "DSC": "宜蘭",
-            "SVGYAXIS": 476,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7200",
-            "DSC": "四城",
-            "SVGYAXIS": 556,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7210",
-            "DSC": "礁溪",
-            "SVGYAXIS": 656,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7220",
-            "DSC": "頂埔",
-            "SVGYAXIS": 744,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7230",
-            "DSC": "頭城",
-            "SVGYAXIS": 791,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7240",
-            "DSC": "外澳",
-            "SVGYAXIS": 868,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7250",
-            "DSC": "龜山",
-            "SVGYAXIS": 944,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7260",
-            "DSC": "大溪",
-            "SVGYAXIS": 1043,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7270",
-            "DSC": "大里",
-            "SVGYAXIS": 1143,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7280",
-            "DSC": "石城",
-            "SVGYAXIS": 1201,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7290",
-            "DSC": "福隆",
-            "SVGYAXIS": 1316,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7300",
-            "DSC": "貢寮",
-            "SVGYAXIS": 1395,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7310",
-            "DSC": "雙溪",
-            "SVGYAXIS": 1511,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7320",
-            "DSC": "牡丹",
-            "SVGYAXIS": 1581,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7330",
-            "DSC": "三貂嶺",
-            "SVGYAXIS": 1658,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7350",
-            "DSC": "猴硐",
-            "SVGYAXIS": 1712,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7360",
-            "DSC": "瑞芳",
-            "SVGYAXIS": 1810,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7380",
-            "DSC": "四腳亭",
-            "SVGYAXIS": 1917,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "7390",
-            "DSC": "暖暖",
-            "SVGYAXIS": 1966,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "0920",
-            "DSC": "八堵",
-            "SVGYAXIS": 2000,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "7120", "DSC": "蘇澳", "SVGYAXIS": 0.0, "TERMINAL": "Y" },
+  { "ID": "7130", "DSC": "蘇澳新", "SVGYAXIS": 119.4, "TERMINAL": "" },
+  { "ID": "7140", "DSC": "新馬", "SVGYAXIS": 149.25, "TERMINAL": "" },
+  { "ID": "7150", "DSC": "冬山", "SVGYAXIS": 223.88, "TERMINAL": "" },
+  { "ID": "7160", "DSC": "羅東", "SVGYAXIS": 313.43, "TERMINAL": "" },
+  { "ID": "7170", "DSC": "中里", "SVGYAXIS": 345.28, "TERMINAL": "" },
+  { "ID": "7180", "DSC": "二結", "SVGYAXIS": 373.13, "TERMINAL": "" },
+  { "ID": "7190", "DSC": "宜蘭", "SVGYAXIS": 462.69, "TERMINAL": "" },
+  { "ID": "7200", "DSC": "四城", "SVGYAXIS": 537.31, "TERMINAL": "" },
+  { "ID": "7210", "DSC": "礁溪", "SVGYAXIS": 626.87, "TERMINAL": "" },
+  { "ID": "7220", "DSC": "頂埔", "SVGYAXIS": 701.49, "TERMINAL": "" },
+  { "ID": "7230", "DSC": "頭城", "SVGYAXIS": 746.27, "TERMINAL": "" },
+  { "ID": "7240", "DSC": "外澳", "SVGYAXIS": 805.97, "TERMINAL": "" },
+  { "ID": "7250", "DSC": "龜山", "SVGYAXIS": 880.6, "TERMINAL": "" },
+  { "ID": "7260", "DSC": "大溪", "SVGYAXIS": 970.15, "TERMINAL": "" },
+  { "ID": "7270", "DSC": "大里", "SVGYAXIS": 1059.7, "TERMINAL": "" },
+  { "ID": "7280", "DSC": "石城", "SVGYAXIS": 1119.4, "TERMINAL": "" },
+  { "ID": "7290", "DSC": "福隆", "SVGYAXIS": 1223.88, "TERMINAL": "" },
+  { "ID": "7300", "DSC": "貢寮", "SVGYAXIS": 1298.51, "TERMINAL": "" },
+  { "ID": "7310", "DSC": "雙溪", "SVGYAXIS": 1402.99, "TERMINAL": "" },
+  { "ID": "7320", "DSC": "牡丹", "SVGYAXIS": 1492.54, "TERMINAL": "" },
+  { "ID": "7330", "DSC": "三貂嶺", "SVGYAXIS": 1582.09, "TERMINAL": "" },
+  { "ID": "7350", "DSC": "猴硐", "SVGYAXIS": 1656.72, "TERMINAL": "" },
+  { "ID": "7360", "DSC": "瑞芳", "SVGYAXIS": 1776.12, "TERMINAL": "" },
+  { "ID": "7380", "DSC": "四腳亭", "SVGYAXIS": 1895.52, "TERMINAL": "" },
+  { "ID": "7390", "DSC": "暖暖", "SVGYAXIS": 1955.22, "TERMINAL": "" },
+  { "ID": "0920", "DSC": "八堵", "SVGYAXIS": 2000.0, "TERMINAL": "Y" }
+],
     "LINE_J": [
         {
             "ID": "3430",
