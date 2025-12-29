@@ -362,11 +362,5 @@ function linearInterpolation(array) {
             const indexDiff = nextIndex - prevIndex;
             const valueDiff = nextValue - prevValue;
 
-            // 線性插補
-            const interpolatedValue = prevValue + (valueDiff / indexDiff) * (i - prevIndex);
-            array[i] = interpolatedValue;
-        }
-    }
-
     return array;
 }
