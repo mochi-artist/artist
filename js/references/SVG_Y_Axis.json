@@ -526,433 +526,77 @@
   { "ID": "1250", "DSC": "竹南", "SVGYAXIS": 3000, "TERMINAL": "Y" }
 ],
     "LINE_WS": [
-        {
-            "ID": "3360",
-            "DSC": "彰化",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "3370",
-            "DSC": "花壇",
-            "SVGYAXIS": 140,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3380",
-            "DSC": "大村",
-            "SVGYAXIS": 237,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3390",
-            "DSC": "員林",
-            "SVGYAXIS": 311,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3400",
-            "DSC": "永靖",
-            "SVGYAXIS": 385,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3410",
-            "DSC": "社頭",
-            "SVGYAXIS": 464,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3420",
-            "DSC": "田中",
-            "SVGYAXIS": 555,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3430",
-            "DSC": "二水",
-            "SVGYAXIS": 678,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3450",
-            "DSC": "林內",
-            "SVGYAXIS": 849,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3460",
-            "DSC": "石榴",
-            "SVGYAXIS": 951,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3470",
-            "DSC": "斗六",
-            "SVGYAXIS": 1052,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3480",
-            "DSC": "斗南",
-            "SVGYAXIS": 1213,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "3490",
-            "DSC": "石龜",
-            "SVGYAXIS": 1296,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4050",
-            "DSC": "大林",
-            "SVGYAXIS": 1393,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4060",
-            "DSC": "民雄",
-            "SVGYAXIS": 1516,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4070",
-            "DSC": "嘉北",
-            "SVGYAXIS": 1658,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4080",
-            "DSC": "嘉義",
-            "SVGYAXIS": 1713,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "北回歸線",
-            "SVGYAXIS": 1808,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4090",
-            "DSC": "水上",
-            "SVGYAXIS": 1853,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4100",
-            "DSC": "南靖",
-            "SVGYAXIS": 1908,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4110",
-            "DSC": "後壁",
-            "SVGYAXIS": 2035,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4120",
-            "DSC": "新營",
-            "SVGYAXIS": 2198,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4130",
-            "DSC": "柳營",
-            "SVGYAXIS": 2268,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4140",
-            "DSC": "林鳳營",
-            "SVGYAXIS": 2350,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4150",
-            "DSC": "隆田",
-            "SVGYAXIS": 2467,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4160",
-            "DSC": "拔林",
-            "SVGYAXIS": 2513,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4170",
-            "DSC": "善化",
-            "SVGYAXIS": 2611,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4180",
-            "DSC": "南科",
-            "SVGYAXIS": 2672,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4190",
-            "DSC": "新市",
-            "SVGYAXIS": 2772,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4200",
-            "DSC": "永康",
-            "SVGYAXIS": 2878,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4210",
-            "DSC": "大橋",
-            "SVGYAXIS": 2956,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4220",
-            "DSC": "台南",
-            "SVGYAXIS": 3013,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "南臺南",
-            "SVGYAXIS": 3094,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4250",
-            "DSC": "保安",
-            "SVGYAXIS": 3174,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4260",
-            "DSC": "仁德",
-            "SVGYAXIS": 3204,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4270",
-            "DSC": "中洲",
-            "SVGYAXIS": 3259,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4290",
-            "DSC": "大湖",
-            "SVGYAXIS": 3320,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4300",
-            "DSC": "路竹",
-            "SVGYAXIS": 3382,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4310",
-            "DSC": "岡山",
-            "SVGYAXIS": 3547,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4320",
-            "DSC": "橋頭",
-            "SVGYAXIS": 3623,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4330",
-            "DSC": "楠梓",
-            "SVGYAXIS": 3712,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4340",
-            "DSC": "新左營",
-            "SVGYAXIS": 3820,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4350",
-            "DSC": "左營",
-            "SVGYAXIS": 3860,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4360",
-            "DSC": "內惟",
-            "SVGYAXIS": 3894,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4370",
-            "DSC": "美術館",
-            "SVGYAXIS": 3920,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4380",
-            "DSC": "鼓山",
-            "SVGYAXIS": 3958,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4390",
-            "DSC": "三塊厝",
-            "SVGYAXIS": 3989,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4400",
-            "DSC": "高雄",
-            "SVGYAXIS": 4000,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4410",
-            "DSC": "民族",
-            "SVGYAXIS": 4034,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4420",
-            "DSC": "科工館",
-            "SVGYAXIS": 4059,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4430",
-            "DSC": "正義",
-            "SVGYAXIS": 4103,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4440",
-            "DSC": "鳳山",
-            "SVGYAXIS": 4142,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4450",
-            "DSC": "後庄",
-            "SVGYAXIS": 4232,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4460",
-            "DSC": "九曲堂",
-            "SVGYAXIS": 4338,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4470",
-            "DSC": "六塊厝",
-            "SVGYAXIS": 4460,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5000",
-            "DSC": "屏東 ",
-            "SVGYAXIS": 4514,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5010",
-            "DSC": "歸來 ",
-            "SVGYAXIS": 4577,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5020",
-            "DSC": "麟洛 ",
-            "SVGYAXIS": 4634,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5030",
-            "DSC": "西勢 ",
-            "SVGYAXIS": 4692,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5040",
-            "DSC": "竹田 ",
-            "SVGYAXIS": 4783,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5050",
-            "DSC": "潮州 ",
-            "SVGYAXIS": 4883,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5998",
-            "DSC": "潮州機廠(南方小站)",
-            "SVGYAXIS": 4923,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5999",
-            "DSC": "潮州基地(陽光小站)",
-            "SVGYAXIS": 4962,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5060",
-            "DSC": "崁頂 ",
-            "SVGYAXIS": 5001,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5070",
-            "DSC": "南州 ",
-            "SVGYAXIS": 5060,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5080",
-            "DSC": "鎮安 ",
-            "SVGYAXIS": 5148,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5090",
-            "DSC": "林邊 ",
-            "SVGYAXIS": 5226,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5100",
-            "DSC": "佳冬 ",
-            "SVGYAXIS": 5324,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5110",
-            "DSC": "東海 ",
-            "SVGYAXIS": 5400,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "NA",
-            "DSC": "建興",
-            "SVGYAXIS": 5444,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "5120",
-            "DSC": "枋寮 ",
-            "SVGYAXIS": 5500,
-            "TERMINAL": "Y"
-        }
-    ],
+  { "ID": "3360", "DSC": "彰化", "SVGYAXIS": 0, "TERMINAL": "Y" },
+  { "ID": "3370", "DSC": "花壇", "SVGYAXIS": 160, "TERMINAL": "" },
+  { "ID": "3380", "DSC": "大村", "SVGYAXIS": 247, "TERMINAL": "" },
+  { "ID": "3390", "DSC": "員林", "SVGYAXIS": 312, "TERMINAL": "" },
+  { "ID": "3400", "DSC": "永靖", "SVGYAXIS": 385, "TERMINAL": "" },
+  { "ID": "3410", "DSC": "社頭", "SVGYAXIS": 464, "TERMINAL": "" },
+  { "ID": "3420", "DSC": "田中", "SVGYAXIS": 555, "TERMINAL": "" },
+  { "ID": "3430", "DSC": "二水", "SVGYAXIS": 678, "TERMINAL": "" },
+  { "ID": "3450", "DSC": "林內", "SVGYAXIS": 849, "TERMINAL": "" },
+  { "ID": "3460", "DSC": "石榴", "SVGYAXIS": 951, "TERMINAL": "" },
+  { "ID": "3470", "DSC": "斗六", "SVGYAXIS": 1052, "TERMINAL": "" },
+  { "ID": "3480", "DSC": "斗南", "SVGYAXIS": 1213, "TERMINAL": "" },
+  { "ID": "3490", "DSC": "石龜", "SVGYAXIS": 1296, "TERMINAL": "" },
+  { "ID": "4050", "DSC": "大林", "SVGYAXIS": 1393, "TERMINAL": "" },
+  { "ID": "4060", "DSC": "民雄", "SVGYAXIS": 1516, "TERMINAL": "" },
+  { "ID": "4070", "DSC": "嘉北", "SVGYAXIS": 1658, "TERMINAL": "" },
+  { "ID": "4080", "DSC": "嘉義", "SVGYAXIS": 1733, "TERMINAL": "" },
+  { "ID": "NA", "DSC": "北回歸線", "SVGYAXIS": 1808, "TERMINAL": "" },
+  { "ID": "4090", "DSC": "水上", "SVGYAXIS": 1873, "TERMINAL": "" },
+  { "ID": "4100", "DSC": "南靖", "SVGYAXIS": 1928, "TERMINAL": "" },
+  { "ID": "4110", "DSC": "後壁", "SVGYAXIS": 2045, "TERMINAL": "" },
+  { "ID": "4120", "DSC": "新營", "SVGYAXIS": 2208, "TERMINAL": "" },
+  { "ID": "4130", "DSC": "柳營", "SVGYAXIS": 2283, "TERMINAL": "" },
+  { "ID": "4140", "DSC": "林鳳營", "SVGYAXIS": 2360, "TERMINAL": "" },
+  { "ID": "4150", "DSC": "隆田", "SVGYAXIS": 2477, "TERMINAL": "" },
+  { "ID": "4160", "DSC": "拔林", "SVGYAXIS": 2520, "TERMINAL": "" },
+  { "ID": "4170", "DSC": "善化", "SVGYAXIS": 2611, "TERMINAL": "" },
+  { "ID": "4180", "DSC": "南科", "SVGYAXIS": 2672, "TERMINAL": "" },
+  { "ID": "4190", "DSC": "新市", "SVGYAXIS": 2772, "TERMINAL": "" },
+  { "ID": "4200", "DSC": "永康", "SVGYAXIS": 2878, "TERMINAL": "" },
+  { "ID": "4210", "DSC": "大橋", "SVGYAXIS": 2956, "TERMINAL": "" },
+  { "ID": "4220", "DSC": "台南", "SVGYAXIS": 3013, "TERMINAL": "" },
+  { "ID": "NA", "DSC": "南臺南", "SVGYAXIS": 3094, "TERMINAL": "" },
+  { "ID": "4250", "DSC": "保安", "SVGYAXIS": 3184, "TERMINAL": "" },
+  { "ID": "4260", "DSC": "仁德", "SVGYAXIS": 3216, "TERMINAL": "" },
+  { "ID": "4270", "DSC": "中洲", "SVGYAXIS": 3264, "TERMINAL": "" },
+  { "ID": "4290", "DSC": "大湖", "SVGYAXIS": 3320, "TERMINAL": "" },
+  { "ID": "4300", "DSC": "路竹", "SVGYAXIS": 3370, "TERMINAL": "" },
+  { "ID": "4310", "DSC": "岡山", "SVGYAXIS": 3490, "TERMINAL": "" },
+  { "ID": "4320", "DSC": "橋頭", "SVGYAXIS": 3556, "TERMINAL": "" },
+  { "ID": "4330", "DSC": "楠梓", "SVGYAXIS": 3620, "TERMINAL": "" },
+  { "ID": "4340", "DSC": "新左營", "SVGYAXIS": 3715, "TERMINAL": "" },
+  { "ID": "4350", "DSC": "左營", "SVGYAXIS": 3750.75, "TERMINAL": "" },
+  { "ID": "4360", "DSC": "內惟", "SVGYAXIS": 3775.75, "TERMINAL": "" },
+  { "ID": "4370", "DSC": "美術館", "SVGYAXIS": 3800.75, "TERMINAL": "" },
+  { "ID": "4380", "DSC": "鼓山", "SVGYAXIS": 3829.5, "TERMINAL": "" },
+  { "ID": "4390", "DSC": "三塊厝", "SVGYAXIS": 3868.25, "TERMINAL": "" },
+  { "ID": "4400", "DSC": "高雄", "SVGYAXIS": 3907, "TERMINAL": "" },
+  { "ID": "4410", "DSC": "民族", "SVGYAXIS": 3955.75, "TERMINAL": "" },
+  { "ID": "4420", "DSC": "科工館", "SVGYAXIS": 3980.75, "TERMINAL": "" },
+  { "ID": "4430", "DSC": "正義", "SVGYAXIS": 4006.25, "TERMINAL": "" },
+  { "ID": "4440", "DSC": "鳳山", "SVGYAXIS": 4047, "TERMINAL": "" },
+  { "ID": "4450", "DSC": "後庄", "SVGYAXIS": 4147, "TERMINAL": "" },
+  { "ID": "4460", "DSC": "九曲堂", "SVGYAXIS": 4243, "TERMINAL": "" },
+  { "ID": "4470", "DSC": "六塊厝", "SVGYAXIS": 4360, "TERMINAL": "" },
+  { "ID": "5000", "DSC": "屏東", "SVGYAXIS": 4419, "TERMINAL": "" },
+  { "ID": "5010", "DSC": "歸來", "SVGYAXIS": 4487, "TERMINAL": "" },
+  { "ID": "5020", "DSC": "麟洛", "SVGYAXIS": 4529, "TERMINAL": "" },
+  { "ID": "5030", "DSC": "西勢", "SVGYAXIS": 4592, "TERMINAL": "" },
+  { "ID": "5040", "DSC": "竹田", "SVGYAXIS": 4683, "TERMINAL": "" },
+  { "ID": "5050", "DSC": "潮州", "SVGYAXIS": 4777, "TERMINAL": "" },
+  { "ID": "5998", "DSC": "潮州機廠(南方小站)", "SVGYAXIS": 4816, "TERMINAL": "" },
+  { "ID": "5999", "DSC": "潮州基地(陽光小站)", "SVGYAXIS": 4838, "TERMINAL": "" },
+  { "ID": "5060", "DSC": "崁頂", "SVGYAXIS": 4905, "TERMINAL": "" },
+  { "ID": "5070", "DSC": "南州", "SVGYAXIS": 4963, "TERMINAL": "" },
+  { "ID": "5080", "DSC": "鎮安", "SVGYAXIS": 5041, "TERMINAL": "" },
+  { "ID": "5090", "DSC": "林邊", "SVGYAXIS": 5104, "TERMINAL": "" },
+  { "ID": "5100", "DSC": "佳冬", "SVGYAXIS": 5165, "TERMINAL": "" },
+  { "ID": "5110", "DSC": "東海", "SVGYAXIS": 5208, "TERMINAL": "" },
+  { "ID": "5120", "DSC": "枋寮", "SVGYAXIS": 5285, "TERMINAL": "Y" }
+],
     "LINE_WSEA": [
   { "ID": "1250", "DSC": "竹南", "SVGYAXIS": 0, "TERMINAL": "Y" },
   { "ID": "2110", "DSC": "談文", "SVGYAXIS": 100, "TERMINAL": "" },
