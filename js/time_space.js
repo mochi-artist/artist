@@ -239,7 +239,7 @@ function find_passing_stations(timetable, line, line_dir) {
             }
         }
 
-        if (_passing_stations.length > 200) {
+        if (_passing_stations.length > 500) {
             break;
         }
     }
