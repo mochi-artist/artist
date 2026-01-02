@@ -108,10 +108,16 @@ function find_passing_stations(timetable, line, line_dir) {
         pingxi = true;
     }
 
-    let jiji = false;
-    if (stations.includes('3432') || stations.includes('3431')) {
-        jiji = true;
-    }
+   let jiji = false;
+if (stations.includes('3432') || // 濁水
+    stations.includes('3431') || // 源泉
+    stations.includes('3433') || // 龍泉 (依你的描述補上)
+    stations.includes('3434') || // 集集 (最重要！特別列車有停這站)
+    stations.includes('3435') || // 水里 (如果有的話)
+    stations.includes('3436'))   // 車埕 (如果有的話)
+{
+    jiji = true;
+}
 
     let shalun = false;
     if (stations.includes('4272')) {
