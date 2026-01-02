@@ -99,12 +99,30 @@ function find_passing_stations(timetable, line, line_dir) {
     }
 
     let neiwan = false;
-    if (stations.includes('1194') || stations.includes('1203')) {
+    if (stations.includes('1191') || 
+    stations.includes('1192') || 
+    stations.includes('1193') || 
+    stations.includes('1194') || 
+    stations.includes('1201') || 
+    stations.includes('1202') ||
+    stations.includes('1203') ||
+    stations.includes('1204') ||
+    stations.includes('1205') ||
+    stations.includes('1206') ||
+    stations.includes('1207') ||
+    stations.includes('1208')) 
+    {
         neiwan = true;
     }
 
     let pingxi = false;
-    if (stations.includes('7332')) {
+    if (stations.includes('7331') || 
+    stations.includes('7332') ||
+    stations.includes('7333') ||
+    stations.includes('7334') ||
+    stations.includes('7335') ||
+    stations.includes('7336'))
+    {
         pingxi = true;
     }
 
@@ -120,7 +138,7 @@ if (stations.includes('3432') || // 濁水
 }
 
     let shalun = false;
-    if (stations.includes('4272')) {
+    if (stations.includes('4271') || stations.includes('4272')) {
         shalun = true;
     }
 
