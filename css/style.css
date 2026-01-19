@@ -81,7 +81,7 @@ path:focus {
 
 /* 車次線 */
 .taroko, .kuaimu {
-    stroke: #d3d3d3
+    stroke: #c4bfbb
 }
 
 .puyuma, .zhongxing, .direct {
@@ -134,6 +134,18 @@ path:focus {
 
 .others {
     stroke: grey;
+}
+
+.HAIFENG {
+    stroke: #54bcb5;
+}
+
+.SHANLAN {
+    stroke: #02ca0c;
+}
+
+.GRUND {
+    stroke: #4D3900;
 }
 
 /* 即時列車位置點 */
