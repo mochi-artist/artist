@@ -23,7 +23,8 @@ function json_to_trains_data(json_data, train_no_input, line_kind) {
 
             // 過濾：只處理目標車次
             if (trainInfo['Train'] == train_no) {
-                let train_data = calculate_space_time(trainInfo, line_kind);  // 車次資料處理，轉換成時間空間資料
+                // ★ 這裡呼叫 calculate_space_time
+                let train_data = calculate_space_time(trainInfo, line_kind);
 
                 if (train_data && Array.isArray(train_data)) {
                     all_trains_data.push(train_data);
@@ -42,26 +43,28 @@ function json_to_trains_data(json_data, train_no_input, line_kind) {
 
 // 處理車次資料
 function calculate_space_time(train, line_kind) {
-    // const after_midnight_data = [];                 // 跨午夜車次的資料
-    const train_id = train['Train'];                 // 車次代碼
-    const car_class = train['CarClass'];             // 車種代碼
-    const line = train['Line'];                      // 山線1、海線2、成追線3，東部幹線則為0
-    // const over_night_stn = train['OverNightStn'];   // 跨午夜車站
-    const line_dir = train['LineDir'];               // 順行1、逆行2
+    const train_id = train['Train'];                // 車次代碼
+    const car_class = train['CarClass'];            // 車種代碼
+    const line = train['Line'];                     // 路線代號
+    const line_dir = train['LineDir'];              // 順行1、逆行2
     const timetable = train['TimeInfos'];
 
-    let timetable_dict = {};                         // 暫存車次時刻表物件
-    let _trains_data = [];                           // 時刻表轉換後的時間空間資料，包括各個營運路線
+    let timetable_dict = {};                        // 暫存車次時刻表物件
+    let _trains_data = [];                          // 時刻表轉換後的時間空間資料
 
-    // console.log(train_id, car_class, line, line_dir); // 偵錯用，將車次的時刻表資料輸出到主控台 
-
+    // 建立時刻表字典
     for (let TimeInfos of train.TimeInfos) {
         timetable_dict[TimeInfos.Station] = [TimeInfos.ARRTime, TimeInfos.DEPTime, TimeInfos.Station, TimeInfos.Order];
     }
 
-    const passing_stations = find_passing_stations(timetable, line, line_dir);                 // 找出車次「停靠與通過」的所有車站
-    const estimate_time_space = estimate_timeSpace(timetable_dict, passing_stations);          // 整理車次通過的所有車站到站與離站時間
-    const operation_lines = time_space_to_operation_lines(estimate_time_space, line_kind);     // 將車次的通過車站、到離站時間轉入各營運路線
+    // ★ 關鍵：找出車次「停靠與通過」的所有車站
+    const passing_stations = find_passing_stations(timetable, line, line_dir);
+    
+    // 整理車次通過的所有車站到站與離站時間
+    const estimate_time_space = estimate_timeSpace(timetable_dict, passing_stations);
+    
+    // 將車次的通過車站、到離站時間轉入各營運路線
+    const operation_lines = time_space_to_operation_lines(estimate_time_space, line_kind);
 
     Object.entries(operation_lines).forEach(([key, value]) => {
         _trains_data.push([key, train_id, car_class, line, line_dir, value]);
@@ -79,9 +82,10 @@ function find_passing_stations(timetable, line, line_dir) {
     let station = start_station;
     let km = 0.0;
 
+    // --- 特殊路線判定旗標 ---
     let cheng_zhui = false;
-
     let roundabout_train = false;
+    
     if (end_station == '1001') {
         end_station = start_station;
         roundabout_train = true;
@@ -92,63 +96,48 @@ function find_passing_stations(timetable, line, line_dir) {
         stations.push(item['Station']);
     }
 
+    // 成追線判斷
     if (line == "3") {
         cheng_zhui = true;
     } else if (stations.includes('2260') && stations.includes('3350')) {
         cheng_zhui = true;
     }
 
+    // 內灣線判斷
     let neiwan = false;
-    if (stations.includes('1191') || 
-    stations.includes('1192') || 
-    stations.includes('1193') || 
-    stations.includes('1194') || 
-    stations.includes('1201') || 
-    stations.includes('1202') ||
-    stations.includes('1203') ||
-    stations.includes('1204') ||
-    stations.includes('1205') ||
-    stations.includes('1206') ||
-    stations.includes('1207') ||
-    stations.includes('1208')) 
-    {
+    if (stations.includes('1194') || stations.includes('1203')) {
         neiwan = true;
     }
 
+    // 平溪線判斷
     let pingxi = false;
-    if (stations.includes('7331') || 
-    stations.includes('7332') ||
-    stations.includes('7333') ||
-    stations.includes('7334') ||
-    stations.includes('7335') ||
-    stations.includes('7336'))
-    {
+    if (stations.includes('7332')) {
         pingxi = true;
     }
 
-   let jiji = false;
-if (stations.includes('3432') || // 濁水
-    stations.includes('3431') || // 源泉
-    stations.includes('3433') || // 龍泉 (依你的描述補上)
-    stations.includes('3434') || // 集集 (最重要！特別列車有停這站)
-    stations.includes('3435') || // 水里 (如果有的話)
-    stations.includes('3436'))   // 車埕 (如果有的話)
-{
-    jiji = true;
-}
+    // 集集線判斷
+    let jiji = false;
+    if (stations.includes('3432') || stations.includes('3431')) {
+        jiji = true;
+    }
 
+    // 沙崙線判斷
     let shalun = false;
-    if (stations.includes('4271') || stations.includes('4272')) {
+    if (stations.includes('4272')) {
         shalun = true;
     }
 
+    // --- 開始模擬火車行走 (Route Topology) ---
     while (true) {
+        // 記錄當前車站
         _passing_stations.push([String(station), Route[station].DSC, Route[station].KM, km]);
 
+        // 【逆行處理 (LineDir = 2)】
         if (line_dir == '2') {
             if (cheng_zhui == false) {
                 let branch = Route[station].CCW_BRANCH;
                 if (branch != '') {
+                    // 處理支線分岔點邏輯
                     if (station == '7360') {
                         if (end_station == '7362') {
                             km += parseFloat(Route[station].CCW_BRANCH_KM);
@@ -174,7 +163,8 @@ if (stations.includes('3432') || // 濁水
                             station = Route[station].CCW;
                         }
                     } else {
-                        if (line == '1' || line == '0') {
+                        // ★★★ 修正點 1：加入 thsr (台灣高鐵)
+                        if (line == '1' || line == '0' || line == 'LINE_Alishan' || line == 'thsr') {
                             km += parseFloat(Route[station].CCW_KM);
                             station = Route[station].CCW;
                         } else if (line == '2') {
@@ -183,17 +173,22 @@ if (stations.includes('3432') || // 濁水
                         }
                     }
                 } else {
+                    // 無分岔，正常逆行
                     km += parseFloat(Route[station].CCW_KM);
                     station = Route[station].CCW;
                 }
             } else {
+                // 成追線逆行
                 km += parseFloat(Route[station].CHENG_ZHUI_CCW_KM);
                 station = Route[station].CHENG_ZHUI_CCW;
             }
+        
+        // 【順行處理 (LineDir = 1)】
         } else if (line_dir == '1') {
             if (cheng_zhui == false) {
                 let branch = Route[station].CW_BRANCH;
                 if (branch != '') {
+                    // 處理順行分岔邏輯
                     if (station == '0920') {
                         if (end_station != '0900') {
                             km += parseFloat(Route[station].CW_BRANCH_KM);
@@ -211,16 +206,12 @@ if (stations.includes('3432') || // 濁水
                             station = '7110';
                         }
                     } else if (station == '1190' || station == '1193') {
-                        if (neiwan == true) {
+                         if (neiwan == true) {
                             km += parseFloat(Route[station].CW_BRANCH_KM);
-                            if (station == '1190') {
-                                station = '1191';
-                            } else if (station == '1193') {
-                                if (end_station == '1208' || end_station == '1203') {
-                                    station = '1201';
-                                } else if (end_station == '1194') {
-                                    station = '1194';
-                                }
+                            if (station == '1190') station = '1191';
+                            else if (station == '1193') {
+                                if (end_station == '1208' || end_station == '1203') station = '1201';
+                                else if (end_station == '1194') station = '1194';
                             }
                         } else if (neiwan == false) {
                             km += parseFloat(Route[station].CW_KM);
@@ -235,7 +226,8 @@ if (stations.includes('3432') || // 濁水
                             station = '7320';
                         }
                     } else {
-                        if (line == '1' || line == '0') {
+                        // ★★★ 修正點 2：加入 thsr (台灣高鐵)
+                        if (line == '1' || line == '0' || line == 'LINE_Alishan' || line == 'thsr') {
                             km += parseFloat(Route[station].CW_KM);
                             station = Route[station].CW;
                         } else if (line == '2') {
@@ -244,15 +236,18 @@ if (stations.includes('3432') || // 濁水
                         }
                     }
                 } else {
+                    // 無分岔，正常順行
                     km += parseFloat(Route[station].CW_KM);
                     station = Route[station].CW;
                 }
             } else {
+                // 成追線順行
                 km += parseFloat(Route[station].CHENG_ZHUI_CW_KM);
                 station = Route[station].CHENG_ZHUI_CW;
             }
         }
 
+        // 終止條件：到達終點站
         if (station == end_station) {
             if (roundabout_train == true) {
                 _passing_stations.push(['1001', Route[station].DSC, Route[station].KM, km]);
@@ -263,6 +258,7 @@ if (stations.includes('3432') || // 濁水
             }
         }
 
+        // 安全機制：防止無窮迴圈
         if (_passing_stations.length > 500) {
             break;
         }
@@ -280,6 +276,7 @@ function estimate_timeSpace(timetable, passing_stations) {
     // 將起終點中間歷經的停靠與通過車站均找出
     for (const [StationId, StationName, LocationKM, KM] of passing_stations) {
         if (timetable_stations.includes(StationId)) {
+            // 注意：這裡依賴 SVG_X_Axis 來轉換時間，確保該物件存在
             let ARRTime = parseFloat(SVG_X_Axis[timetable[StationId][0]].ax1);
             let DEPTime = parseFloat(SVG_X_Axis[timetable[StationId][1]].ax1);
             let Order = parseInt(timetable[StationId][3]);
@@ -302,7 +299,7 @@ function estimate_timeSpace(timetable, passing_stations) {
         if (value[0] == "1001") {
             value[0] = "1000";
         }
-        // 跨午夜車次處理(一般車次所有的時間都是越來越大，但跨午夜車次會有一筆資料時間開始變小，這裡要找出是哪一筆資料？)
+        // 跨午夜車次處理
         if (!isNaN(value[3])) {
             if (value[3] < last_time_value) {
                 after_midnight_row_index = parseInt(key);
@@ -320,13 +317,12 @@ function estimate_timeSpace(timetable, passing_stations) {
         })
     }
 
-    // 將所有停靠與通過車站的時間都存到暫存陣列
+    // 插補運算
     let interpolate = []
     Object.entries(_estimate_time_space).forEach(([key, value]) => {
         interpolate.push(value[3]);
     })
 
-    // 計算沒有時間的通過車站插補資料，計算插補資料的原因主要是為了各路線端點車站可能列車會直接通過，譬如北迴線有的列車會直接通過蘇澳新，必須要計算出大致的通過時間
     const interpolatedArray = linearInterpolation(interpolate);
     Object.entries(_estimate_time_space).forEach(([key, value]) => {
         value[3] = interpolatedArray[key];
@@ -335,7 +331,7 @@ function estimate_timeSpace(timetable, passing_stations) {
     return _estimate_time_space;
 }
 
-// 將車次通過車站時間轉入各營運路線的資料，設定通過車站的順序碼
+// 將車次通過車站時間轉入各營運路線的資料
 function time_space_to_operation_lines(estimate_time_space, line_kind) {
     let _operation_lines = {};
 
@@ -343,10 +339,9 @@ function time_space_to_operation_lines(estimate_time_space, line_kind) {
         _operation_lines[key] = [];
     }
 
-    // 迭代df_estimate_time_space的每一列
     Object.entries(estimate_time_space).forEach(([key, value]) => {
         Object.entries(LinesStations).forEach(([key1, value1]) => {
-            if (key1 == line_kind)
+            if (key1 == line_kind) // 只處理目前選擇的路線
                 if (value[0] in value1)
                     _operation_lines[key1].push([value[1], value[0], value[3], LinesStations[key1][value[0]]['SVGYAXIS'], value[4], parseInt(key)]);
         })
@@ -355,16 +350,13 @@ function time_space_to_operation_lines(estimate_time_space, line_kind) {
     return _operation_lines;
 }
 
-// 計算陣列資料插補的函式
+// 線性插補函式
 function linearInterpolation(array) {
     for (let i = 0; i < array.length; i++) {
         if (isNaN(array[i])) {
-            let prevValue;
-            let nextValue;
-            let prevIndex;
-            let nextIndex;
+            let prevValue, nextValue, prevIndex, nextIndex;
 
-            // 找到前一個非NaN元素
+            // 往前找
             for (let j = i - 1; j >= 0; j--) {
                 if (!isNaN(array[j])) {
                     prevValue = array[j];
@@ -373,7 +365,7 @@ function linearInterpolation(array) {
                 }
             }
 
-            // 找到後一個非NaN元素
+            // 往後找
             for (let j = i + 1; j < array.length; j++) {
                 if (!isNaN(array[j])) {
                     nextValue = array[j];
@@ -382,15 +374,14 @@ function linearInterpolation(array) {
                 }
             }
 
-            // 計算索引差距和數值差距
-            const indexDiff = nextIndex - prevIndex;
-            const valueDiff = nextValue - prevValue;
-
-            // 線性插補
-            const interpolatedValue = prevValue + (valueDiff / indexDiff) * (i - prevIndex);
-            array[i] = interpolatedValue;
+            // 計算插補
+            if (prevValue !== undefined && nextValue !== undefined) {
+                const indexDiff = nextIndex - prevIndex;
+                const valueDiff = nextValue - prevValue;
+                const interpolatedValue = prevValue + (valueDiff / indexDiff) * (i - prevIndex);
+                array[i] = interpolatedValue;
+            }
         }
     }
-
     return array;
 }
