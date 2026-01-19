@@ -77,6 +77,18 @@
         "PREFIX": "JIJI_",
         "MAX_X_AXIS": 1250
     },
+    "LINE_Alishan": {
+        "NAME": "阿里山線(嘉義-祝山)",
+        "FOLDER": "alishan",
+        "PREFIX": "ALISHAN_",
+        "MAX_X_AXIS": 2000
+    },
+     "thsr": {
+        "NAME": "台灣高鐵(南港-左營)",
+        "FOLDER": "thsr",
+        "PREFIX": "THSR_",
+        "MAX_X_AXIS": 2000
+    },
     "LINE_SL": {
         "NAME": "沙崙線(中洲-沙崙)",
         "FOLDER": "shalun",
