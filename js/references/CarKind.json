@@ -32,5 +32,8 @@
   "110G": "emu3000",
   "110H": "emu3000",
   "110K": "special",
-  "0000": "special"
+  "0000": "special",
+  "0001": "HAIFENG",
+  "0002": "SHANLAN",
+  "0003": "GRUND"
 }
