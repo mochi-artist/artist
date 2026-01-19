@@ -28,7 +28,9 @@ const dict_line = {
     'LINE_J': '集集線',
     'LINE_SL': '沙崙線',
     'LINE_I': '宜蘭線',
-    'LINE_N': '北迴線'
+    'LINE_N': '北迴線',
+    'LINE_Alishan': '阿里山線',
+    'thsr': '台灣高鐵'
 };
 
 // 資料檔路徑
