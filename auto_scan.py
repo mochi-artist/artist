@@ -9,16 +9,73 @@ from collections import defaultdict
 # ================= 設定區 =================
 MASTER_FILE_PATH = "final_train_diagram.json" 
 TRAIN_ID_KEY = "Train"
-START_DATE = 20260101 # 設定你要開始偵測的日期
+START_DATE = 20260101
+
+# 📂 1. 車站資料庫 (讀取 SVG_Y_Axis.json)
+STATION_DB_PATH = "js/references/SVG_Y_Axis.json" 
+
+# 📂 2. 車種代碼資料庫 (讀取 CarKind.json)
+CAR_KIND_DB_PATH = "js/references/CarKind.json"
 
 # 🛑 排除規則
 EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
+TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
-# 🎯 只鎖定 billy1125
-TARGETS = [
-    ("billy1125", "billy1125.github.io", "data")
-]
+# 🎨 3. 顏色對照表 (根據你的 style.css 轉換)
+CSS_COLOR_MAP = {
+    # .taroko, .kuaimu
+    "taroko": "太魯閣 (#20b2aa)",
+    "kuaimu": "檜木 (#20b2aa)",
+    
+    # .puyuma, .zhongxing, .direct
+    "puyuma": "普悠瑪 (red)",
+    "zhongxing": "中興號 (red)",
+    "direct": "直達車 (red)",
+    
+    # .tze_chiang, .alishan_local
+    "tze_chiang": "自強 (#ffa500)", # Orange
+    "alishan_local": "阿里山號 (#ffa500)", # Orange
+    
+    # .tze_chiang_diesel
+    "tze_chiang_diesel": "柴自強 (gold)",
+    
+    # .emu1200
+    "emu1200": "紅斑馬 (#ff008c)",
+    
+    # .emu300
+    "emu300": "EMU300 (#f44)",
+    
+    # .emu3000
+    "emu3000": "騰雲座 (#000)",
+    
+    # .chu_kuang, .chushan1, .chushan2, .skip_stop
+    "chu_kuang": "莒光 (#faab82)",
+    "chushan1": "祝山 (#faab82)",
+    "chushan2": "祝山 (#faab82)",
+    "skip_stop": "跳站 (#faab82)",
+    
+    # .local, .alishan, .all_stop
+    "local": "區間 (#00f)",
+    "alishan": "阿里山 (#00f)",
+    "all_stop": "站站停 (#00f)",
+    
+    # .local_express
+    "local_express": "區快 (#00a6ff)",
+    
+    # .fu_hsing
+    "fu_hsing": "復興 (#00bfff)",
+    
+    # .ordinary, .theme
+    "ordinary": "普快 (#006055)",
+    "theme": "主題 (#006055)",
+    
+    # .special
+    "special": "專車 (#ff1493)",
+    
+    # .others
+    "others": "其他 (grey)"
+}
 # =========================================
 
 def get_filename_date(filename):
@@ -39,10 +96,42 @@ def extract_train_list(data):
         if TRAIN_ID_KEY in data: return [data]
     return []
 
+# 📖 讀取車站 DB (SVG版)
+def load_station_db(path):
+    station_map = {}
+    if not os.path.exists(path): return station_map
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            # 針對 SVG_Y_Axis.json 格式: { "LINE_I": [{"ID":..., "DSC":...}], ... }
+            for line_key, stations in data.items():
+                if not isinstance(stations, list): continue
+                for st in stations:
+                    code = str(st.get("ID", ""))
+                    name = st.get("DSC", "")
+                    if (not code or code.lower() == "n/a" or code.startswith("8") or code.startswith("9")): continue
+                    if name: station_map[code] = name
+    except: pass
+    return station_map
+
+# 📖 讀取車種代碼 DB (CarKind.json)
+def load_carkind_db(path):
+    carkind_map = {}
+    if not os.path.exists(path): return carkind_map
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            carkind_map = json.load(f)
+            carkind_map = {str(k): v for k, v in carkind_map.items()}
+    except: pass
+    return carkind_map
+
 def main():
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 1. 讀取本地 final 檔 (比對基準)
+    # 1. 載入兩本字典
+    station_map = load_station_db(STATION_DB_PATH)
+    carkind_map = load_carkind_db(CAR_KIND_DB_PATH)
+
     master_ids = set()
     if os.path.exists(MASTER_FILE_PATH):
         try:
@@ -51,8 +140,6 @@ def main():
                 master_ids = set(str(t.get(TRAIN_ID_KEY)) for t in master_list if isinstance(t, dict))
         except: pass
 
-    # 2. 開始掃描並按日期分類
-    # 結構: { 20260201: [車次A, 車次B], 20260202: [車次C] }
     new_trains_by_date = defaultdict(list)
     total_new_count = 0
     
@@ -68,8 +155,6 @@ def main():
             fname = file['name']
             if not fname.endswith(".json"): continue
             fdate = get_filename_date(fname)
-            
-            # 只看指定日期之後的
             if fdate < START_DATE: continue
             
             raw_data = fetch_json(file['download_url'])
@@ -81,76 +166,70 @@ def main():
                 if not isinstance(train, dict): continue
                 tid = str(train.get(TRAIN_ID_KEY, ""))
                 
-                # 過濾邏輯: 沒代碼、已存在、或是排除名單 -> 跳過
                 if (not tid or 
                     tid in master_ids or 
                     any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or 
                     any(k in tid for k in EXCLUDE_KEYWORDS)): 
                     continue
                 
-                # 存入該日期的清單
                 new_trains_by_date[fdate].append(train)
                 total_new_count += 1
             
-            time.sleep(0.05) # 稍微休息避免被擋
+            time.sleep(0.05)
 
-    # 3. 輸出日記 (格式化)
     log_content = []
-    
-    # 標頭: 日期與總數
     log_content.append(f"本日讀取日期: {now_str}")
     
     if total_new_count > 0:
         log_content.append(f"發現 {total_new_count} 筆新車次！\n")
-        
-        # 依照日期排序 (從小到大)
         sorted_dates = sorted(new_trains_by_date.keys())
         
         for date_key in sorted_dates:
             trains = new_trains_by_date[date_key]
-            # 該日期有車才顯示
             if not trains: continue
             
             log_content.append(f"📅 日期: {date_key}")
-            
-            # 車次排序
             trains.sort(key=lambda x: str(x.get(TRAIN_ID_KEY, "0")))
             
             for t in trains:
                 tid = t.get(TRAIN_ID_KEY, "?")
-                typ = t.get("CarClass", t.get("Type", "")) # 抓車種
                 
-                # 抓起訖站 (優化顯示 ? -> ?)
-                start_st = "?"
-                end_st = "?"
-                if "Timetables" in t and t["Timetables"]:
-                    try:
-                        start_st = t["Timetables"][0].get("Station", "?")
-                        end_st = t["Timetables"][-1].get("Station", "?")
-                    except: pass
-                elif "StopTimes" in t and t["StopTimes"]: # 兼容另一種格式
-                     try:
-                        start_st = t["StopTimes"][0].get("StationName", "?")
-                        end_st = t["StopTimes"][-1].get("StationName", "?")
-                     except: pass
+                # ─── 顏色轉換 ───
+                car_class_code = str(t.get("CarClass", t.get("Type", "?")))
+                english_kind = carkind_map.get(car_class_code, "others")
+                color_info = CSS_COLOR_MAP.get(english_kind, f"未知 ({english_kind})")
+                
+                # ─── 路線處理 (強力抓取版) ───
+                start_st_code = "?"
+                end_st_code = "?"
+                
+                # 優先抓取 TimeInfos，並嘗試多種 Key
+                timetable = t.get("TimeInfos", t.get("Timetables", t.get("StopTimes", [])))
+                if timetable and len(timetable) > 0:
+                    # 嘗試抓取 Station 或 StationID
+                    s_first = timetable[0]
+                    s_last = timetable[-1]
+                    start_st_code = str(s_first.get("Station", s_first.get("StationID", "?")))
+                    end_st_code = str(s_last.get("Station", s_last.get("StationID", "?")))
+                
+                # 翻譯代碼 (如果翻譯不到，就會顯示原始代碼，至少不會是問號)
+                start_name = station_map.get(start_st_code, start_st_code)
+                end_name = station_map.get(end_st_code, end_st_code)
 
-                route_str = f" ({start_st} ➝ {end_st})"
+                route_str = f" ({start_name} ➝ {end_name})"
                 
-                # 組合字串:   ➜ [1404] 2 (樹林 ➝ 花蓮)
-                line = f"   ➜ [{tid}] {typ}{route_str}"
+                # ─── 最終輸出 ───
+                # 格式：[車次] 顏色 (顏色前) 代碼 (代碼後) (起點 ➝ 終點)
+                # 範例：➜ [1404] 區間 (#00f) 1131 (樹林 ➝ 花蓮)
+                line = f"   ➜ [{tid}] {color_info} {car_class_code}{route_str}"
                 log_content.append(line)
             
-            log_content.append("") # 日期之間空一行
-            
+            log_content.append("")
     else:
-        # 如果沒新車，只留一句話，保持版面乾淨
-        log_content.append("目前沒有發現新的額外車次。")
+        pass 
 
-    # 寫入檔案
     with open("scan_log.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(log_content))
-        
-    print(f"✅ 掃描完成，已寫入 scan_log.txt (發現 {total_new_count} 筆)")
 
 if __name__ == "__main__":
     main()
