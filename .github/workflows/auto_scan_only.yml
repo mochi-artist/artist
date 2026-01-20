@@ -1,0 +1,43 @@
+name: 每日台鐵偵察兵 (純紀錄)
+
+# 觸發時間：每天台灣時間中午 12:00
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch: # 讓你可以手動按按鈕測試
+
+permissions:
+  contents: write # 雖然給寫入權限，但我們只准它寫 log
+
+jobs:
+  daily-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 下載你的程式碼
+        uses: actions/checkout@v3
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安裝套件
+        run: pip install requests
+
+      - name: 執行偵查 (Scan Only)
+        # 只跑這支程式，產生 scan_log.txt
+        run: python auto_scan.py
+
+      - name: 上傳偵察日記
+        run: |
+          git config --global user.name "Scout Bot"
+          git config --global user.email "bot@github.com"
+          
+          # ⚠️ 關鍵差異在此：我們只 add 這個 txt 檔
+          # 機器人完全沒有機會碰到你的 json 檔
+          git add scan_log.txt
+          
+          # 提交變更 (如果日記沒變就不做任何事)
+          git commit -m "📝 更新偵察日記 [skip ci]" || exit 0
+          git push
