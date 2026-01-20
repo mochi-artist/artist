@@ -36,7 +36,7 @@ jobs:
           
           # ⚠️ 關鍵差異在此：我們只 add 這個 txt 檔
           # 機器人完全沒有機會碰到你的 json 檔
-          git add scan_log.txt
+          git add -f scan_log.txt
           
           # 提交變更 (如果日記沒變就不做任何事)
           git commit -m "📝 更新偵察日記 [skip ci]" || exit 0
