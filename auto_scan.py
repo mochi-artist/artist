@@ -11,10 +11,10 @@ MASTER_FILE_PATH = "final_train_diagram.json"
 TRAIN_ID_KEY = "Train"
 START_DATE = 20260101
 
-# 📂 1. 車站資料庫 (讀取 SVG_Y_Axis.json)
+# 📂 1. 車站資料庫
 STATION_DB_PATH = "js/references/SVG_Y_Axis.json" 
 
-# 📂 2. 車種代碼資料庫 (讀取 CarKind.json)
+# 📂 2. 車種代碼資料庫 (要把這行救回來！)
 CAR_KIND_DB_PATH = "js/references/CarKind.json"
 
 # 🛑 排除規則
@@ -22,59 +22,32 @@ EXCLUDE_PREFIXES = ["29", "47", "48", "49"]
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
-# 🎨 3. 顏色對照表 (根據你的 style.css 轉換)
-CSS_COLOR_MAP = {
-    # .taroko, .kuaimu
-    "taroko": "太魯閣 (#20b2aa)",
-    "kuaimu": "檜木 (#20b2aa)",
-    
-    # .puyuma, .zhongxing, .direct
-    "puyuma": "普悠瑪 (red)",
-    "zhongxing": "中興號 (red)",
-    "direct": "直達車 (red)",
-    
-    # .tze_chiang, .alishan_local
-    "tze_chiang": "自強 (#ffa500)", # Orange
-    "alishan_local": "阿里山號 (#ffa500)", # Orange
-    
-    # .tze_chiang_diesel
-    "tze_chiang_diesel": "柴自強 (gold)",
-    
-    # .emu1200
-    "emu1200": "紅斑馬 (#ff008c)",
-    
-    # .emu300
-    "emu300": "EMU300 (#f44)",
-    
-    # .emu3000
-    "emu3000": "騰雲座 (#000)",
-    
-    # .chu_kuang, .chushan1, .chushan2, .skip_stop
-    "chu_kuang": "莒光 (#faab82)",
-    "chushan1": "祝山 (#faab82)",
-    "chushan2": "祝山 (#faab82)",
-    "skip_stop": "跳站 (#faab82)",
-    
-    # .local, .alishan, .all_stop
-    "local": "區間 (#00f)",
-    "alishan": "阿里山 (#00f)",
-    "all_stop": "站站停 (#00f)",
-    
-    # .local_express
-    "local_express": "區快 (#00a6ff)",
-    
-    # .fu_hsing
-    "fu_hsing": "復興 (#00bfff)",
-    
-    # .ordinary, .theme
-    "ordinary": "普快 (#006055)",
-    "theme": "主題 (#006055)",
-    
-    # .special
-    "special": "專車 (#ff1493)",
-    
-    # .others
-    "others": "其他 (grey)"
+# 📝 3. 純中文對照表 (不含顏色代碼)
+CHINESE_NAME_MAP = {
+    "taroko": "太魯閣",
+    "kuaimu": "檜木",
+    "puyuma": "普悠瑪",
+    "zhongxing": "中興號",
+    "direct": "直達車",
+    "tze_chiang": "自強",
+    "alishan_local": "阿里山號",
+    "tze_chiang_diesel": "柴自強",
+    "emu1200": "紅斑馬",
+    "emu300": "EMU300",
+    "emu3000": "騰雲座",
+    "chu_kuang": "莒光",
+    "chushan1": "祝山",
+    "chushan2": "祝山",
+    "skip_stop": "跳站",
+    "local": "區間",
+    "alishan": "阿里山",
+    "all_stop": "站站停",
+    "local_express": "區快",
+    "fu_hsing": "復興",
+    "ordinary": "普快",
+    "theme": "主題",
+    "special": "專車",
+    "others": "其他"
 }
 # =========================================
 
@@ -96,14 +69,13 @@ def extract_train_list(data):
         if TRAIN_ID_KEY in data: return [data]
     return []
 
-# 📖 讀取車站 DB (SVG版)
+# 📖 讀取車站 DB
 def load_station_db(path):
     station_map = {}
     if not os.path.exists(path): return station_map
     try:
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            # 針對 SVG_Y_Axis.json 格式: { "LINE_I": [{"ID":..., "DSC":...}], ... }
             for line_key, stations in data.items():
                 if not isinstance(stations, list): continue
                 for st in stations:
@@ -114,7 +86,7 @@ def load_station_db(path):
     except: pass
     return station_map
 
-# 📖 讀取車種代碼 DB (CarKind.json)
+# 📖 讀取車種代碼 DB
 def load_carkind_db(path):
     carkind_map = {}
     if not os.path.exists(path): return carkind_map
@@ -128,7 +100,7 @@ def load_carkind_db(path):
 def main():
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 1. 載入兩本字典
+    # 載入兩本字典
     station_map = load_station_db(STATION_DB_PATH)
     carkind_map = load_carkind_db(CAR_KIND_DB_PATH)
 
@@ -194,34 +166,32 @@ def main():
             for t in trains:
                 tid = t.get(TRAIN_ID_KEY, "?")
                 
-                # ─── 顏色轉換 ───
+                # ─── 轉換中文車種 (重點在這裡) ───
                 car_class_code = str(t.get("CarClass", t.get("Type", "?")))
-                english_kind = carkind_map.get(car_class_code, "others")
-                color_info = CSS_COLOR_MAP.get(english_kind, f"未知 ({english_kind})")
                 
-                # ─── 路線處理 (強力抓取版) ───
+                # 1. 先查代碼對應的英文 (1131 -> local)
+                english_kind = carkind_map.get(car_class_code, "others")
+                
+                # 2. 再查英文對應的中文 (local -> 區間)
+                # 如果查不到，就預設顯示英文原名
+                chinese_name = CHINESE_NAME_MAP.get(english_kind, english_kind)
+                
+                # ─── 路線處理 ───
                 start_st_code = "?"
                 end_st_code = "?"
-                
-                # 優先抓取 TimeInfos，並嘗試多種 Key
                 timetable = t.get("TimeInfos", t.get("Timetables", t.get("StopTimes", [])))
                 if timetable and len(timetable) > 0:
-                    # 嘗試抓取 Station 或 StationID
-                    s_first = timetable[0]
-                    s_last = timetable[-1]
-                    start_st_code = str(s_first.get("Station", s_first.get("StationID", "?")))
-                    end_st_code = str(s_last.get("Station", s_last.get("StationID", "?")))
-                
-                # 翻譯代碼 (如果翻譯不到，就會顯示原始代碼，至少不會是問號)
+                    start_st_code = str(timetable[0].get("Station", "?"))
+                    end_st_code = str(timetable[-1].get("Station", "?"))
+
                 start_name = station_map.get(start_st_code, start_st_code)
                 end_name = station_map.get(end_st_code, end_st_code)
 
                 route_str = f" ({start_name} ➝ {end_name})"
                 
-                # ─── 最終輸出 ───
-                # 格式：[車次] 顏色 (顏色前) 代碼 (代碼後) (起點 ➝ 終點)
-                # 範例：➜ [1404] 區間 (#00f) 1131 (樹林 ➝ 花蓮)
-                line = f"   ➜ [{tid}] {color_info} {car_class_code}{route_str}"
+                # ─── 最終輸出 (有中文，無顏色碼) ───
+                # 格式：➜ [1404] 區間 1131 (臺北 ➝ 基隆)
+                line = f"   ➜ [{tid}] {chinese_name} {car_class_code}{route_str}"
                 log_content.append(line)
             
             log_content.append("")
