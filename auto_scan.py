@@ -7,17 +7,16 @@ from collections import defaultdict
 
 # ================= 設定區 =================
 MASTER_FILE_PATH = "final_train_diagram.json" 
-HISTORY_FILE = "scan_history.json"
 TRAIN_ID_KEY = "Train"
 START_DATE = 20260101
 
-# 🛑 排除規則 (跟 patch.py 完全同步)
-EXCLUDE_PREFIXES = ["29", "47", "48", "49"] # 排除車次開頭
-EXCLUDE_KEYWORDS = ["(林)", "(高)"]          # 排除包含這些字的車次
+# 🛑 排除規則
+EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
+EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 
+# 🎯 只鎖定 billy1125 作為比對來源
 TARGETS = [
-    ("billy1125", "billy1125.github.io", "data"),
-    ("mochi-artist", "artist", "data")
+    ("billy1125", "billy1125.github.io", "data")
 ]
 # =========================================
 
@@ -40,35 +39,26 @@ def extract_train_list(data):
     return []
 
 def main():
-    # 強制將工作目錄設為程式所在位置
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # 這裡不需要切換路徑，因為 GitHub Action 會在根目錄執行
+    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
     
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 1. 讀取基準檔
+    # 1. 讀取你自己目前的 final 檔案 (當作基準)
     master_ids = set()
     if os.path.exists(MASTER_FILE_PATH):
         try:
             with open(MASTER_FILE_PATH, 'r', encoding='utf-8') as f:
                 master_list = extract_train_list(json.load(f))
                 master_ids = set(str(t.get(TRAIN_ID_KEY)) for t in master_list if isinstance(t, dict))
-        except: pass
+            print(f"📚 已讀取本地 final 檔，目前共有 {len(master_ids)} 筆車次。")
+        except: 
+            print("⚠️ 找不到 final 檔，將視為全部都是新車。")
 
-    # 2. 讀取記憶
-    history_ids = set()
-    if os.path.exists(HISTORY_FILE):
-        try:
-            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                history_ids = set(json.load(f))
-        except: pass
-
-    # 3. 掃描
+    # 2. 開始掃描 Billy 的資料
     current_extras = {} 
-    dates_to_merge = set()
-    new_train_dates = defaultdict(set)
     
-    # flush=True 確保文字馬上顯示
-    print(f"📡 [{now_str}] 自動掃描執行中...", end="", flush=True)
+    print(f"📡 [{now_str}] 正在比對 billy1125 的資料...", end="", flush=True)
 
     for user, repo, path in TARGETS:
         try:
@@ -91,73 +81,54 @@ def main():
                 if not isinstance(train, dict): continue
                 tid = str(train.get(TRAIN_ID_KEY, ""))
                 
-                # ================= 過濾邏輯 (同步更新) =================
                 if (not tid or 
-                    tid in master_ids or
+                    tid in master_ids or 
                     any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or 
-                    any(k in tid for k in EXCLUDE_KEYWORDS)): # 這裡會把 (林)/(高) 擋掉
+                    any(k in tid for k in EXCLUDE_KEYWORDS)): 
                     continue
-                # =====================================================
                 
                 current_extras[tid] = train
-                
-                if tid not in history_ids:
-                    dates_to_merge.add(fdate)
-                    new_train_dates[tid].add(fdate)
             
             time.sleep(0.1)
 
-    # 4. 整理新發現
-    new_findings = []
-    current_extra_ids = set(current_extras.keys())
-    
-    for tid in current_extra_ids:
-        if tid not in history_ids:
-            new_findings.append(current_extras[tid])
+    # 3. 輸出比對結果
+    new_findings = list(current_extras.values())
 
-    # 5. 判斷與寫入
     if new_findings:
-        print(f" ➡️ 發現 {len(new_findings)} 筆新車！")
+        print(f" ➡️ 發現 {len(new_findings)} 筆你沒有的額外車次！")
         
         log_msg = []
         log_msg.append("="*40)
-        log_msg.append(f"📅 本日讀取日期: {now_str}")
-        log_msg.append(f"🎉 發現 {len(new_findings)} 筆新車次！")
+        log_msg.append(f"📅 比對時間: {now_str}")
+        log_msg.append(f"🔍 來源: billy1125 vs 本地 final")
+        log_msg.append(f"🎉 發現 {len(new_findings)} 筆額外車次")
+        log_msg.append("-" * 20)
 
-        trains_by_date = defaultdict(list)
         for t in new_findings:
-            tid = str(t.get(TRAIN_ID_KEY, ""))
-            dates = new_train_dates.get(tid, set())
-            for d in dates:
-                trains_by_date[d].append(t)
-        
-        sorted_dates = sorted(trains_by_date.keys())
-        for d in sorted_dates:
-            log_msg.append(f"\n📅 日期: {d}")
-            daily_trains = sorted(trains_by_date[d], key=lambda x: str(x.get(TRAIN_ID_KEY, "0")))
-            for t in daily_trains:
-                tid = t.get(TRAIN_ID_KEY, "?")
-                typ = t.get("Type", t.get("CarClass", "未知"))
-                start, end = "?", "?"
-                if "Timetables" in t and t["Timetables"]:
-                    start = t["Timetables"][0].get("Station", "?")
-                    end = t["Timetables"][-1].get("Station", "?")
-                log_msg.append(f"   ➜ [{tid}] {typ} ({start} ➝ {end})")
+            tid = t.get(TRAIN_ID_KEY, "?")
+            typ = t.get("Type", t.get("CarClass", ""))
+            
+            route_str = ""
+            if "Timetables" in t and t["Timetables"]:
+                start = t["Timetables"][0].get("Station", "")
+                end = t["Timetables"][-1].get("Station", "")
+                if start and end:
+                    route_str = f" ({start} ➝ {end})"
+            
+            info_line = f"   ➜ [{tid}]"
+            if typ: info_line += f" {typ}"
+            if route_str: info_line += route_str
+            
+            log_msg.append(info_line)
 
-        if dates_to_merge:
-            with open("dates_to_update.json", "w") as f: 
-                json.dump(sorted(list(dates_to_merge)), f)
-            log_msg.append(f"\n⚠️  已更新 dates_to_update.json，請執行 patch.py。")
-
-        with open("scan_log.txt", "a", encoding="utf-8") as f:
-            f.write("\n".join(log_msg) + "\n\n")
+        # 寫入日記
+        with open("scan_log.txt", "w", encoding="utf-8") as f:
+            f.write("\n".join(log_msg) + "\n")
             
     else:
-        print(" ➡️ 無新發現 (保持安靜)。")
-
-    # 6. 更新記憶
-    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
-        json.dump(list(current_extra_ids), f)
+        print(" ➡️ 無新車。")
+        with open("scan_log.txt", "w", encoding="utf-8") as f:
+            f.write(f"[{now_str}] 你的資料是最新的，與 billy1125 同步無缺漏。")
 
 if __name__ == "__main__":
     main()
