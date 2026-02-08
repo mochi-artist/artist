@@ -4,7 +4,7 @@ import json
 import os
 import time
 import datetime
-import re
+import re # 引入正則表達式來處理車次排序
 from collections import defaultdict
 
 # ================= 設定區 =================
@@ -57,12 +57,17 @@ def load_db(path):
             return json.load(f)
     except: return {}
 
-# 🔢 智慧排序功能 (1104 -> 1104A -> 1105)
+# 🔢 這裡就是你要的排序魔法！
+# 它會把 "1104A" 拆成 (1104, "A")，確保 1104 排在 1104A 前面，且都在 1105 前面
 def train_sort_key(train_obj):
     tid = str(train_obj.get(TRAIN_ID_KEY, "0"))
+    # 使用正則表達式拆分數字與字母
     match = re.match(r"^(\d+)([a-zA-Z]*)", tid)
     if match:
-        return (int(match.group(1)), match.group(2)) # (數字, 英文後綴)
+        num_part = int(match.group(1)) # 數字部分轉成整數 (為了比大小)
+        str_part = match.group(2)      # 字母部分 (為了跟隨)
+        return (num_part, str_part)
+    # 如果不是數字開頭，就丟到最後面
     return (float('inf'), tid)
 
 def main():
@@ -89,7 +94,7 @@ def main():
                     if isinstance(t, dict): master_ids.add(str(t.get(TRAIN_ID_KEY)))
         except: pass
 
-    # 2. 載入歷史記憶 (避免重複回報)
+    # 2. 載入歷史記憶 (這次的重點：讀取上次看過什麼)
     history_ids = set()
     if os.path.exists(HISTORY_FILE):
         try:
@@ -99,10 +104,9 @@ def main():
 
     # 3. 掃描
     new_findings_by_date = defaultdict(list)
-    current_run_ids = set() # 這次掃到的所有車
     new_count = 0
     
-    print(f"📡 正在掃描...")
+    print(f"📡 正在掃描 Billy 的 GitHub...")
 
     for user, repo, path in TARGETS:
         try:
@@ -129,27 +133,30 @@ def main():
                     any(k in tid for k in EXCLUDE_KEYWORDS)): 
                     continue
                 
-                # 這是新車 (不在歷史紀錄裡)
+                # 關鍵：只有「歷史紀錄裡沒有的」才算新發現
                 if tid not in history_ids:
                     new_findings_by_date[fdate].append(train)
-                    history_ids.add(tid) # 加入記憶
+                    history_ids.add(tid) # 馬上加入記憶
                     new_count += 1
                 
             time.sleep(0.05)
 
-    # 4. 寫入 Log (使用 Append 模式 'a')
+    # 4. 寫入 Log (使用 'a' 模式來附加在檔案後面)
     if new_count > 0:
         log_lines = []
-        log_lines.append("="*40)
-        log_lines.append(f"🕒 掃描時間: {now_str}")
-        log_lines.append(f"🎉 發現 {new_count} 筆【全新】車次！")
+        # 這是分隔線，區分每一次讀取
+        log_lines.append("\n" + "="*40) 
+        log_lines.append(f"🕒 本次讀取日期: {now_str}")
+        log_lines.append(f"🔍 發現 {new_count} 筆新車次！")
+        log_lines.append("-" * 40)
         
         for date_key in sorted(new_findings_by_date.keys()):
             trains = new_findings_by_date[date_key]
-            # 🔢 使用智慧排序
+            
+            # 🔢 使用上面定義的魔法排序
             trains.sort(key=train_sort_key)
             
-            log_lines.append(f"\n📅 日期: {date_key}")
+            log_lines.append(f"📅 日期: {date_key}")
             for t in trains:
                 tid = t.get(TRAIN_ID_KEY, "?")
                 code = str(t.get("CarClass", t.get("Type", "?")))
@@ -163,18 +170,17 @@ def main():
                     end = station_map.get(str(tts[-1].get("Station")), str(tts[-1].get("Station")))
 
                 log_lines.append(f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})")
+            log_lines.append("") # 該日期結束空一行
         
-        log_lines.append("\n") # 結尾空行
-        
-        # 寫入 txt
-        with open("scan_log.txt", "a", encoding="utf-8") as f: # 'a' 代表 append (附加)
+        # 寫入 txt (Append 模式)
+        with open("scan_log.txt", "a", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
             
-        # 更新記憶檔
+        # 更新記憶檔 (覆蓋寫入，記住所有看過的)
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(list(history_ids), f)
             
-        print(f"✅ 已新增 {new_count} 筆資料到 scan_log.txt")
+        print(f"✅ 已將 {new_count} 筆新資料附加到 scan_log.txt")
     else:
         print("💤 本次掃描無新發現。")
 
