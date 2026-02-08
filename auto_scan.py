@@ -4,17 +4,23 @@ import json
 import os
 import time
 import datetime
-import re # 引入正則表達式來處理車次排序
+import re
 from collections import defaultdict
 
 # ================= 設定區 =================
 MASTER_FILE_PATH = "final_train_diagram.json" 
 HISTORY_FILE = "scan_history.json"  # 🧠 記憶檔案
+LOG_FILE = "scan_log.txt"           # 日誌檔案
+
 TRAIN_ID_KEY = "Train"
 START_DATE = 20260101
 
-STATION_DB_PATH = "SVG_Y_Axis.json" 
-CAR_KIND_DB_PATH = "CarKind.json"
+# 字典檔設定 (本地沒有會自動去雲端抓)
+STATION_DB_FILE = "SVG_Y_Axis.json" 
+CAR_KIND_DB_FILE = "CarKind.json"
+
+# Billy 的原始資料庫網址
+BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
 EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
@@ -50,40 +56,49 @@ def extract_train_list(data):
         if TRAIN_ID_KEY in data: return [data]
     return []
 
-def load_db(path):
-    if not os.path.exists(path): return {}
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except: return {}
+# 🧠 智慧讀取字典：本地優先，沒有就去雲端抓
+def load_db(filename):
+    # 1. 嘗試讀取本地檔案
+    if os.path.exists(filename):
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except: pass
+    
+    # 2. 本地沒有，去 Billy 的 GitHub 下載 (解決 GitHub 顯示代碼的問題)
+    print(f"☁️ 正在從雲端下載字典: {filename} ...")
+    url = BILLY_REF_URL + filename
+    data = fetch_json(url)
+    if data:
+        return data
+    else:
+        print(f"⚠️ 警告：無法載入 {filename}，將顯示原始代碼。")
+        return {}
 
-# 🔢 這裡就是你要的排序魔法！
-# 它會把 "1104A" 拆成 (1104, "A")，確保 1104 排在 1104A 前面，且都在 1105 前面
+# 🔢 智慧排序：把 "1104A" 拆成 (1104, "A")
 def train_sort_key(train_obj):
     tid = str(train_obj.get(TRAIN_ID_KEY, "0"))
-    # 使用正則表達式拆分數字與字母
     match = re.match(r"^(\d+)([a-zA-Z]*)", tid)
     if match:
-        num_part = int(match.group(1)) # 數字部分轉成整數 (為了比大小)
-        str_part = match.group(2)      # 字母部分 (為了跟隨)
-        return (num_part, str_part)
-    # 如果不是數字開頭，就丟到最後面
+        return (int(match.group(1)), match.group(2))
     return (float('inf'), tid)
 
 def main():
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    if os.path.dirname(os.path.abspath(__file__)):
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 1. 載入字典與白名單
-    s_db = load_db(STATION_DB_PATH)
+    # 1. 載入字典 (支援雲端下載)
+    s_db = load_db(STATION_DB_FILE)
     station_map = {}
     for k, v in s_db.items():
         if isinstance(v, list):
             for st in v:
                 if "ID" in st and "DSC" in st: station_map[str(st["ID"])] = st["DSC"]
 
-    c_map = load_db(CAR_KIND_DB_PATH)
-    c_map = {str(k): v for k, v in c_map.items()}
+    c_db = load_db(CAR_KIND_DB_FILE)
+    c_map = {str(k): v for k, v in c_db.items()}
 
     master_ids = set()
     if os.path.exists(MASTER_FILE_PATH):
@@ -94,7 +109,7 @@ def main():
                     if isinstance(t, dict): master_ids.add(str(t.get(TRAIN_ID_KEY)))
         except: pass
 
-    # 2. 載入歷史記憶 (這次的重點：讀取上次看過什麼)
+    # 2. 載入歷史記憶
     history_ids = set()
     if os.path.exists(HISTORY_FILE):
         try:
@@ -106,7 +121,7 @@ def main():
     new_findings_by_date = defaultdict(list)
     new_count = 0
     
-    print(f"📡 正在掃描 Billy 的 GitHub...")
+    print(f"📡 正在掃描 Billy 的資料庫...")
 
     for user, repo, path in TARGETS:
         try:
@@ -133,56 +148,59 @@ def main():
                     any(k in tid for k in EXCLUDE_KEYWORDS)): 
                     continue
                 
-                # 關鍵：只有「歷史紀錄裡沒有的」才算新發現
+                # 只有歷史沒看過的才算新
                 if tid not in history_ids:
                     new_findings_by_date[fdate].append(train)
-                    history_ids.add(tid) # 馬上加入記憶
+                    history_ids.add(tid)
                     new_count += 1
-                
-            time.sleep(0.05)
+            
+            time.sleep(0.05) 
 
-    # 4. 寫入 Log (使用 'a' 模式來附加在檔案後面)
+    # 4. 寫入增量日誌
     if new_count > 0:
         log_lines = []
-        # 這是分隔線，區分每一次讀取
-        log_lines.append("\n" + "="*40) 
+        log_lines.append("\n" + "="*40)
         log_lines.append(f"🕒 本次讀取日期: {now_str}")
         log_lines.append(f"🔍 發現 {new_count} 筆新車次！")
         log_lines.append("-" * 40)
         
         for date_key in sorted(new_findings_by_date.keys()):
             trains = new_findings_by_date[date_key]
-            
-            # 🔢 使用上面定義的魔法排序
+            # 排序：數字小到大 + 英文跟隨
             trains.sort(key=train_sort_key)
             
             log_lines.append(f"📅 日期: {date_key}")
             for t in trains:
                 tid = t.get(TRAIN_ID_KEY, "?")
+                
+                # 車種翻譯
                 code = str(t.get("CarClass", t.get("Type", "?")))
                 eng = c_map.get(code, "others")
                 chi = CHINESE_NAME_MAP.get(eng, eng)
                 
+                # 車站翻譯
                 st, end = "?", "?"
                 tts = t.get("TimeInfos", t.get("Timetables", []))
                 if tts:
-                    st = station_map.get(str(tts[0].get("Station")), str(tts[0].get("Station")))
-                    end = station_map.get(str(tts[-1].get("Station")), str(tts[-1].get("Station")))
+                    st_code = str(tts[0].get("Station"))
+                    end_code = str(tts[-1].get("Station"))
+                    st = station_map.get(st_code, st_code)
+                    end = station_map.get(end_code, end_code)
 
                 log_lines.append(f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})")
-            log_lines.append("") # 該日期結束空一行
-        
-        # 寫入 txt (Append 模式)
-        with open("scan_log.txt", "a", encoding="utf-8") as f:
+            log_lines.append("")
+
+        # Append 模式寫入
+        with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
             
-        # 更新記憶檔 (覆蓋寫入，記住所有看過的)
+        # 儲存記憶
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(list(history_ids), f)
             
-        print(f"✅ 已將 {new_count} 筆新資料附加到 scan_log.txt")
+        print(f"✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE}")
     else:
-        print("💤 本次掃描無新發現。")
+        print("💤 本次無新發現。")
 
 if __name__ == "__main__":
     main()
