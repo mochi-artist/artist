@@ -32,7 +32,7 @@ const staticSchedules = {
     "林鐵": [
         // 🟢 第一個時段：1月 (舊班表)
         { 
-            file: "data/林鐵_20260110~20260131.json" 
+            file: "data/林鐵_20260110~20261231.json" 
         }
     ],
     
