@@ -651,67 +651,67 @@
         {
             "ID": "8001",
             "DSC": "台北",
-            "SVGYAXIS": 64,
+            "SVGYAXIS": 152,
             "TERMINAL": ""
         },
         {
             "ID": "8002",
             "DSC": "板橋",
-            "SVGYAXIS": 164,
+            "SVGYAXIS": 262,
             "TERMINAL": ""
         },
         {
             "ID": "8003",
             "DSC": "桃園",
-            "SVGYAXIS": 300,
+            "SVGYAXIS": 469,
             "TERMINAL": ""
         },
         {
             "ID": "8004",
             "DSC": "新竹",
-            "SVGYAXIS": 359,
+            "SVGYAXIS": 648,
             "TERMINAL": ""
         },
         {
             "ID": "8005",
             "DSC": "苗栗",
-            "SVGYAXIS": 500,
+            "SVGYAXIS": 900,
             "TERMINAL": ""
         },
         {
             "ID": "8006",
             "DSC": "台中",
-            "SVGYAXIS": 600,
+            "SVGYAXIS": 1276,
             "TERMINAL": ""
         },
          {
             "ID": "8007",
             "DSC": "彰化",
-            "SVGYAXIS": 800,
+            "SVGYAXIS": 1500,
             "TERMINAL": ""
         },
          {
             "ID": "8008",
             "DSC": "雲林",
-            "SVGYAXIS": 900,
+            "SVGYAXIS": 1693,
             "TERMINAL": ""
         },
          {
             "ID": "8009",
             "DSC": "嘉義",
-            "SVGYAXIS": 1000,
+            "SVGYAXIS": 1900,
             "TERMINAL": ""
         },
          {
             "ID": "8010",
             "DSC": "台南",
-            "SVGYAXIS": 1500,
+            "SVGYAXIS": 2225,
             "TERMINAL": ""
         },
          {
             "ID": "8011",
             "DSC": "左營",
-            "SVGYAXIS": 2000,
+            "SVGYAXIS": 2500,
             "TERMINAL": "Y"
         }
 
