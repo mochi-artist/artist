@@ -1,6 +1,8 @@
-// GRT參數取得 
+// =========================================================================
+// 1. 🌍 全域參數與變數 (Global Params)
+// =========================================================================
 const url = new URL(location.href);
-const line_kind = url.searchParams.get('lineKind');
+const line_kind = url.searchParams.get('lineKind'); // 例如: LINE_Alishan, thsr, 林鐵
 const formattedDate = url.searchParams.get('formattedDate');
 const loadRealtimeParam = url.searchParams.get('realtime');
 const scrollToCurrentTimeParam = url.searchParams.get('scrollToCurrentTime');
@@ -9,10 +11,6 @@ const scrollToCurrentTimeParam = url.searchParams.get('scrollToCurrentTime');
 let date = null;
 let circle_blink = null;
 let scrollToCurrentTime = scrollToCurrentTimeParam === 'true';
-
-// console.log('Line Kind:', line_kind);
-// console.log('Formatted Date:', formattedDate);
-// console.log('Scroll To Current Time:', scrollToCurrentTime);
 
 // 定義基本檔案相依性
 const dependencies = [
@@ -23,10 +21,35 @@ const dependencies = [
     'js/diagram.js'
 ];
 
-// 開始載入基本檔案
+// 開始程式流程
 loadDependencies();
 
-// 載入所有相依並初始化資料
+// =========================================================================
+// 2. 🎛️ 中央控制面板 (Config) - 請在這裡改檔名！
+// =========================================================================
+const staticSchedules = {
+    // 🌲 林鐵：全車次單一檔案
+    "林鐵": [
+        // 🟢 第一個時段：1月 (舊班表)
+        { 
+            file: "data/林鐵_20260110~20260131.json" 
+        }
+    ],
+    
+    // 高鐵：星期分流 (自動拼湊 "高鐵_一_...")
+        "thsr": [
+            {
+                // 改成我們剛剛抓下來的後綴！
+                fileSuffix: "20260202~20261231.json" 
+            }
+        ]
+};
+
+// =========================================================================
+// 3. 🧠 核心邏輯區 (Core Logic)
+// =========================================================================
+
+// 下載相依檔案並初始化
 async function loadDependencies() {
     try {
         for (const dep of dependencies) {
@@ -38,7 +61,7 @@ async function loadDependencies() {
     }
 }
 
-// 載入 JavaScript 檔案的函式
+// 載入腳本工具
 function loadScript(file) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -49,39 +72,130 @@ function loadScript(file) {
     });
 }
 
-// 讀取所有資料檔
+// 安全讀取 JSON (防呆)
+async function safeReadJSONFile(fileUrl) {
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+            console.warn(`❌ 找不到檔案 (404): ${fileUrl}`);
+            return null;
+        }
+        console.log(`✅ 載入成功: ${fileUrl}`);
+        return await response.json();
+    } catch (error) {
+        console.error(`❌ 讀取錯誤: ${fileUrl}`, error);
+        return null;
+    }
+}
+
+// 日期轉星期幾
+function getWeekdayStr(dateString) {
+    const year = parseInt(dateString.substring(0, 4));
+    const month = parseInt(dateString.substring(4, 6)) - 1; 
+    const day = parseInt(dateString.substring(6, 8));
+    const dateObj = new Date(year, month, day);
+    const weekdays = ["日", "一", "二", "三", "四", "五", "六"]; 
+    return weekdays[dateObj.getDay()];
+}
+
+// ✨ 檔名日期解析器 (Magic Parser)
+function parseDateRange(filename) {
+    const match = filename.match(/(\d{8})~(\d{8})/);
+    if (match) {
+        return { start: match[1], end: match[2] };
+    }
+    return null;
+}
+
+// 🚦 智慧路由器 (決定抓哪個檔案) - 關鍵修復在這裡！
+function getTargetFile(lineKind, targetDate) {
+    
+    // 🌲 林鐵模式 (包含 LINE_Alishan)
+    // 👇 這裡修復了您的問題：加入了 || lineKind === "LINE_Alishan"
+    if (lineKind === "林鐵" || lineKind === "lintie" || lineKind === "LINE_Alishan") {
+        for (let config of staticSchedules["林鐵"]) {
+            const range = parseDateRange(config.file);
+            
+            if (range && targetDate >= range.start && targetDate <= range.end) {
+                console.log(`🌲 林鐵 (${lineKind}) | 日期命中 [${range.start}~${range.end}] | 讀取 ${config.file}`);
+                return config.file;
+            }
+        }
+        console.warn(`⛔ 林鐵 | 日期 ${targetDate} 超出設定範圍`);
+        return null;
+    }
+    
+    // 🚅 高鐵模式
+    else if (lineKind === "thsr" || lineKind === "高鐵") {
+        const weekday = getWeekdayStr(targetDate);
+        for (let config of staticSchedules["thsr"]) {
+            const range = parseDateRange(config.fileSuffix);
+            
+            if (range && targetDate >= range.start && targetDate <= range.end) {
+                const fullPath = `data/高鐵_${weekday}_${config.fileSuffix}`;
+                console.log(`🚅 高鐵 | 星期${weekday} | 日期命中 | 讀取 ${fullPath}`);
+                return fullPath;
+            }
+        }
+        console.warn(`⛔ 高鐵 | 日期 ${targetDate} 超出設定範圍`);
+        return null;
+    }
+    
+    // 🚂 台鐵模式 (預設)
+    console.log(`🚂 台鐵 | 動態讀取 data/${targetDate}.json`);
+    return `data/${targetDate}.json`;
+}
+
+// =========================================================================
+// 4. 🚀 主程式入口 (Main Execution)
+// =========================================================================
 async function initial_data() {
     try {
-        date = formattedDate ? formattedDate : getTodayFormattedDate('nodash'); // 如果 URL 中有指定日期則使用，否則用今天
+        date = formattedDate ? formattedDate : getTodayFormattedDate('nodash');
 
+        // 取得目標檔案路徑
+        const targetFile = getTargetFile(line_kind, date);
+
+        // 讀取底圖設定
         const baseFiles = [
             readJSONFile(file1),
             readJSONFile(file2),
             readJSONFile(file3),
             readJSONFile(file4),
-            readJSONFile(file5),
-            readJSONFile(`data/${date}.json`)
+            readJSONFile(file5)
         ];
 
-        const results = await Promise.all(baseFiles);
+        const baseResults = await Promise.all(baseFiles);
+        Route = baseResults[0];
+        SVG_X_Axis = baseResults[1];
+        initial_line_data(baseResults[2]);
+        OperationLines = baseResults[3];
+        CarKind = baseResults[4];
 
-        Route = results[0];
-        SVG_X_Axis = results[1];
-        initial_line_data(results[2]);
-        OperationLines = results[3];
-        CarKind = results[4];
+        // 讀取時刻表
+        let scheduleData = null;
+        if (targetFile) {
+            scheduleData = await safeReadJSONFile(targetFile);
+        }
 
-        const realtimeDiagram = results[5];
-        const realtimeTrains = results[6]; // 可能是 undefined（如果沒載）
+        // 畫圖或顯示空白
+        if (!scheduleData) {
+            console.warn(`⚠️ 無資料，顯示空白圖`);
+            const emptyData = { TrainInfos: [] };
+            execute(emptyData, null, date);
+        } else {
+            execute(scheduleData, null, date);
+        }
 
-        execute(realtimeDiagram, realtimeTrains, date);
     } catch (err) {
-        console.error("初始化資料時發生錯誤:", err);
+        console.error("初始化錯誤:", err);
     }
 }
 
+// =========================================================================
+// 5. 🎨 繪圖與 UI 處理 (Rendering & UI)
+// =========================================================================
 
-// 程式執行函式
 function execute(json_data, live_json_data, date) {
     // 清除已有的運行圖    
     const svg = document.querySelectorAll("svg");
@@ -117,8 +231,9 @@ function execute(json_data, live_json_data, date) {
 function finish_draw() {
     // 移除讀取中的文字標示
     let popup = document.getElementById("popup");
-    const parentObj = popup.parentNode;
-    parentObj.removeChild(popup);
+    if (popup && popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+    }
 
     // 依照現在的時間，將視窗滾動到整點時間，方便使用者閱讀
     if (scrollToCurrentTime) {
