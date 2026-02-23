@@ -87,7 +87,7 @@
         "NAME": "台灣高鐵(南港-左營)",
         "FOLDER": "thsr",
         "PREFIX": "THSR_",
-        "MAX_X_AXIS": 2000
+        "MAX_X_AXIS": 2500
     },
     "LINE_SL": {
         "NAME": "沙崙線(中洲-沙崙)",
