@@ -9,17 +9,14 @@ from collections import defaultdict
 
 # ================= 設定區 =================
 MASTER_FILE_PATH = "final_train_diagram.json" 
-HISTORY_FILE = "scan_history.json"  # 🧠 記憶檔案
+HISTORY_FILE = "scan_history.json"  # 🧠 新版結構化記憶檔案
 LOG_FILE = "scan_log.txt"           # 日誌檔案
 
 TRAIN_ID_KEY = "Train"
 START_DATE = 20260101
 
-# 字典檔設定 (本地沒有會自動去雲端抓)
 STATION_DB_FILE = "SVG_Y_Axis.json" 
 CAR_KIND_DB_FILE = "CarKind.json"
-
-# Billy 的原始資料庫網址
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
 EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
@@ -56,31 +53,25 @@ def extract_train_list(data):
         if TRAIN_ID_KEY in data: return [data]
     return []
 
-# 🧠 智慧讀取字典：本地優先，沒有就去雲端抓
+# 🧠 讀取字典 (本地沒有去雲端抓)
 def load_db(filename):
-    # 1. 嘗試讀取本地檔案
     if os.path.exists(filename):
         try:
             with open(filename, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except: pass
     
-    # 2. 本地沒有，去 Billy 的 GitHub 下載 (解決 GitHub 顯示代碼的問題)
     print(f"☁️ 正在從雲端下載字典: {filename} ...")
     url = BILLY_REF_URL + filename
     data = fetch_json(url)
-    if data:
-        return data
-    else:
-        print(f"⚠️ 警告：無法載入 {filename}，將顯示原始代碼。")
-        return {}
+    if data: return data
+    return {}
 
-# 🔢 智慧排序：把 "1104A" 拆成 (1104, "A")
+# 🔢 智慧排序：(1104, A)
 def train_sort_key(train_obj):
     tid = str(train_obj.get(TRAIN_ID_KEY, "0"))
     match = re.match(r"^(\d+)([a-zA-Z]*)", tid)
-    if match:
-        return (int(match.group(1)), match.group(2))
+    if match: return (int(match.group(1)), match.group(2))
     return (float('inf'), tid)
 
 def main():
@@ -89,7 +80,7 @@ def main():
         
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 1. 載入字典 (支援雲端下載)
+    # 1. 載入字典與總檔
     s_db = load_db(STATION_DB_FILE)
     station_map = {}
     for k, v in s_db.items():
@@ -109,20 +100,28 @@ def main():
                     if isinstance(t, dict): master_ids.add(str(t.get(TRAIN_ID_KEY)))
         except: pass
 
-    # 2. 載入歷史記憶
-    history_ids = set()
+    # 2. 載入新版結構化歷史記憶
+    history_data = {
+        "runs": [],      # 記錄每次執行的時間與數量
+        "seen": [],      # 記錄已經看過的 "日期_車次"
+        "records": {}    # 記錄排版內容
+    }
+    
     if os.path.exists(HISTORY_FILE):
         try:
             with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                history_ids = set(json.load(f))
+                data = json.load(f)
+                if "runs" in data:  # 確認是新版格式
+                    history_data = data
         except: pass
 
-    # 3. 掃描
+    seen_set = set(history_data["seen"])
     new_findings_by_date = defaultdict(list)
     new_count = 0
     
     print(f"📡 正在掃描 Billy 的資料庫...")
 
+    # 3. 掃描
     for user, repo, path in TARGETS:
         try:
             res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
@@ -148,57 +147,83 @@ def main():
                     any(k in tid for k in EXCLUDE_KEYWORDS)): 
                     continue
                 
-                # 只有歷史沒看過的才算新
-                if tid not in history_ids:
+                # 🛑 綁定 日期+車次 檢查
+                uid = f"{fdate}_{tid}"
+                if uid not in seen_set:
                     new_findings_by_date[fdate].append(train)
-                    history_ids.add(tid)
+                    seen_set.add(uid)
                     new_count += 1
             
             time.sleep(0.05) 
 
-    # 4. 寫入增量日誌
+    # 4. 如果有新發現，更新資料庫並全面重新產生日誌
     if new_count > 0:
-        log_lines = []
-        log_lines.append("\n" + "="*40)
-        log_lines.append(f"🕒 本次讀取日期: {now_str}")
-        log_lines.append(f"🔍 發現 {new_count} 筆新車次！")
-        log_lines.append("-" * 40)
+        # 新增本次掃描紀錄
+        history_data["runs"].append({"time": now_str, "count": new_count})
+        history_data["seen"] = list(seen_set)
         
+        # 將新車次整理並存入 records
         for date_key in sorted(new_findings_by_date.keys()):
             trains = new_findings_by_date[date_key]
-            # 排序：數字小到大 + 英文跟隨
-            trains.sort(key=train_sort_key)
+            trains.sort(key=train_sort_key) # 排序
             
-            log_lines.append(f"📅 日期: {date_key}")
+            date_str = str(date_key)
+            if date_str not in history_data["records"]:
+                history_data["records"][date_str] = {}
+                
+            history_data["records"][date_str][now_str] = []
+            
             for t in trains:
                 tid = t.get(TRAIN_ID_KEY, "?")
-                
-                # 車種翻譯
                 code = str(t.get("CarClass", t.get("Type", "?")))
                 eng = c_map.get(code, "others")
                 chi = CHINESE_NAME_MAP.get(eng, eng)
                 
-                # 車站翻譯
                 st, end = "?", "?"
                 tts = t.get("TimeInfos", t.get("Timetables", []))
                 if tts:
-                    st_code = str(tts[0].get("Station"))
-                    end_code = str(tts[-1].get("Station"))
-                    st = station_map.get(st_code, st_code)
-                    end = station_map.get(end_code, end_code)
+                    st = station_map.get(str(tts[0].get("Station")), str(tts[0].get("Station")))
+                    end = station_map.get(str(tts[-1].get("Station")), str(tts[-1].get("Station")))
 
-                log_lines.append(f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})")
-            log_lines.append("")
+                formatted_line = f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})"
+                history_data["records"][date_str][now_str].append(formatted_line)
 
-        # Append 模式寫入
-        with open(LOG_FILE, "a", encoding="utf-8") as f:
+        # 儲存 JSON 記憶
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history_data, f, ensure_ascii=False, indent=2)
+
+        # 🌟 重新建構 TXT 日誌檔案 (完美排版) 🌟
+        log_lines = []
+        log_lines.append("========================================")
+        log_lines.append("🕒 掃描歷史摘要:")
+        
+        # 建立掃描次數對照表
+        run_map = {}
+        for idx, r in enumerate(history_data["runs"], 1):
+            log_lines.append(f"  [{idx}] {r['time']} (發現 {r['count']} 筆新車次)")
+            run_map[r['time']] = idx
+        log_lines.append("========================================\n")
+        
+        # 依日期為主體輸出
+        for date_str in sorted(history_data["records"].keys(), key=lambda x: int(x)):
+            log_lines.append(f"📅 日期: {date_str}")
+            date_blocks = history_data["records"][date_str]
+            
+            # 依照讀取時間排序印出
+            for run_time in sorted(date_blocks.keys()):
+                run_idx = run_map.get(run_time, "?")
+                log_lines.append(f"  --- [第 {run_idx} 次讀取] {run_time} ---")
+                
+                for line in date_blocks[run_time]:
+                    log_lines.append(line)
+                    
+            log_lines.append("") # 每個日期結束空一行
+            
+        # 寫入 (覆蓋模式)
+        with open(LOG_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
             
-        # 儲存記憶
-        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(list(history_ids), f)
-            
-        print(f"✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE}")
+        print(f"✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE} (重新排版完成)")
     else:
         print("💤 本次無新發現。")
 
