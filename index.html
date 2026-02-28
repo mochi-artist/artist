@@ -11,6 +11,12 @@
     <meta name="robots" content="index,follow" />
     <meta name="author" content="呂卓勳 Cho Husn Lu" />
 
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="軌道運行圖">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <link rel="Shortcut Icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -51,9 +57,7 @@
                         class="btn btn-success btn-lg" role="button">海線 (竹南-彰化)</a>
                     <a href='diagram_output.html?lineKind=LINE_WS&scrollToCurrentTime=true'
                         class="btn btn-success btn-lg" role="button">南段 (彰化-枋寮)</a>
-                 <!--    <a href='diagram_output.html?lineKind=LINE_P&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">屏東線 (高雄-枋寮)</a> -->
-                </div>
+                 </div>
 
                 <h3>東部幹線與南迴線</h3>
                 <div class="btn-group-vertical btn-block">
@@ -73,9 +77,7 @@
                         class="btn btn-success btn-lg" role="button">平溪深澳線</a>
                     <a href='diagram_output.html?lineKind=LINE_NW&scrollToCurrentTime=true'
                         class="btn btn-success btn-lg" role="button">六家/內灣線</a>
-                 <!--   <a href='diagram_output.html?lineKind=LINE_LJ&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">六家線</a> -->
-                    <a href='diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true'
+                 <a href='diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true'
                         class="btn btn-success btn-lg" role="button">集集線</a>
                     <a href='diagram_output.html?lineKind=LINE_SL&scrollToCurrentTime=true'
                         class="btn btn-success btn-lg" role="button">沙崙線</a>
@@ -90,8 +92,7 @@
                     <a href='lines.html?lineKind=LINE_WM' class="btn btn-primary btn-lg" role="button">山線 (竹南-彰化)</a>
                     <a href='lines.html?lineKind=LINE_WSEA' class="btn btn-primary btn-lg" role="button">海線 (竹南-彰化)</a>
                     <a href='lines.html?lineKind=LINE_WS' class="btn btn-primary btn-lg" role="button">南段 (彰化-枋寮)</a>
-                 <!--   <a href='lines.html?lineKind=LINE_P' class="btn btn-primary btn-lg" role="button">屏東線 (高雄-枋寮)</a> -->
-                </div>
+                 </div>
                 <h3>東部幹線與南迴線</h3>
                 <div class="btn-group-vertical btn-block">
                     <a href='lines.html?lineKind=LINE_I' class="btn btn-primary btn-lg" role="button">宜蘭線 (八堵-蘇澳)</a>
@@ -103,8 +104,7 @@
                 <div class="btn-group-vertical btn-block">
                     <a href='lines.html?lineKind=LINE_PX' class="btn btn-primary btn-lg" role="button">平溪深澳線</a>
                     <a href='lines.html?lineKind=LINE_NW' class="btn btn-primary btn-lg" role="button">六家/內灣線</a>
-                  <!--  <a href='lines.html?lineKind=LINE_LJ' class="btn btn-primary btn-lg" role="button">六家線</a> -->
-                    <a href='lines.html?lineKind=LINE_J' class="btn btn-primary btn-lg" role="button">集集線</a>
+                  <a href='lines.html?lineKind=LINE_J' class="btn btn-primary btn-lg" role="button">集集線</a>
                     <a href='lines.html?lineKind=LINE_SL' class="btn btn-primary btn-lg" role="button">沙崙線</a>
                 </div>
                 <h3>阿里山森林鐵路</h3>
@@ -116,36 +116,7 @@
                     <a href='lines.html?lineKind=thsr' class="btn btn-primary btn-lg" role="button">台灣高鐵 (南港-左營)</a>
                  </div>   
             </div>
-          <!--  <div class="col-md-4 portfolio-item">
-                <h2><b>其他鐵路運行圖圖庫</b></h2>
-                <div class="alert alert-danger" role="alert">提供其他軌道運輸的靜態運行圖</a></div>
-                <h3>阿里山森林鐵路</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=alishan_m1' class="btn btn-primary btn-lg" role="button">阿里山線 (嘉義-阿里山)</a>
-                    <a href='lines.html?lineKind=alishan_b2' class="btn btn-primary btn-lg" role="button">沼平/祝山線 (阿里山-祝山)</a>
-                </div>
-                <h3>台灣高鐵</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=thsr' class="btn btn-primary btn-lg" role="button">台灣高鐵 (南港-左營)</a>
-                </div>
-                <h2><b>其他功能</b></h2>
-                <div class="btn-group-vertical btn-block">
-                    <a href='special_use.html' class="btn btn-danger btn-lg" role="button">特殊運用(如:蒸汽火車)</a>
-                    <a href='realtime_trains_positions.html' class="btn btn-danger btn-lg" role="button">列車即時位置</a>
-                    <a href='editor.html' class="btn btn-danger btn-lg" role="button">鐵路運行圖編輯器 <span class="badge">測試中</span></a>
-                    <a href='converter.html' class="btn btn-danger btn-lg" role="button">台鐵公開資料轉運行圖 <span class="badge">測試中</span></a>
-                </div>
-                <h2><b>關於</b></h2>
-                <div class="alert alert-danger" role="alert">本站說明</a></div>
-                <div class="btn-group-vertical btn-block">
-                    <a href='about.html' class="btn btn-info btn-lg" role="button">關於本站</a>
-                    <a href='style_editor.html' class="btn btn-info btn-lg" role="button">運行圖預設標色 <span class="badge">測試中</span></a>
-                    <a href='https://github.com/billy1125' class="btn btn-info btn-lg" role="button">GitHub</a>
-                    <a href='https://www.facebook.com/traDiagram/' class="btn btn-info btn-lg" role="button">facebook粉絲頁</a>
-                    <a href='privacy.html' class="btn btn-info btn-lg" role="button">隱私權政策</a>
-                    <a href='https://play.google.com/store/apps/details?id=com.chohsunlu.tradiagram' class="btn btn-info btn-lg" role="button">台鐵運行圖App(Google Play)</a>
-                </div>-->
-            </div>
+          </div>
         </div>
         <br>
         <footer class="alert alert-warning" role="alert"></footer>
@@ -177,4 +148,17 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3628172690328777"
     crossorigin="anonymous"></script>
 
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('Service Worker 註冊成功，範圍:', registration.scope);
+        })
+        .catch(error => {
+          console.log('Service Worker 註冊失敗:', error);
+        });
+    });
+  }
+</script>
 </html>
