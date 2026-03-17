@@ -30,15 +30,27 @@
 ],
     "LINE_J": [
         {
-            "ID": "3430",
-            "DSC": "二水",
+            "ID": "3420",
+            "DSC": "田中",
             "SVGYAXIS": 0,
             "TERMINAL": "Y"
         },
         {
+            "ID": "3430",
+            "DSC": "二水",
+            "SVGYAXIS": 75,
+            "TERMINAL": ""
+        },
+        {
+            "ID": "3450",
+            "DSC": "林內",
+            "SVGYAXIS": 150,
+            "TERMINAL": ""
+        },
+        {
             "ID": "3431",
             "DSC": "源泉",
-            "SVGYAXIS": 122,
+            "SVGYAXIS": 200,
             "TERMINAL": ""
         },
         {
@@ -431,24 +443,18 @@
     { "ID": "9019", "DSC": "祝山", "SVGYAXIS": 2000, "TERMINAL": "Y" }
   ],
     "LINE_SL": [
-        {
-            "ID": "4270",
-            "DSC": "中洲",
-            "SVGYAXIS": 0,
-            "TERMINAL": "Y"
-        },
-        {
-            "ID": "4271",
-            "DSC": "長榮大學",
-            "SVGYAXIS": 318.868,
-            "TERMINAL": ""
-        },
-        {
-            "ID": "4272",
-            "DSC": "沙崙",
-            "SVGYAXIS": 650,
-            "TERMINAL": "Y"
-        }
+  { "ID": "4170", "DSC": "善化", "SVGYAXIS": 0, "TERMINAL": "Y" },
+  { "ID": "4180", "DSC": "南科", "SVGYAXIS": 61, "TERMINAL": "" },
+  { "ID": "4190", "DSC": "新市", "SVGYAXIS": 161, "TERMINAL": "" },
+  { "ID": "4200", "DSC": "永康", "SVGYAXIS": 267, "TERMINAL": "" },
+  { "ID": "4210", "DSC": "大橋", "SVGYAXIS": 345, "TERMINAL": "" },
+  { "ID": "4220", "DSC": "台南", "SVGYAXIS": 403, "TERMINAL": "" },
+  { "ID": "NA", "DSC": "南臺南", "SVGYAXIS": 483, "TERMINAL": "" },
+  { "ID": "4250", "DSC": "保安", "SVGYAXIS": 573, "TERMINAL": "" },
+  { "ID": "4260", "DSC": "仁德", "SVGYAXIS": 605, "TERMINAL": "" },
+  { "ID": "4270", "DSC": "中洲", "SVGYAXIS": 650, "TERMINAL": "" },
+  { "ID": "4271", "DSC": "長榮大學", "SVGYAXIS": 800, "TERMINAL": "" },
+  { "ID": "4272", "DSC": "沙崙", "SVGYAXIS": 950, "TERMINAL": "Y" }
     ],
     "LINE_T": [
   { "ID": "6000", "DSC": "台東", "SVGYAXIS": 0.0, "TERMINAL": "Y" },
@@ -556,6 +562,7 @@
   { "ID": "3410", "DSC": "社頭", "SVGYAXIS": 464, "TERMINAL": "" },
   { "ID": "3420", "DSC": "田中", "SVGYAXIS": 555, "TERMINAL": "" },
   { "ID": "3430", "DSC": "二水", "SVGYAXIS": 678, "TERMINAL": "" },
+  { "ID": "3431", "DSC": "源泉", "SVGYAXIS": 750, "TERMINAL": "" },
   { "ID": "3450", "DSC": "林內", "SVGYAXIS": 849, "TERMINAL": "" },
   { "ID": "3460", "DSC": "石榴", "SVGYAXIS": 951, "TERMINAL": "" },
   { "ID": "3470", "DSC": "斗六", "SVGYAXIS": 1052, "TERMINAL": "" },
