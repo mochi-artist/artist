@@ -42,7 +42,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <!-- Zabuto Calendar -->
     <script src="js/calendar/zabuto_calendar.min.js"></script>
     <link rel="stylesheet" type="text/css" href="js/calendar/zabuto_calendar.css">
     <script src="js/url.min.js"></script>
@@ -52,46 +51,83 @@
 
 </html>
 
-
 <script>
     const owner = 'mochi-artist';                 // GitHub 使用者名稱
-    const repo = 'artist';        // GitHub 倉庫名稱
-    const path = 'data';                       // GitHub 倉庫中的路徑
-    const url = new URL(location.href);        // 取得當前頁面的 URL
-    const line_kind = $.url('?lineKind');      // 從 URL 取得 lineKind 參數
+    const repo = 'artist';                        // GitHub 倉庫名稱
+    const path = 'data';                          // GitHub 倉庫中的路徑
+    const url = new URL(location.href);           // 取得當前頁面的 URL
+    const line_kind = $.url('?lineKind');         // 從 URL 取得 lineKind 參數
 
-    const kind_realtime = dict_line[line_kind]; // 取得對應的實時線路類型
+    const kind_realtime = dict_line[line_kind];   // 取得對應的實時線路類型
 
+    // 🌟 升級版：智慧讀取 GitHub 檔案邏輯
     async function getGitHubFileNames(owner, repo, path = '') {
         const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`GitHub API request failed: ${response.status}`);
             const data = await response.json();
-            // console.log('Fetched data:', data);
-            const svgFileDates = data
-                .map(item => item.name)
-                .filter(name => /^\d{8}\.json$/.test(name))  // 確保是8碼數字開頭的檔案名
-                .map(name => {
-                    const match = name.match(/^(\d{8})\.json$/);  // 抓取數字部分
-                    // console.log('Match:', match);
-                    if (match) {
-                        const dateStr = match[1];
-                        const y = dateStr.substring(0, 4);
-                        const m = dateStr.substring(4, 6);
-                        const d = dateStr.substring(6, 8);
-                        return `${y}-${m}-${d}`;
-                    }
-                    return null; // 避免出錯
-                })
-                .filter(Boolean); // 過濾掉 null 結果
 
-            // console.log('Filtered SVG file dates:', svgFileDates);
-            const events = svgFileDates.map(date => ({
+            let allDates = new Set(); // 使用 Set 來避免同一天重複亮燈
+
+            // 輔助工具：將 "YYYYMMDD" 字串轉換為 JavaScript Date 物件
+            const parseDateStr = (str) => new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8));
+            
+            // 輔助工具：將 JavaScript Date 物件轉換為 Zabuto 要求的 "YYYY-MM-DD"
+            const formatDate = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            };
+
+            // 開始掃描 data 資料夾底下的所有檔案
+            data.forEach(item => {
+                const name = item.name;
+
+                // 🌲 【林鐵模式】比對：林鐵_20260101~20260228.json
+                if (line_kind === 'LINE_Alishan' || line_kind === '林鐵') {
+                    const match = name.match(/林鐵_(\d{8})~(\d{8})\.json$/);
+                    if (match) {
+                        const start = parseDateStr(match[1]);
+                        const end = parseDateStr(match[2]);
+                        // 將這段期間內的每一天都加入行事曆
+                        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                            allDates.add(formatDate(d));
+                        }
+                    }
+                }
+                // 🚅 【高鐵模式】比對：高鐵_一_20260202~20261231.json
+                else if (line_kind === 'thsr' || line_kind === '高鐵') {
+                    const match = name.match(/高鐵_(.)_(\d{8})~(\d{8})\.json$/);
+                    if (match) {
+                        const weekdayMap = { "日": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6 };
+                        const targetWeekday = weekdayMap[match[1]];
+                        const start = parseDateStr(match[2]);
+                        const end = parseDateStr(match[3]);
+
+                        // 迴圈跑這段期間，但「只把符合該星期」的日子加入
+                        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                            if (d.getDay() === targetWeekday) {
+                                allDates.add(formatDate(d));
+                            }
+                        }
+                    }
+                }
+                // 🚂 【台鐵模式 (預設)】比對傳統格式：20260327.json
+                else {
+                    const match = name.match(/^(\d{8})\.json$/);
+                    if (match) {
+                        allDates.add(formatDate(parseDateStr(match[1])));
+                    }
+                }
+            });
+
+            // 將 Set 中的日期轉成 Zabuto Calendar 要求的 events 陣列格式
+            const events = Array.from(allDates).map(date => ({
                 date: date,
-                // badge: true,
                 title: "SVG available",
-                body: `<p>${date}.svg</p>`
+                body: `<p>${date.replace(/-/g, '')}.json 或相關區間檔</p>`
             }));
 
             return events;
@@ -108,10 +144,10 @@
             today: true,
             weekstartson: 0,
             language: "en",
-            data: events, // 直接使用內嵌資料
+            data: events, // 直接使用我們剛剛處理好的 events
             action: function () {
                 // 取得被點選的日期
-                const date = $(this).data('date'); // zabuto_calendar 會將點選的日期儲存在 data-date 中
+                const date = $(this).data('date'); 
                 // 檢查日期是否在 events 中
                 const isValidDate = events.some(event => event.date === date);
 
@@ -133,10 +169,10 @@
 
     function showDiagram(id, fromModal, line_kind) {
         const date = $("#" + id).data("date");
-        const formattedDate = date.replace(/-/g, ''); // 移除所有 "-"，得到 "20250607"
+        const formattedDate = date.replace(/-/g, ''); // 移除所有 "-"，得到 "20260327"
 
-        // console.log('Formatted Date:', date);
         if (formattedDate) {
+            // 注意：這裡只負責傳遞日期參數，真正的檔案路由判斷交給 js/diagram_output.js
             const targetUrl = `diagram_output.html?formattedDate=${formattedDate}&lineKind=${line_kind}&scrollToCurrentTime=false`;
             window.open(targetUrl, '_blank');
         } else {
