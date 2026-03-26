@@ -1,0 +1,3021 @@
+{
+    "TrainInfos": [
+        {
+            "Type": "1",
+            "Train": "1(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1107",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "嘉義至十字路",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "1",
+                    "ARRTime": "09:00:00",
+                    "DEPTime": "09:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "2",
+                    "ARRTime": "09:09:00",
+                    "DEPTime": "09:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "3",
+                    "ARRTime": "09:32:00",
+                    "DEPTime": "09:33:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "4",
+                    "ARRTime": "09:42:00",
+                    "DEPTime": "09:43:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "5",
+                    "ARRTime": "09:56:00",
+                    "DEPTime": "09:57:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "6",
+                    "ARRTime": "10:09:00",
+                    "DEPTime": "10:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "7",
+                    "ARRTime": "10:22:00",
+                    "DEPTime": "10:23:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "8",
+                    "ARRTime": "10:35:00",
+                    "DEPTime": "10:36:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "9",
+                    "ARRTime": "10:47:00",
+                    "DEPTime": "10:48:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "10",
+                    "ARRTime": "11:04:00",
+                    "DEPTime": "11:05:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "11",
+                    "ARRTime": "11:29:00",
+                    "DEPTime": "11:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "12",
+                    "ARRTime": "11:44:00",
+                    "DEPTime": "11:45:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "13",
+                    "ARRTime": "12:00:00",
+                    "DEPTime": "12:00:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "2(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1107",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "十字路至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "1",
+                    "ARRTime": "13:20:00",
+                    "DEPTime": "13:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "2",
+                    "ARRTime": "13:35:00",
+                    "DEPTime": "13:36:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "3",
+                    "ARRTime": "13:50:00",
+                    "DEPTime": "14:31:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "4",
+                    "ARRTime": "14:47:00",
+                    "DEPTime": "14:48:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "5",
+                    "ARRTime": "15:05:00",
+                    "DEPTime": "15:06:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "6",
+                    "ARRTime": "15:17:00",
+                    "DEPTime": "15:18:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "7",
+                    "ARRTime": "15:30:00",
+                    "DEPTime": "15:31:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "8",
+                    "ARRTime": "15:43:00",
+                    "DEPTime": "15:44:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "9",
+                    "ARRTime": "15:57:00",
+                    "DEPTime": "15:57:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "10",
+                    "ARRTime": "16:11:00",
+                    "DEPTime": "16:12:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "11",
+                    "ARRTime": "16:20:00",
+                    "DEPTime": "16:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "12",
+                    "ARRTime": "16:44:00",
+                    "DEPTime": "16:45:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "13",
+                    "ARRTime": "16:51:00",
+                    "DEPTime": "16:51:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "5(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1107",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "嘉義至阿里山",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "1",
+                    "ARRTime": "10:00:00",
+                    "DEPTime": "10:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "2",
+                    "ARRTime": "10:07:00",
+                    "DEPTime": "10:08:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "3",
+                    "ARRTime": "10:30:00",
+                    "DEPTime": "10:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "4",
+                    "ARRTime": "10:38:00",
+                    "DEPTime": "10:39:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "5",
+                    "ARRTime": "10:52:00",
+                    "DEPTime": "10:52:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "6",
+                    "ARRTime": "11:05:00",
+                    "DEPTime": "11:05:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "7",
+                    "ARRTime": "11:18:00",
+                    "DEPTime": "11:18:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "8",
+                    "ARRTime": "11:30:00",
+                    "DEPTime": "11:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "9",
+                    "ARRTime": "11:42:00",
+                    "DEPTime": "11:43:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "10",
+                    "ARRTime": "11:59:00",
+                    "DEPTime": "11:59:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "11",
+                    "ARRTime": "12:16:00",
+                    "DEPTime": "13:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "12",
+                    "ARRTime": "13:36:00",
+                    "DEPTime": "13:36:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "13",
+                    "ARRTime": "13:51:00",
+                    "DEPTime": "13:51:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "14",
+                    "ARRTime": "14:15:00",
+                    "DEPTime": "14:15:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "15",
+                    "ARRTime": "14:22:00",
+                    "DEPTime": "14:22:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "16",
+                    "ARRTime": "14:37:00",
+                    "DEPTime": "14:38:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "17",
+                    "ARRTime": "14:49:00",
+                    "DEPTime": "14:49:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "18",
+                    "ARRTime": "14:56:00",
+                    "DEPTime": "14:56:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "8(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1107",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "阿里山至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "11:50:00",
+                    "DEPTime": "11:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "11:58:00",
+                    "DEPTime": "11:58:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "3",
+                    "ARRTime": "12:08:00",
+                    "DEPTime": "12:09:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "4",
+                    "ARRTime": "12:20:00",
+                    "DEPTime": "12:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "5",
+                    "ARRTime": "12:27:00",
+                    "DEPTime": "12:27:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "6",
+                    "ARRTime": "12:49:00",
+                    "DEPTime": "12:49:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "7",
+                    "ARRTime": "13:04:00",
+                    "DEPTime": "13:04:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "8",
+                    "ARRTime": "13:19:00",
+                    "DEPTime": "13:29:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "9",
+                    "ARRTime": "13:45:00",
+                    "DEPTime": "13:45:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "10",
+                    "ARRTime": "14:03:00",
+                    "DEPTime": "14:04:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "11",
+                    "ARRTime": "14:15:00",
+                    "DEPTime": "14:15:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "12",
+                    "ARRTime": "14:26:00",
+                    "DEPTime": "14:26:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "13",
+                    "ARRTime": "14:38:00",
+                    "DEPTime": "14:38:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "14",
+                    "ARRTime": "14:52:00",
+                    "DEPTime": "14:52:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "15",
+                    "ARRTime": "15:06:00",
+                    "DEPTime": "15:07:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "16",
+                    "ARRTime": "15:14:00",
+                    "DEPTime": "15:14:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "17",
+                    "ARRTime": "15:38:00",
+                    "DEPTime": "15:39:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "18",
+                    "ARRTime": "15:45:00",
+                    "DEPTime": "15:45:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "811(林)(五)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "特色列車",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "1",
+                    "ARRTime": "09:30:00",
+                    "DEPTime": "09:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "2",
+                    "ARRTime": "09:36:00",
+                    "DEPTime": "09:51:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "3",
+                    "ARRTime": "10:13:00",
+                    "DEPTime": "10:13:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "4",
+                    "ARRTime": "10:21:00",
+                    "DEPTime": "10:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "5",
+                    "ARRTime": "10:34:00",
+                    "DEPTime": "10:34:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "6",
+                    "ARRTime": "10:47:00",
+                    "DEPTime": "11:27:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "7",
+                    "ARRTime": "11:39:00",
+                    "DEPTime": "11:39:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "8",
+                    "ARRTime": "11:51:00",
+                    "DEPTime": "12:06:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "9",
+                    "ARRTime": "12:16:00",
+                    "DEPTime": "12:16:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "10",
+                    "ARRTime": "12:32:00",
+                    "DEPTime": "12:32:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "11",
+                    "ARRTime": "12:48:00",
+                    "DEPTime": "13:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "12",
+                    "ARRTime": "14:05:00",
+                    "DEPTime": "14:18:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "13",
+                    "ARRTime": "14:33:00",
+                    "DEPTime": "15:03:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "14",
+                    "ARRTime": "15:24:00",
+                    "DEPTime": "15:24:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "15",
+                    "ARRTime": "15:31:00",
+                    "DEPTime": "15:31:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "16",
+                    "ARRTime": "15:43:00",
+                    "DEPTime": "16:28:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "17",
+                    "ARRTime": "16:39:00",
+                    "DEPTime": "16:39:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "18",
+                    "ARRTime": "16:45:00",
+                    "DEPTime": "17:15:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "811A(林)(六)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "阿里山至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "17:15:00",
+                    "DEPTime": "17:15:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "17:21:00",
+                    "DEPTime": "17:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "3",
+                    "ARRTime": "17:32:00",
+                    "DEPTime": "18:02:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "811B(林)(五)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "特色列車",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "1",
+                    "ARRTime": "18:02:00",
+                    "DEPTime": "18:02:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "18:10:00",
+                    "DEPTime": "18:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "3",
+                    "ARRTime": "18:19:00",
+                    "DEPTime": "18:19:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "812A(林)(六)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "阿里山至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "08:36:00",
+                    "DEPTime": "08:36:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9020",
+                    "Order": "2",
+                    "ARRTime": "09:06:00",
+                    "DEPTime": "09:43:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "812B(林)(六)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "阿里山至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9020",
+                    "Order": "1",
+                    "ARRTime": "09:43:00",
+                    "DEPTime": "09:43:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "10:13:00",
+                    "DEPTime": "10:53:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "812(林)(六)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "1131",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "阿里山至嘉義",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "10:53:00",
+                    "DEPTime": "10:53:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "10:59:00",
+                    "DEPTime": "10:59:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "3",
+                    "ARRTime": "11:10:00",
+                    "DEPTime": "11:29:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "4",
+                    "ARRTime": "11:37:00",
+                    "DEPTime": "11:37:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "5",
+                    "ARRTime": "11:44:00",
+                    "DEPTime": "11:44:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "6",
+                    "ARRTime": "12:09:00",
+                    "DEPTime": "12:34:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "7",
+                    "ARRTime": "12:49:00",
+                    "DEPTime": "12:49:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "8",
+                    "ARRTime": "13:04:00",
+                    "DEPTime": "14:04:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "9",
+                    "ARRTime": "14:20:00",
+                    "DEPTime": "14:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "10",
+                    "ARRTime": "14:46:00",
+                    "DEPTime": "15:31:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "11",
+                    "ARRTime": "15:40:00",
+                    "DEPTime": "15:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "12",
+                    "ARRTime": "15:51:00",
+                    "DEPTime": "15:51:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "13",
+                    "ARRTime": "16:03:00",
+                    "DEPTime": "16:03:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "14",
+                    "ARRTime": "16:17:00",
+                    "DEPTime": "16:17:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "15",
+                    "ARRTime": "16:31:00",
+                    "DEPTime": "16:51:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "16",
+                    "ARRTime": "16:58:00",
+                    "DEPTime": "16:58:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "17",
+                    "ARRTime": "17:21:00",
+                    "DEPTime": "17:23:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9000",
+                    "Order": "18",
+                    "ARRTime": "17:29:00",
+                    "DEPTime": "17:29:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "821(林)(日)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0003",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "北門至祝山",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "1",
+                    "ARRTime": "09:30:00",
+                    "DEPTime": "09:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "2",
+                    "ARRTime": "09:52:00",
+                    "DEPTime": "10:07:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "3",
+                    "ARRTime": "10:15:00",
+                    "DEPTime": "10:15:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "4",
+                    "ARRTime": "10:28:00",
+                    "DEPTime": "10:28:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "5",
+                    "ARRTime": "10:41:00",
+                    "DEPTime": "11:21:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "6",
+                    "ARRTime": "11:32:00",
+                    "DEPTime": "11:42:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "7",
+                    "ARRTime": "11:54:00",
+                    "DEPTime": "11:54:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "8",
+                    "ARRTime": "12:04:00",
+                    "DEPTime": "12:04:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "9",
+                    "ARRTime": "12:20:00",
+                    "DEPTime": "12:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "10",
+                    "ARRTime": "12:36:00",
+                    "DEPTime": "12:41:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "11",
+                    "ARRTime": "12:56:00",
+                    "DEPTime": "13:06:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "12",
+                    "ARRTime": "13:20:00",
+                    "DEPTime": "14:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "13",
+                    "ARRTime": "14:44:00",
+                    "DEPTime": "14:44:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "14",
+                    "ARRTime": "14:51:00",
+                    "DEPTime": "14:51:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "15",
+                    "ARRTime": "15:00:00",
+                    "DEPTime": "15:15:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "16",
+                    "ARRTime": "15:25:00",
+                    "DEPTime": "15:27:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "17",
+                    "ARRTime": "15:35:00",
+                    "DEPTime": "15:47:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "18",
+                    "ARRTime": "15:52:00",
+                    "DEPTime": "15:52:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9020",
+                    "Order": "19",
+                    "ARRTime": "16:16:00",
+                    "DEPTime": "17:20:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "821B(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0003",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "逢週日行駛，祝山至阿里山",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9020",
+                    "Order": "1",
+                    "ARRTime": "17:20:00",
+                    "DEPTime": "17:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "17:39:00",
+                    "DEPTime": "17:39:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "3",
+                    "ARRTime": "17:45:00",
+                    "DEPTime": "17:45:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "822(林)(一)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0003",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "N",
+            "Note": "阿里山至北門",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "08:55:00",
+                    "DEPTime": "08:55:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "09:02:00",
+                    "DEPTime": "09:02:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9015",
+                    "Order": "3",
+                    "ARRTime": "09:15:00",
+                    "DEPTime": "10:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9014",
+                    "Order": "4",
+                    "ARRTime": "10:11:00",
+                    "DEPTime": "10:11:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9013",
+                    "Order": "5",
+                    "ARRTime": "10:17:00",
+                    "DEPTime": "10:17:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "6",
+                    "ARRTime": "10:40:00",
+                    "DEPTime": "10:55:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "7",
+                    "ARRTime": "11:13:00",
+                    "DEPTime": "11:13:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "8",
+                    "ARRTime": "11:30:00",
+                    "DEPTime": "12:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "9",
+                    "ARRTime": "12:56:00",
+                    "DEPTime": "14:06:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "10",
+                    "ARRTime": "14:22:00",
+                    "DEPTime": "14:37:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "11",
+                    "ARRTime": "14:48:00",
+                    "DEPTime": "14:48:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "12",
+                    "ARRTime": "15:00:00",
+                    "DEPTime": "15:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "13",
+                    "ARRTime": "15:12:00",
+                    "DEPTime": "15:12:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "14",
+                    "ARRTime": "15:25:00",
+                    "DEPTime": "15:25:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "15",
+                    "ARRTime": "15:40:00",
+                    "DEPTime": "15:55:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "16",
+                    "ARRTime": "16:03:00",
+                    "DEPTime": "16:03:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "17",
+                    "ARRTime": "16:25:00",
+                    "DEPTime": "16:25:00"
+                }
+            ]
+        },
+        {
+            "Type": "1",
+            "Train": "822S(林)(6/3、6/17)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "1",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0003",
+            "Bike": "N",
+            "ExtraTrain": "Y",
+            "Everyday": "N",
+            "Note": "不定期，十字路至北門",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9012",
+                    "Order": "1",
+                    "ARRTime": "14:20:00",
+                    "DEPTime": "14:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9011",
+                    "Order": "2",
+                    "ARRTime": "14:35:00",
+                    "DEPTime": "14:35:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9010",
+                    "Order": "3",
+                    "ARRTime": "14:50:00",
+                    "DEPTime": "14:53:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9009",
+                    "Order": "4",
+                    "ARRTime": "15:09:00",
+                    "DEPTime": "16:09:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9008",
+                    "Order": "5",
+                    "ARRTime": "16:25:00",
+                    "DEPTime": "16:35:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9007",
+                    "Order": "6",
+                    "ARRTime": "16:45:00",
+                    "DEPTime": "16:45:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9006",
+                    "Order": "7",
+                    "ARRTime": "16:57:00",
+                    "DEPTime": "16:57:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9005",
+                    "Order": "8",
+                    "ARRTime": "17:09:00",
+                    "DEPTime": "17:09:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9004",
+                    "Order": "9",
+                    "ARRTime": "17:22:00",
+                    "DEPTime": "17:22:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9003",
+                    "Order": "10",
+                    "ARRTime": "17:36:00",
+                    "DEPTime": "17:36:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9002",
+                    "Order": "11",
+                    "ARRTime": "17:43:00",
+                    "DEPTime": "17:43:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9001",
+                    "Order": "12",
+                    "ARRTime": "18:05:00",
+                    "DEPTime": "18:05:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "100(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "09:40:00",
+                    "DEPTime": "09:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "09:47:00",
+                    "DEPTime": "09:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "101(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "10:00:00",
+                    "DEPTime": "10:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "10:07:00",
+                    "DEPTime": "10:07:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "102(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "10:10:00",
+                    "DEPTime": "10:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "10:17:00",
+                    "DEPTime": "10:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "103(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "10:30:00",
+                    "DEPTime": "10:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "10:37:00",
+                    "DEPTime": "10:37:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "104(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "10:40:00",
+                    "DEPTime": "10:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "10:47:00",
+                    "DEPTime": "10:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "105(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "11:00:00",
+                    "DEPTime": "11:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "11:07:00",
+                    "DEPTime": "11:07:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "106(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "11:10:00",
+                    "DEPTime": "11:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "11:17:00",
+                    "DEPTime": "11:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "107(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "11:30:00",
+                    "DEPTime": "11:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "11:37:00",
+                    "DEPTime": "11:37:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "108(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "11:40:00",
+                    "DEPTime": "11:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "11:47:00",
+                    "DEPTime": "11:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "109(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "12:00:00",
+                    "DEPTime": "12:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "12:07:00",
+                    "DEPTime": "12:07:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "110(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "13:10:00",
+                    "DEPTime": "13:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "13:17:00",
+                    "DEPTime": "13:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "111(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "13:30:00",
+                    "DEPTime": "13:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "13:37:00",
+                    "DEPTime": "13:37:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "112(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "13:40:00",
+                    "DEPTime": "13:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "13:47:00",
+                    "DEPTime": "13:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "113(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "14:00:00",
+                    "DEPTime": "14:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "14:07:00",
+                    "DEPTime": "14:07:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "114(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "14:10:00",
+                    "DEPTime": "14:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "14:17:00",
+                    "DEPTime": "14:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "115(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "14:30:00",
+                    "DEPTime": "14:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "14:37:00",
+                    "DEPTime": "14:37:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "116(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "14:40:00",
+                    "DEPTime": "14:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "14:47:00",
+                    "DEPTime": "14:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "117(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "15:10:00",
+                    "DEPTime": "15:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "15:17:00",
+                    "DEPTime": "15:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "118(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "15:20:00",
+                    "DEPTime": "15:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "15:27:00",
+                    "DEPTime": "15:27:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "119(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "15:40:00",
+                    "DEPTime": "15:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "15:47:00",
+                    "DEPTime": "15:47:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "120(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "15:50:00",
+                    "DEPTime": "15:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "2",
+                    "ARRTime": "15:57:00",
+                    "DEPTime": "15:57:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "121(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "2",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "神木線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9016",
+                    "Order": "1",
+                    "ARRTime": "16:10:00",
+                    "DEPTime": "16:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "16:17:00",
+                    "DEPTime": "16:17:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "31(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "09:00:00",
+                    "DEPTime": "09:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "09:06:00",
+                    "DEPTime": "09:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "32(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "09:20:00",
+                    "DEPTime": "09:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "09:26:00",
+                    "DEPTime": "09:26:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "33(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "09:30:00",
+                    "DEPTime": "09:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "09:36:00",
+                    "DEPTime": "09:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "34(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "09:50:00",
+                    "DEPTime": "09:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "09:56:00",
+                    "DEPTime": "09:56:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "35(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "10:00:00",
+                    "DEPTime": "10:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "10:06:00",
+                    "DEPTime": "10:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "36(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "10:20:00",
+                    "DEPTime": "10:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "10:26:00",
+                    "DEPTime": "10:26:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "37(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "10:30:00",
+                    "DEPTime": "10:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "10:36:00",
+                    "DEPTime": "10:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "38(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "10:50:00",
+                    "DEPTime": "10:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "10:56:00",
+                    "DEPTime": "10:56:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "39(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "11:00:00",
+                    "DEPTime": "11:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "11:06:00",
+                    "DEPTime": "11:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "40(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "11:20:00",
+                    "DEPTime": "11:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "11:26:00",
+                    "DEPTime": "11:26:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "41(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "11:30:00",
+                    "DEPTime": "11:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "11:36:00",
+                    "DEPTime": "11:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "42(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "11:50:00",
+                    "DEPTime": "11:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "11:56:00",
+                    "DEPTime": "11:56:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "43(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "13:00:00",
+                    "DEPTime": "13:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "13:06:00",
+                    "DEPTime": "13:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "44(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "13:20:00",
+                    "DEPTime": "13:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "13:26:00",
+                    "DEPTime": "13:26:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "45(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "13:30:00",
+                    "DEPTime": "13:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "13:36:00",
+                    "DEPTime": "13:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "46(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "13:50:00",
+                    "DEPTime": "13:50:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "13:56:00",
+                    "DEPTime": "13:56:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "47(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "14:00:00",
+                    "DEPTime": "14:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "14:06:00",
+                    "DEPTime": "14:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "48(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "14:20:00",
+                    "DEPTime": "14:20:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "14:26:00",
+                    "DEPTime": "14:26:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "49(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "14:30:00",
+                    "DEPTime": "14:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "14:36:00",
+                    "DEPTime": "14:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "50(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "15:00:00",
+                    "DEPTime": "15:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "15:06:00",
+                    "DEPTime": "15:06:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "51(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "15:10:00",
+                    "DEPTime": "15:10:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "15:16:00",
+                    "DEPTime": "15:16:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "52(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "15:30:00",
+                    "DEPTime": "15:30:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "15:36:00",
+                    "DEPTime": "15:36:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "53(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "1",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "1",
+                    "ARRTime": "15:40:00",
+                    "DEPTime": "15:40:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "2",
+                    "ARRTime": "15:46:00",
+                    "DEPTime": "15:46:00"
+                }
+            ]
+        },
+        {
+            "Type": "2",
+            "Train": "54(林)",
+            "BreastFeed": "N",
+            "Route": "",
+            "Package": "N",
+            "OverNightStn": "",
+            "LineDir": "2",
+            "Line": "0",
+            "Dinning": "N",
+            "FoodSrv": "N",
+            "Cripple": "N",
+            "CarClass": "0002",
+            "Bike": "N",
+            "ExtraTrain": "N",
+            "Everyday": "Y",
+            "Note": "沼平線",
+            "NoteEng": "",
+            "TimeInfos": [
+                {
+                    "Route": "",
+                    "Station": "9018",
+                    "Order": "1",
+                    "ARRTime": "16:00:00",
+                    "DEPTime": "16:00:00"
+                },
+                {
+                    "Route": "",
+                    "Station": "9017",
+                    "Order": "2",
+                    "ARRTime": "16:06:00",
+                    "DEPTime": "16:06:00"
+                }
+            ]
+        }
+    ]
+}
