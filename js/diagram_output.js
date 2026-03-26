@@ -53,12 +53,8 @@ const staticSchedules = {
         "thsr": [
             {
                 // 改成我們剛剛抓下來的後綴！
-                fileSuffix: "20260101~20261031.json" 
-            },
-            {
-                // 改成我們剛剛抓下來的後綴！
-                fileSuffix: "20261101~20261231.json" 
-            },
+                fileSuffix: "20260202~20261231.json" 
+            }
         ]
 };
 
