@@ -440,7 +440,8 @@
     { "ID": "9016", "DSC": "神木", "SVGYAXIS": 291, "TERMINAL": "" },
     { "ID": "9017", "DSC": "阿里山", "SVGYAXIS": 236, "TERMINAL": "" },
     { "ID": "9018", "DSC": "沼平", "SVGYAXIS": 189, "TERMINAL": "" },
-    { "ID": "9019", "DSC": "祝山", "SVGYAXIS": 0, "TERMINAL": "Y" }
+    { "ID": "9019", "DSC": "對高岳", "SVGYAXIS": 60, "TERMINAL": "" },
+    { "ID": "9020", "DSC": "祝山", "SVGYAXIS": 0, "TERMINAL": "Y" }
   ],
     "LINE_SL": [
   { "ID": "4170", "DSC": "善化", "SVGYAXIS": 0, "TERMINAL": "Y" },
