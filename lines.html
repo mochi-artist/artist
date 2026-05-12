@@ -16,85 +16,53 @@
     <link rel="stylesheet" href="css/web.css">
     <link rel="Shortcut Icon" type="image/x-icon" href="favicon.ico" />
 
-    <!-- 🌟 修復 Zabuto 日曆：藍色縮小版樣式 -->
     <style>
-        /* 1. 基本修復：標題與箭頭 */
-        .zabuto_calendar .calendar-month-header th {
-            background-color: transparent !important;
-        }
+    /* 1. 修正左右箭頭圖示與位置 */
+    .datepicker .prev::before { content: "❮" !important; color: #333 !important; font-weight: bold; }
+    .datepicker .next::before { content: "❯" !important; color: #333 !important; font-weight: bold; }
+    .datepicker .prev i, .datepicker .next i { display: none !important; }
 
-        /* 2. 結構修復：等寬排列 */
-        .zabuto_calendar .table {
-            table-layout: fixed !important;
-            width: 100% !important;
-        }
-        
-        .zabuto_calendar .calendar-dow-header th {
-            text-align: center !important;
-            padding-bottom: 10px !important;
-        }
+    /* 2. 縮小米色格子間的空隙 (針對手機版優化) */
+    .datepicker table {
+        border-collapse: separate !important;
+        border-spacing: 2px !important; /* 調小這個數值，空隙就會變小 */
+        width: 100% !important;
+    }
 
-        /* ================= 核心調整：藍色縮小方塊跟隨效果 ================= */
-        
-        /* A. 外層容器：設定格子間距 */
-        .zabuto_calendar .table td {
-            background-color: transparent !important;
-            border: none !important;
-            padding: 4px !important; 
-        }
+    /* 3. 設定米色格子基礎樣式 */
+    .datepicker table tr td.day {
+        background-color: #fff3e0 !important; /* 淺米色 */
+        color: #5d4037 !important;
+        border-radius: 4px !important;
+        padding: 8px 0 !important; /* 縮減上下內距讓格子更緊湊 */
+        font-size: 14px !important;
+        position: relative; /* 為了讓藍色格子可以精準定位 */
+        border: none !important;
+    }
 
-        /* B. 底層格子：預設樣式 */
-        .zabuto_calendar .table td div.day {
-            border-radius: 6px !important;
-            padding: 8px 0 !important;
-            margin: 0 auto !important;
-            width: 100% !important;
-            display: block !important;
-            text-align: center !important;
-            position: relative;
-            background-color: transparent !important; /* 沒資料時透明 */
-            color: #333 !important;
-        }
+    /* 4. 藍色格子：限定在米色格子的範圍內，並自動跟隨今日日期 */
+    /* .today 是外掛自動判斷當下系統日期的 Class */
+    .datepicker table tr td.today,
+    .datepicker table tr td.active {
+        background-color: #0d6efd !important; /* 強制覆蓋為藍色 */
+        color: white !important;
+        font-weight: bold;
+        box-shadow: inset 0 0 0 2px #0d6efd !important; /* 確保邊界貼合 */
+        z-index: 1;
+    }
 
-        /* C. 米黃色方格：有資料的日期 (Event) */
-        .zabuto_calendar .table td.event div.day {
-            background-color: #fef0cd !important; /* 米黃色底 */
-        }
+    /* 無資料或非本月的格子顏色稍微淡化 (可選) */
+    .datepicker table tr td.old, 
+    .datepicker table tr td.new {
+        background-color: #f5f5f5 !important;
+        color: #999 !important;
+    }
 
-        /* D. 💥 關鍵：讓藍色縮小方格「跟隨」 */
-        /* 當格子是「今天」或「被點選(Active)」時，數字區域變藍色 */
-        .zabuto_calendar .table td.today div.day span,
-        .zabuto_calendar .table td.active div.day span,
-        .zabuto_calendar .table td.today div.day a,
-        .zabuto_calendar .table td.active div.day a {
-            background-color: #0d6efd !important; /* 藍色 */
-            color: #ffffff !important;
-            display: inline-block !important;
-            width: 28px !important;    /* 限制寬度 */
-            height: 28px !important;   /* 限制高度 */
-            line-height: 28px !important; /* 文字垂直置中 */
-            padding: 0 !important;
-            border-radius: 5px !important; 
-            margin: -2px 0 !important; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* 讓小藍塊有一點點立體感 */
-        }
-
-        /* E. 避免顏色衝突：當被選中時，外層 div 依然維持原本的顏色 */
-        /* 如果是選中沒資料的日期，底色變淡灰；如果是選中有資料的日期，維持米黃 */
-        .zabuto_calendar .table td.active div.day {
-            background-color: #f8f9fa !important; /* 預設淡灰底 */
-        }
-        .zabuto_calendar .table td.event.active div.day,
-        .zabuto_calendar .table td.event.today div.day {
-            background-color: #fef0cd !important; /* 有資料則維持米黃底 */
-        }
-
-        /* F. 滑鼠互動 */
-        .zabuto_calendar .table td.event div.day:hover {
-            background-color: #fce29f !important;
-            cursor: pointer;
-        }
-    </style>
+    /* 手機版觸控反應 */
+    .datepicker table tr td.day:active {
+        background-color: #ffe0b2 !important;
+    }
+</style>
 </head>
 
 <!-- ⚠️ 已經把會造成白邊的 style="padding-top:..." 拿掉了！ -->
