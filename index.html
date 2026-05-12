@@ -3,137 +3,356 @@
 
 <head>
     <title id="web_name"></title>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     <meta name="robots" content="index,follow" />
     <meta name="author" content="呂卓勳 Cho Husn Lu" />
-
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#2c3e50">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="軌道運行圖">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
     <link rel="Shortcut Icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/web.css">
-
 </head>
 
-<body style="padding-top:40px;">
+<body style="padding-top: 56px;">
     <navbar></navbar>
 
-    <div class="jumbotron">
+    <div class="hero-section">
         <div class="container text-center">
-            <h1><b>台灣鐵路/軌道運行圖</b></h1>
-            <h2>本網站只專門收入運轉時刻運行圖，客運停靠站無法查閱(要查閱請至其他平台)，本網站資料請多加利用，謝謝</h2>
-            <h3>因完整時間表與網站架構問題，難免會有線歪斜的情況產生，請多多見諒，我盡力了:b</h3>
-            <h4>未來若要自行繼續修改運行圖，請至<a href="https://github.com/mochi-artist/artist/"
-                    target="_blank">GitHub專案頁面</a>找尋，感謝各位麻糬們</h4>
-            <h4>可視察日期(20251231全台鐵車次，台鐵20260101起，林鐵20260110起，高鐵20260202起)</h4>
-                             <h4>想知道哪一天有開行加班車請至<a href="https://tra-special-train-filter.pages.dev/"target="_blank">每日額外開行列車查詢地</a>或<a href=https://github.com/mochi-artist/artist/blob/main/scan_log.txt>抓原作者車次檔案</a>找尋</h4>
-            <h4>今天日期：<span id="today_date"></span></h4>
+            <h1 class="fw-bold mb-1">台灣鐵路/軌道運行圖</h1>
+            <p class="text-muted mb-3">今天日期：<span id="today_date"></span></p>
         </div>
     </div>
 
-    <div class="container bg-1 text-center">
-        <div id="status_now"></div>
+    <div class="container py-3 pb-5">
 
-        <div class="row">
-            <div class="col-md-6 portfolio-item">
-                <h2><b>今日運行圖</b></h2>
-                <div class="alert alert-danger" role="alert">今日的運行圖捷徑</div>
-                <h3>西部幹線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='diagram_output.html?lineKind=LINE_WN&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">北段 (基隆-竹南)</a>
-                    <a href='diagram_output.html?lineKind=LINE_WM&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">山線 (竹南-彰化)</a>
-                    <a href='diagram_output.html?lineKind=LINE_WSEA&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">海線 (竹南-彰化)</a>
-                    <a href='diagram_output.html?lineKind=LINE_WS&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">南段 (彰化-枋寮)</a>
-                 </div>
-
-                <h3>東部幹線與南迴線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='diagram_output.html?lineKind=LINE_I&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">宜蘭線 (八堵-蘇澳)</a>
-                    <a href='diagram_output.html?lineKind=LINE_N&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">北迴線 (蘇澳新-花蓮)</a>
-                    <a href='diagram_output.html?lineKind=LINE_T&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">台東線 (花蓮-台東)</a>
-                    <a href='diagram_output.html?lineKind=LINE_S&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">南迴線 (台東-枋寮)</a>
+        <!-- 搜尋 
+        <div class="row justify-content-center mt-2 mb-1">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                    </span>
+                    <input type="text" id="search-input" class="form-control border-start-0 ps-0"
+                        placeholder="輸入車站名稱">
+                    <button class="btn btn-dark" type="button" id="search-btn">搜尋</button>
                 </div>
-
-                <h3>支線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='diagram_output.html?lineKind=LINE_PX&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">平溪深澳線</a>
-                    <a href='diagram_output.html?lineKind=LINE_NW&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">六家/內灣線</a>
-                 <a href='diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">集集線</a>
-                    <a href='diagram_output.html?lineKind=LINE_SL&scrollToCurrentTime=true'
-                        class="btn btn-success btn-lg" role="button">沙崙線</a>
+                <div class="input-group">
+                    <span class="text-muted small">請直接輸入車站名稱，可直接顯示今日運行圖並跳轉到車站(車次號搜尋功能尚在開發中)</span>
                 </div>
             </div>
-            <div class="col-md-6 portfolio-item">
-                <h2><b>台鐵運行圖圖庫</b></h2>
-                <div class="alert alert-danger" role="alert">提供未來60天內的台鐵靜態運行圖</a></div>
-                <h3>西部幹線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=LINE_WN' class="btn btn-primary btn-lg" role="button">北段 (基隆-竹南)</a>
-                    <a href='lines.html?lineKind=LINE_WM' class="btn btn-primary btn-lg" role="button">山線 (竹南-彰化)</a>
-                    <a href='lines.html?lineKind=LINE_WSEA' class="btn btn-primary btn-lg" role="button">海線 (竹南-彰化)</a>
-                    <a href='lines.html?lineKind=LINE_WS' class="btn btn-primary btn-lg" role="button">南段 (彰化-枋寮)</a>
-                 </div>
-                <h3>東部幹線與南迴線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=LINE_I' class="btn btn-primary btn-lg" role="button">宜蘭線 (八堵-蘇澳)</a>
-                    <a href='lines.html?lineKind=LINE_N' class="btn btn-primary btn-lg" role="button">北迴線 (蘇澳新-花蓮)</a>
-                    <a href='lines.html?lineKind=LINE_T' class="btn btn-primary btn-lg" role="button">台東線 (花蓮-台東)</a>
-                    <a href='lines.html?lineKind=LINE_S' class="btn btn-primary btn-lg" role="button">南迴線 (台東-枋寮)</a>
-                </div>
-                <h3>支線</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=LINE_PX' class="btn btn-primary btn-lg" role="button">平溪深澳線</a>
-                    <a href='lines.html?lineKind=LINE_NW' class="btn btn-primary btn-lg" role="button">六家/內灣線</a>
-                  <a href='lines.html?lineKind=LINE_J' class="btn btn-primary btn-lg" role="button">集集線</a>
-                    <a href='lines.html?lineKind=LINE_SL' class="btn btn-primary btn-lg" role="button">沙崙線</a>
-                </div>
-                <h3>阿里山森林鐵路</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=LINE_Alishan' class="btn btn-primary btn-lg" role="button">阿里山線 (嘉義-祝山)</a>
-                </div>
-                <h3>台灣高鐵</h3>
-                <div class="btn-group-vertical btn-block">
-                    <a href='lines.html?lineKind=thsr' class="btn btn-primary btn-lg" role="button">台灣高鐵 (南港-左營)</a>
-                 </div>   
-            </div>
-          </div>
+        </div>-->
+
+        <!-- 操作說明 -->
+         <div class="mt-4 text-center">
+    <h5 class="text-secondary fw-normal" style="font-size: 1.1rem;">
+        想知道哪一天有開行加班車，請至 
+        <a href="https://tra-special-train-filter.pages.dev/" target="_blank" class="text-decoration-none fw-bold text-primary">每日額外開行列車查詢地</a> 
+        或 
+        <a href="https://github.com/mochi-artist/artist/blob/main/scan_log.txt" target="_blank" class="text-decoration-none fw-bold text-primary">抓原作者車次檔案</a> 
+        找尋
+    </h5>
+</div>
+        <div class="d-flex gap-3 justify-content-center my-3 text-muted small">
+            <span><span class="badge me-1" style="background-color: #fca311; color: #000000;">今日</span>直接開啟今天的運行圖</span>
+            <span><span class="badge me-1"
+                    style="background-color: #14213d; color: #ffffff;">圖庫</span>選擇日期查看歷史運行圖</span>
         </div>
-        <br>
+
+        <!-- 西部幹線 -->
+        <div class="section-heading">西部幹線</div>
+        <div class="row g-2">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">北段</div>
+                        <p class="line-stations">基隆 － 竹南</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_WN&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_WN" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">山線</div>
+                        <p class="line-stations">竹南 － 彰化</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_WM&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_WM" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">海線</div>
+                        <p class="line-stations">竹南 － 彰化</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_WSEA&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_WSEA" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">南段</div>
+                        <p class="line-stations">彰化 － 枋寮</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_WS&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_WS" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+
+        <!-- 東部幹線與南迴線 -->
+        <div class="section-heading">東部幹線與南迴線</div>
+        <div class="row g-2">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">宜蘭線</div>
+                        <p class="line-stations">八堵 － 蘇澳</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_I&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_I" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">北迴線</div>
+                        <p class="line-stations">蘇澳新 － 花蓮</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_N&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_N" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">台東線</div>
+                        <p class="line-stations">花蓮 － 台東</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_T&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_T" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">南迴線</div>
+                        <p class="line-stations">台東 － 枋寮</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_S&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_S" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 支線 -->
+        <div class="section-heading">支線</div>
+        <div class="row g-2">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">平溪/深澳線</div>
+                        <p class="line-stations">八斗子 － 菁桐</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_PX&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_PX" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">六家/內灣線</div>
+                        <p class="line-stations">新竹 － 內灣</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_NW&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_NW" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">集集線</div>
+                        <p class="line-stations">田中 － 車埕</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_J" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">沙崙線</div>
+                        <p class="line-stations">善化 － 沙崙</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_SL&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_SL" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 其他鐵道系統 -->
+        <div class="section-heading">其他鐵道系統</div>
+        <div class="row g-2">
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">阿里山森林鐵路</div>
+                        <p class="line-stations">嘉義 － 祝山</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=LINE_Alishan&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=LINE_Alishan" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="line-card card">
+                    <div class="card-body">
+                        <div class="line-name">台灣高鐵</div>
+                        <p class="line-stations">南港 － 左營</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="diagram_output.html?lineKind=thsr&scrollToCurrentTime=true"
+                            class="btn btn-today flex-fill">今日</a>
+                        <a href="lines.html?lineKind=thsr" class="btn btn-archive flex-fill">圖庫</a>
+                    </div>
+                </div>
+            </div>
+        <hr>
         <footer class="alert alert-warning" role="alert"></footer>
     </div>
+
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/util.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
+<script>
     const diagram_data = localStorage.getItem('is_confirmed');
     const today_date = getTodayFormattedDate();
-    
+    if (diagram_data == null || typeof (diagram_data) == "undefined" || diagram_data !== "ok") {
+        Swal.fire({
+            title: '本網站聲明',
+            icon: 'warning',
+            text: '本站所提供的資料，僅供參考，實際鐵路運行情況，請以現場、各鐵路與軌道系統的管理單位所公布資訊或實際鐵路運作為準',
+            width: 500,
+            heightAuto: true,
+            padding: '3em',
+            backdrop: `rgba(255, 255, 0, 0.2) no-repeat`,
+            showDenyButton: true,
+            confirmButtonText: '我了解了',
+            denyButtonText: '我不同意',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire('您將開始瀏覽本網站，本聲明將不再出現', '', 'success');
+                window.localStorage.setItem("is_confirmed", "ok");
+            } else if (result.isDenied) {
+                window.localStorage.setItem("is_confirmed", "nook");
+            }
+        })
+    }
+
+    function searchByTrainNumber(trainNo) {
+        Swal.fire({ title: `你要找的是 ${trainNo} 車次嗎？`, icon: 'question', showCancelButton: true, confirmButtonText: '是', cancelButtonText: '取消' });
+    }
+
+    function searchByStationName(query) {
+        $.when(
+            $.getJSON('js/references/Station.json'),
+            $.getJSON('js/references/OperationLines.json'),
+            $.getJSON('js/references/SVG_Y_Axis.json')
+        ).done(function (stationsRes, opLinesRes, svgYAxisRes) {
+            const stations = stationsRes[0];
+            const opLines = opLinesRes[0];
+            const svgYAxis = svgYAxisRes[0];
+            const results = stations.filter(s => s.STATIONNAME.includes(query));
+            console.log(`[Station.json] 搜尋「${query}」，找到 ${results.length} 筆：`, results);
+            if (results.length === 0) {
+                Swal.fire({ title: '查無結果', text: `找不到車站「${query}」`, icon: 'info' });
+                return;
+            }
+            const btnHtml = results.map(s => {
+                const name = opLines[s.LINE] ? opLines[s.LINE].NAME : s.LINE;
+                return `<button class="swal2-confirm swal2-styled" style="display:block;width:100%;margin:4px 0" data-line="${s.LINE}" data-stationid="${s.STATIONID}">${name} - ${s.STATIONNAME}</button>`;
+            }).join('');
+            Swal.fire({
+                title: `「${query}」的搜尋結果`,
+                html: btnHtml,
+                showConfirmButton: false,
+                showCancelButton: true,
+                cancelButtonText: '取消',
+                didOpen: () => {
+                    document.querySelectorAll('.swal2-html-container [data-line]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const line = btn.dataset.line;
+                            const stationId = btn.dataset.stationid;
+                            const lineStations = svgYAxis[line] || [];
+                            console.log(`[SVG_Y_Axis] LINE=${line} 共 ${lineStations.length} 站，比對 STATIONID=${stationId}`);
+                            const station = lineStations.find(s => String(s.ID) === String(stationId));
+                            if (!station) {
+                                console.warn('[SVG_Y_Axis] 找不到對應站點', { line, stationId, lineStations });
+                                return;
+                            }
+                            console.log('[SVG_Y_Axis] 找到站點：', station, `→ 開啟 lineKind=${line}&stationAxisY=${station.SVGYAXIS}`);
+                            Swal.close();
+                            window.location.href = `diagram_output.html?lineKind=${line}&scrollToCurrentTime=true&stationAxisY=${station.SVGYAXIS}`;
+                        });
+                    });
+                }
+            });
+        });
+    }
+
+    // 搜尋功能：如果輸入全為數字，則視為車次號；否則視為車站名稱
+    function searchStation(query) {
+        if (/^\d+$/.test(query)) {
+            searchByTrainNumber(query);
+        } else {
+            searchByStationName(query);
+        }
+    }
 
     $(document).ready(function () {
         $('#web_name').append(web_name)
@@ -142,23 +361,21 @@
         $("meta[name='keywords']").attr("content", keywords)
         $('footer').append(footer)
         $("navbar").load("navbar.html")
+
+        $('#search-btn').on('click', function () {
+            const query = $('#search-input').val().trim();
+            if (query) searchStation(query);
+        });
+        $('#search-input').on('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const query = $(this).val().trim();
+                if (query) searchStation(query);
+            }
+        });
     })
 </script>
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3628172690328777"
     crossorigin="anonymous"></script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('Service Worker 註冊成功，範圍:', registration.scope);
-        })
-        .catch(error => {
-          console.log('Service Worker 註冊失敗:', error);
-        });
-    });
-  }
-</script>
 </html>
