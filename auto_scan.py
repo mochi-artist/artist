@@ -28,7 +28,7 @@ CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
 # 🛡️ 強化排除名單 (包含 7, 8, 60, 61 等貨運/迴送/工程車)
-EXCLUDE_PREFIXES = ["29", "47", "48", "49", "7", "8", "60", "61"] 
+EXCLUDE_PREFIXES = ["29", "47", "48", "49", "7", "8", "60", "61","371A","386B","191A","196B"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
