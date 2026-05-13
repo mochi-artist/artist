@@ -160,6 +160,7 @@ function renderDetail(train) {
         .forEach(([k, v]) => {
             const row = tpl('tpl-info-row');
             row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
+            row.querySelector('.info-val').textContent = ''; // Clear placeholder
             fillInfoVal(row.querySelector('.info-val'), k, v);
             infoTbody.appendChild(row);
         });
@@ -178,7 +179,20 @@ function renderDetail(train) {
         row.querySelector('.route').textContent = t.Route || '—';
         timeTbody.appendChild(row);
     });
+    
+    // 把時刻表塞進去
     detail.appendChild(section);
+
+    // ==========================================
+    // 💡 [新增] 100% 絕對有效的物理墊高防護罩
+    // 確保手機版最後一站絕對不會被吃掉！
+    // ==========================================
+    const spacer = document.createElement('div');
+    spacer.style.height = '120px';
+    spacer.style.width = '100%';
+    spacer.style.opacity = '0';
+    spacer.style.pointerEvents = 'none'; // 讓它即使蓋在上面也不會阻擋點擊
+    detail.appendChild(spacer);
 }
 
 const cache = {};
