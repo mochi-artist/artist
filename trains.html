@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/trains.css" />
     
     <!-- ==========================================
-         📱 終極手機版響應式補丁 (絕對強制比例版)
+         📱 終極手機版響應式補丁 (上 4 : 下 6 比例版)
          ========================================== -->
     <style>
         @media screen and (max-width: 768px) {
@@ -25,16 +25,12 @@
             }
 
             /* ==========================================
-               🌟 上半部：三個選單區塊
+               🌟 上半部：三個選單區塊 (比例 4)
                ========================================== */
             .panel-group {
-                /* 💡 調整上半部比例 (目前設定為 6) */
-                flex: 6 !important; 
-                
-                /* 💀 殺死內容撐開高度的預設行為，強制由 flex 接管 */
+                flex: 4 !important; 
                 min-height: 0 !important; 
                 height: 0 !important;     
-
                 display: flex !important;
                 flex-direction: row !important; 
                 width: 100% !important;
@@ -65,16 +61,12 @@
             }
 
             /* ==========================================
-               🌟 下半部：詳細資料區塊 (車次與時刻表)
+               🌟 下半部：詳細資料區塊 (比例 6)
                ========================================== */
             .panel-detail {
-                /* 💡 調整下半部比例 (目前設定為 4) */
-                flex: 4 !important; 
-
-                /* 💀 同樣殺死高度預設行為 */
+                flex: 6 !important; 
                 min-height: 0 !important; 
                 height: 0 !important;
-
                 width: 100% !important;
                 margin-top: 0 !important;
                 overflow-y: auto !important; 
