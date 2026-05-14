@@ -28,8 +28,8 @@
                🌟 上半部：三個選單區塊
                ========================================== */
             .panel-group {
-                /* 💡 調整上半部比例 */
-                flex: 5 !important; 
+                /* 💡 調整上半部比例 (目前設定為 6) */
+                flex: 6 !important; 
                 
                 /* 💀 殺死內容撐開高度的預設行為，強制由 flex 接管 */
                 min-height: 0 !important; 
@@ -68,157 +68,12 @@
                🌟 下半部：詳細資料區塊 (車次與時刻表)
                ========================================== */
             .panel-detail {
-                /* 💡 調整下半部比例 */
-                flex: 5 !important; 
+                /* 💡 調整下半部比例 (目前設定為 4) */
+                flex: 4 !important; 
 
                 /* 💀 同樣殺死高度預設行為 */
                 min-height: 0 !important; 
                 height: 0 !important;
-
-                width: 100% !important;
-                margin-top: 0 !important;
-                overflow-y: auto !important; 
-            }
-
-            /* ==========================================
-               🌟 時刻表縮放防護
-               ========================================== */
-            .time-table-wrap {
-                overflow-x: hidden !important;
-                width: 100% !important;
-            }
-            .time-table {
-                width: 100% !important;
-                table-layout: fixed !important; 
-                font-size: 0.75rem !important;   
-            }
-            .time-table th, .time-table td {
-                padding: 6px 1px !important; 
-                text-align: center;
-                word-wrap: break-word !important; 
-                white-space: normal !important; 
-                letter-spacing: -0.5px !important;         
-            }
-            .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 10%; } 
-            .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 24%; } 
-            .time-table th:nth-child(3), .time-table td:nth-child(3) { width: 26%; } 
-            .time-table th:nth-child(4), .time-table td:nth-child(4) { width: 26%; } 
-            .time-table th:nth-child(5), .time-table td:nth-child(5) { width: 14%; } 
-
-            #detail-scroll {
-                padding-bottom: 60px !important; 
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <h1><span class="title-full">目前所有可讀取的台鐵時刻資料 </span>抓原作者車次檔案區</h1>
-        <span class="subtitle" id="status"><span class="loading-dots">載入中</span></span>
-    </header>
-
-    <div class="workspace">
-        <div class="panel-group">
-            <div class="panel panel-files">
-                <div class="panel-head">日期檔案</div>
-                <div class="panel-body" id="file-list"><div class="panel-empty"><span class="loading-dots">載入中</span></div></div>
-            </div>
-            <div class="panel panel-filter">
-                <div class="panel-head">車種過濾</div>
-                <div class="panel-body" id="type-filter"><div class="panel-empty">—</div></div>
-            </div>
-            <div class="panel panel-trains">
-                <div class="panel-head">車次清單</div>
-                <div class="panel-body" id="train-list"><div class="panel-empty">請先選擇日期</div></div>
-            </div>
-        </div>
-
-        <div class="panel-detail">
-            <div class="detail-scroll" id="detail-scroll">
-                <div class="placeholder" id="placeholder">
-                    <p>選擇左側日期 → 車次以顯示詳情</p>
-                </div>
-                <div id="detail" style="display:none;"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Templates ── -->
-    <template id="tpl-filter-item"><div class="filter-item"><span class="f-name"></span><span class="f-count"></span></div></template>
-    <template id="tpl-train-item"><div class="train-item"><span class="t-num"></span><span class="t-meta"></span></div></template>
-    <template id="tpl-detail-card">
-        <div class="detail-card">
-            <div class="card-header">
-                <span class="train-id">車次 <span class="train-num"></span></span>
-                <span class="type-badge"></span>
-            </div>
-            <table class="info-table"><tbody></tbody></table>
-        </div>
-    </template>
-    <template id="tpl-info-row"><tr><td class="info-key"></td><td class="info-val"></td></tr></template>
-    <template id="tpl-time-section">
-        <div class="time-section">
-            <div class="section-title"></div>
-            <div class="time-table-wrap">
-                <table class="time-table">
-                    <thead><tr><th>順序</th><th>車站名稱</th><th>到站</th><th>出發</th><th>路線</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </template>
-    <template id="tpl-time-row"><tr><td class="order"></td><td class="station"></td><td class="time arr"></td><td class="time dep"></td><td class="route"></td></tr></template>
-
-    <script src="js/trains.js"></script>
-</body>
-</html>                height: auto !important;
-                gap: 0 !important;
-            }
-            .panel {
-                width: 33.33% !important; 
-                height: 100% !important;
-                border-right: 1px solid #1e293b !important;
-                border-bottom: 2px solid #1e293b !important;
-            }
-            
-            .panel-head {
-                font-size: 0.75rem !important;
-                padding: 6px 2px !important;
-                justify-content: center !important;
-                letter-spacing: -0.5px !important;
-                white-space: nowrap !important;
-            }
-            .panel-head svg {
-                display: none !important; 
-            }
-            .panel-body {
-                height: calc(100% - 35px) !important;
-                overflow-x: hidden !important;
-                overflow-y: auto !important;
-                padding: 2px !important; 
-            }
-
-            .file-item, .filter-item, .train-item {
-                display: flex !important;
-                flex-direction: row !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                padding: 8px 4px !important;
-                font-size: 0.75rem !important; 
-                white-space: nowrap !important;
-            }
-            .file-date, .file-count, .f-name, .f-count, .t-num, .t-meta { 
-                font-size: 0.75rem !important; 
-                white-space: nowrap !important;
-            }
-
-            /* ==========================================
-               🌟 下半部：詳細資料區塊 (車次與時刻表)
-               ========================================== */
-            .panel-detail {
-                /* 💡 在這裡調整下半部的比例 (目前為 6 份空間) */
-                flex: 4 !important; 
 
                 width: 100% !important;
                 margin-top: 0 !important;
