@@ -28,7 +28,7 @@ const CAR_CLASS_MAP = {
 const LINE_DIR_MAP = { '1': '順行', '2': '逆行' };
 const LINE_MAP = { '0': '不經山海線', '1': '山線', '2': '海線', '3': '成追線', '4': '山海線' };
 
-const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '專列', '其他'];
+const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '專列', '客迴'];
 
 const CAR_CLASS_CATEGORY = {
     // 新自強
@@ -59,30 +59,87 @@ const CAR_CLASS_CATEGORY = {
 };
 
 function getTrainCategory(carClass) {
-    return CAR_CLASS_CATEGORY[carClass] || '其他';
+    return CAR_CLASS_CATEGORY[carClass] || '客迴';
 }
 
 const KEYS_ZH = {
-    Type: '列車型態', Train: '車次', BreastFeed: '哺(集)乳室',
-    Route: '路線', Package: '行李(託運)服務', OverNightStn: '跨日車站代碼',
-    LineDir: '行駛方向', Line: '經由路線', Dinning: '餐車',
-    FoodSrv: '訂餐(便當)服務', Cripple: '輪椅座', CarClass: '列車種類',
-    Bike: '攜帶自行車', ExtraTrain: '加班車', Everyday: '每日行駛',
-    Note: '備註', NoteEng: '英文備註'
+    Type: '列車型態', Train: '車次',
+    Route: '路線', 
+    LineDir: '行駛方向', Line: '經由路線', CarClass: '列車種類',
+    ExtraTrain: '加班車', Everyday: '每日行駛',
+    Note: '備註', CalculatedOverNightStn: '跨日車站代碼'
 };
 
-const YN_KEYS = new Set(['BreastFeed', 'Package', 'Dinning', 'FoodSrv', 'Cripple', 'Bike', 'ExtraTrain', 'Everyday']);
+const YN_KEYS = new Set(['ExtraTrain', 'Everyday']);
+
+const IGNORE_KEYS = new Set(['BreastFeed', 'Package', 'Dinning', 'FoodSrv', 'Cripple', 'Bike', 'NoteEng', 'OverNightStn', 'OverNightStationID']);
 
 let Route = {};
 
 // ==========================================
-// 💡 [新增] 特殊車次日誌解析專區
+// 💡 精準計算「最靠近 00:00:00 的跨日車站」演算法
+// ==========================================
+function timeToSeconds(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseInt(parts[2] || 0, 10);
+}
+
+function timeToMidnightDiff(timeStr) {
+    if (!timeStr) return Infinity;
+    const sec = timeToSeconds(timeStr);
+    if (sec > 12 * 3600) return 86400 - sec;
+    return sec;
+}
+
+function findOverNightStation(timeInfos) {
+    if (!timeInfos || timeInfos.length === 0) return null;
+    
+    let crossedMidnight = false;
+    let prevSeconds = -1;
+    let minDiff = Infinity;
+    let closestStn = null;
+    
+    for (const t of timeInfos) {
+        const arrStr = t.ARRTime || t.DEPTime;
+        const depStr = t.DEPTime || t.ARRTime;
+        if (!arrStr || !depStr) continue;
+        
+        const arrSec = timeToSeconds(arrStr);
+        const depSec = timeToSeconds(depStr);
+        
+        if (prevSeconds !== -1 && (arrSec < prevSeconds || depSec < arrSec)) {
+            crossedMidnight = true;
+        }
+        prevSeconds = Math.max(arrSec, depSec);
+    }
+    
+    if (!crossedMidnight) return null;
+    
+    for (const t of timeInfos) {
+        const arrStr = t.ARRTime || t.DEPTime;
+        const depStr = t.DEPTime || t.ARRTime;
+        
+        const arrDiff = timeToMidnightDiff(arrStr);
+        const depDiff = timeToMidnightDiff(depStr);
+        
+        const localMinDiff = Math.min(arrDiff, depDiff);
+        if (localMinDiff < minDiff) {
+            minDiff = localMinDiff;
+            closestStn = t.Station;
+        }
+    }
+    
+    return closestStn;
+}
+
+// ==========================================
+// 💡 特殊車次日誌解析專區
 // ==========================================
 let specialTrainsByDate = {};
 
 async function loadSpecialTrainsLog() {
     try {
-        // 讀取日誌檔也加上不留快取，確保永遠抓到最新掃描結果
         const res = await fetch('scan_log.txt', { cache: 'no-store' });
         const text = await res.text();
         
@@ -90,7 +147,6 @@ async function loadSpecialTrainsLog() {
         const lines = text.split('\n');
         
         for (const line of lines) {
-            // 1. 抓日期
             const dateMatch = line.match(/日期:\s*(\d{8})/);
             if (dateMatch) {
                 currentDate = dateMatch[1];
@@ -99,23 +155,17 @@ async function loadSpecialTrainsLog() {
                 }
                 continue;
             }
-            
-            // 2. 抓車次號碼 (強化版防彈寫法)
-            // 只要這行不是「第 x 次讀取」，且包含 [車次]，就抓出來
             if (currentDate && !line.includes('次讀取')) {
-                // 支援半形 [1404] 或全形 ［1404］
                 const trainMatch = line.match(/[\[［]([a-zA-Z0-9]+)[\]］]/);
                 if (trainMatch) {
                     specialTrainsByDate[currentDate].add(trainMatch[1]);
                 }
             }
         }
-        console.log("日誌解析完成！", specialTrainsByDate);
     } catch (error) {
         console.error('無法讀取或解析 scan_log.txt', error);
     }
 }
-// ==========================================
 
 function setYN(td, v) {
     if (v === 'Y') { td.innerHTML = '<span class="badge badge-green">是</span>'; return; }
@@ -156,13 +206,35 @@ function renderDetail(train) {
     card.querySelector('.train-num').textContent = train.Train;
     card.querySelector('.type-badge').textContent = CAR_CLASS_MAP[train.CarClass] || train.CarClass || '';
     const infoTbody = card.querySelector('tbody');
-    Object.entries(train)
-        .filter(([k]) => k !== 'TimeInfos')
+    
+    const displayObj = { ...train };
+    
+    delete displayObj.OverNightStn;
+    delete displayObj.OverNightStationID;
+    
+    const calculatedStn = findOverNightStation(train.TimeInfos);
+    if (calculatedStn) {
+        displayObj.CalculatedOverNightStn = calculatedStn;
+    }
+
+    Object.entries(displayObj)
+        .filter(([k, v]) => {
+            if (k === 'TimeInfos') return false;
+            if (IGNORE_KEYS.has(k)) return false; 
+            return true;
+        })
         .forEach(([k, v]) => {
+            let displayVal = v;
+            
+            if (k === 'CalculatedOverNightStn') {
+                const stnName = Route[v]?.DSC || '';
+                displayVal = stnName ? `${v} ${stnName}` : v;
+            }
+
             const row = tpl('tpl-info-row');
             row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
-            row.querySelector('.info-val').textContent = ''; // Clear placeholder
-            fillInfoVal(row.querySelector('.info-val'), k, v);
+            row.querySelector('.info-val').textContent = ''; 
+            fillInfoVal(row.querySelector('.info-val'), k, displayVal);
             infoTbody.appendChild(row);
         });
     detail.appendChild(card);
@@ -181,18 +253,13 @@ function renderDetail(train) {
         timeTbody.appendChild(row);
     });
     
-    // 把時刻表塞進去
     detail.appendChild(section);
 
-    // ==========================================
-    // 💡 [新增] 100% 絕對有效的物理墊高防護罩
-    // 確保手機版最後一站絕對不會被吃掉！
-    // ==========================================
     const spacer = document.createElement('div');
     spacer.style.height = '120px';
     spacer.style.width = '100%';
     spacer.style.opacity = '0';
-    spacer.style.pointerEvents = 'none'; // 讓它即使蓋在上面也不會阻擋點擊
+    spacer.style.pointerEvents = 'none'; 
     detail.appendChild(spacer);
 }
 
@@ -209,13 +276,11 @@ async function loadFile(filename) {
     let source = '';
 
     try {
-        // 🚀 第一關：優先找你的 GitHub 庫 (你的專屬資料庫與舊資料寶藏)
         console.log(`⏳ [1] 正在尋找你的 GitHub: ${filename} ...`);
-        const myGithubUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/data/${filename}`;
+        const basePath = filename === 'final_train_diagram.json' ? '' : 'data/';
+        const myGithubUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${basePath}${filename}`;
         
-        // 💡 [防止快取爆炸] 加入 { cache: 'no-store' } 阻擋手機瀏覽器偷存這 6MB 檔案
         const res = await fetch(myGithubUrl, { cache: 'no-store' });
-        
         if (!res.ok) throw new Error('你的 GitHub 尚未上傳或無此檔案');
         
         rawData = await res.json();
@@ -223,26 +288,22 @@ async function loadFile(filename) {
 
     } catch (err1) {
         try {
-            // 🚀 第二關：你這邊沒資料，前往 Billy 的 GitHub 尋找最新版
             console.log(`⏳ [2] 你這邊沒資料，前往 Billy 的雲端尋找備用資料...`);
-            const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/data/${filename}`;
+            const billyPath = filename === 'final_train_diagram.json' ? '' : 'data/';
+            const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${billyPath}${filename}`;
             
-            // 💡 [防止快取爆炸] 同樣加入不快取機制
             const res2 = await fetch(billyUrl, { cache: 'no-store' });
-            
             if (!res2.ok) throw new Error('Billy 那邊也刪除或沒有了');
             
             rawData = await res2.json();
             source = 'Billy 的 GitHub';
 
         } catch (err2) {
-            // ☠️ 兩邊都找不到
             console.error(`❌ 徹底失敗：兩個資料庫都找不到 ${filename}`);
-            return []; // 回傳空陣列，讓畫面顯示「無資料」而不是壞掉
+            return []; 
         }
     }
 
-    // 🚀 資料格式相容性處理 (自動適應你或 Billy 的 JSON 格式)
     let trainArray = [];
     if (Array.isArray(rawData)) {
         trainArray = rawData;
@@ -256,8 +317,6 @@ async function loadFile(filename) {
     }
 
     console.log(`✅ 成功從 [${source}] 讀取，解析出 ${trainArray.length} 筆車次！`);
-
-    // 存入這一次工作階段的記憶體 (重整網頁後就會消失，不會堆積在手機實體硬碟)
     cache[filename] = trainArray;
     return cache[filename];
 }
@@ -278,9 +337,15 @@ function renderFilterPanel(trains) {
     filterEl.innerHTML = '';
 
     const counts = {};
+    let overnightCount = 0;
+
     trains.forEach(t => {
         const cat = getTrainCategory(t.CarClass);
         counts[cat] = (counts[cat] || 0) + 1;
+
+        if (cat !== '客迴' && findOverNightStation(t.TimeInfos) !== null) {
+            overnightCount++;
+        }
     });
 
     const allFrag = tpl('tpl-filter-item');
@@ -308,19 +373,47 @@ function renderFilterPanel(trains) {
         });
         filterEl.appendChild(el);
     });
+
+    if (overnightCount > 0) {
+        const frag = tpl('tpl-filter-item');
+        const el = frag.firstElementChild;
+        el.querySelector('.f-name').textContent = '跨夜正班車';
+        el.querySelector('.f-name').style.color = '#eab308'; 
+        el.querySelector('.f-count').textContent = overnightCount;
+        if (selectedType === '跨夜正班車') el.classList.add('active');
+        el.addEventListener('click', () => {
+            selectedType = '跨夜正班車';
+            renderFilterPanel(currentTrains);
+            renderTrainList(currentTrains);
+        });
+        filterEl.appendChild(el);
+    }
 }
 
 function renderTrainList(trains) {
     const listEl = document.getElementById('train-list');
-    const filtered = selectedType
-        ? trains.filter(t => getTrainCategory(t.CarClass) === selectedType)
-        : trains;
+    
+    let filtered = trains;
+    if (selectedType === '跨夜正班車') {
+        filtered = trains.filter(t => getTrainCategory(t.CarClass) !== '客迴' && findOverNightStation(t.TimeInfos) !== null);
+    } else if (selectedType) {
+        filtered = trains.filter(t => getTrainCategory(t.CarClass) === selectedType);
+    }
+
     if (!filtered.length) {
         listEl.innerHTML = '<div class="panel-empty">無資料</div>';
         return;
     }
     listEl.innerHTML = '';
-    [...filtered].sort((a, b) => Number(a.Train) - Number(b.Train)).forEach(train => {
+    
+    [...filtered].sort((a, b) => {
+        const numA = parseInt(a.Train, 10) || 0;
+        const numB = parseInt(b.Train, 10) || 0;
+        if (numA !== numB) {
+            return numA - numB;
+        }
+        return a.Train.localeCompare(b.Train);
+    }).forEach(train => {
         const frag = tpl('tpl-train-item');
         const el = frag.firstElementChild;
         el.querySelector('.t-num').textContent = train.Train;
@@ -334,7 +427,8 @@ function renderTrainList(trains) {
 
 async function selectFile(filename, itemEl) {
     document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
-    itemEl.classList.add('active');
+    if (itemEl) itemEl.classList.add('active');
+    
     activeFile = filename;
     activeTrain = null;
 
@@ -345,80 +439,168 @@ async function selectFile(filename, itemEl) {
 
     selectedType = null;
     
-    // 💡 [修改] 取得全部車次後，使用 scan_log.txt 的名單進行精準過濾
     let allTrains = await loadFile(filename);
-    const dateStr = filename.replace('.json', '');
-    const specialSet = specialTrainsByDate[dateStr] || new Set();
     
-    currentTrains = allTrains.filter(t => specialSet.has(t.Train));
+    if (filename === 'final_train_diagram.json') {
+        currentTrains = allTrains;
+        document.getElementById('status').textContent = `全車次總表 — 共 ${currentTrains.length} 筆`;
+    } else {
+        const dateStr = filename.replace('.json', '');
+        const specialSet = specialTrainsByDate[dateStr] || new Set();
+        currentTrains = allTrains.filter(t => specialSet.has(t.Train));
+        document.getElementById('status').textContent = `${filename} — 共 ${currentTrains.length} 筆`;
+    }
 
-    itemEl.querySelector('.file-count').textContent = `${currentTrains.length} 車次`;
-    document.getElementById('status').textContent = `${filename} — ${currentTrains.length} 筆 (已過濾特殊車次)`;
     renderFilterPanel(currentTrains);
     renderTrainList(currentTrains);
 }
 
-async function listJsonFiles() {
-    // 💡 [修改] 改成直接抓取你的 GitHub Repo 裡的 data 資料夾
-    const url = 'https://api.github.com/repos/mochi-artist/artist/contents/data';
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`GitHub API error: ${response.status}`);
-        const data = await response.json();
-        return data
-            .map(item => item.name)
-            .filter(name => /^\d{8}\.json$/.test(name))
-            .sort();
-    } catch (error) {
-        console.error('Error fetching GitHub files:', error);
-        return [];
-    }
-}
-
+// ==========================================
+// 💡 初始化與左側「月份資料夾」渲染
+// ==========================================
 async function init() {
-    // 1. 初始化時，先去讀取並解析 TXT 日誌檔
     await loadSpecialTrainsLog();
 
-    // 2. 取得 Route.json (為了顯示車站中文名稱) (此為小檔，且不常變動，保持預設快取即可)
     const routeData = await fetch('js/references/Route.json').then(r => r.json());
     Route = routeData;
 
     const listEl = document.getElementById('file-list');
     listEl.innerHTML = '';
 
-    // 💡 [關鍵修改] 捨棄去 GitHub API 撈所有檔案
-    // 改成直接從我們剛解析好的 specialTrainsByDate 裡面拿出「有紀錄的日期」
+    // 💡 提前宣告這兩個變數，讓「全車次總表」的點擊事件可以呼叫
+    const monthElements = {};
+    const jumpSelect = document.createElement('select');
+
+    // 1. 全車次總表 (置頂)
+    const masterEl = document.createElement('div');
+    masterEl.className = 'file-item';
+    masterEl.innerHTML = `<span class="file-date">全車次總表</span><span class="file-count">基準檔</span>`;
+    
+    masterEl.addEventListener('click', () => {
+        selectFile('final_train_diagram.json', masterEl);
+        
+        // 💡 [新增] 當點擊全車次總表時，強制把所有的月份資料夾都收合起來！
+        Object.values(monthElements).forEach(group => {
+            group.container.style.display = 'none';
+            group.header.innerHTML = `<span>📅 ${group.year}年 ${group.month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${group.daysLen} 天 ▸</span>`;
+        });
+        
+        // 順便把跳轉選單歸零
+        jumpSelect.value = '';
+    });
+    listEl.appendChild(masterEl);
+
     const logDates = Object.keys(specialTrainsByDate).sort();
 
-    // 如果 TXT 檔裡沒讀到任何日期
     if (logDates.length === 0) {
-        listEl.innerHTML = '<div class="panel-empty">無特殊車次紀錄</div>';
+        listEl.innerHTML += '<div class="panel-empty">無特殊車次紀錄</div>';
         document.getElementById('status').textContent = `0 個日期檔案`;
         return;
     }
 
-    // 3. 根據 TXT 裡面的日期，產生左側的列表
+    // 2. 將日期依照 YYYYMM 進行分組
+    const groups = {};
     logDates.forEach(dateStr => {
-        // 因為檔案名稱是 "20260514.json"，我們把日期字串組裝回去
-        const filename = `${dateStr}.json`; 
-        
-        // 把 "20260514" 變成 "2026/05/14" 的格式顯示在畫面上
-        const formatted = `${dateStr.slice(0, 4)}/${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`;
-        
-        // 取得該日期在 TXT 裡面紀錄了幾台車次
-        const countInLog = specialTrainsByDate[dateStr].size;
-
-        const el = document.createElement('div');
-        el.className = 'file-item';
-        el.innerHTML = `<span class="file-date">${formatted}</span><span class="file-count">${countInLog} 車次</span>`;
-        
-        // 綁定點擊事件
-        el.addEventListener('click', () => selectFile(filename, el));
-        listEl.appendChild(el);
+        const monthKey = dateStr.slice(0, 6); 
+        if (!groups[monthKey]) groups[monthKey] = [];
+        groups[monthKey].push(dateStr);
     });
 
-    // 4. 更新上方標題的統計數字
-    document.getElementById('status').textContent = `${logDates.length} 個日期檔案`;
+    const jumpContainer = document.createElement('div');
+    jumpContainer.style.padding = '8px 15px';
+    jumpContainer.style.backgroundColor = '#0f172a';
+    jumpContainer.style.position = 'sticky'; 
+    jumpContainer.style.top = '0';
+    jumpContainer.style.zIndex = '10';
+    jumpContainer.style.borderBottom = '1px solid #1e293b';
+
+    jumpSelect.style.width = '100%';
+    jumpSelect.style.padding = '6px';
+    jumpSelect.style.backgroundColor = '#1e293b';
+    jumpSelect.style.color = '#e2e8f0';
+    jumpSelect.style.border = '1px solid #334155';
+    jumpSelect.style.borderRadius = '4px';
+    jumpSelect.style.outline = 'none';
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.textContent = '快速跳轉至月份...';
+    defaultOpt.value = '';
+    jumpSelect.appendChild(defaultOpt);
+    jumpContainer.appendChild(jumpSelect);
+    listEl.appendChild(jumpContainer);
+
+    // 3. 依序渲染每個月份的「資料夾標題」與內含的「檔案」
+    Object.keys(groups).sort().forEach(monthKey => {
+        const year = monthKey.slice(0, 4);
+        const month = monthKey.slice(4, 6);
+        const days = groups[monthKey];
+
+        jumpSelect.appendChild(new Option(`${year}年 ${month}月`, monthKey));
+
+        const headerEl = document.createElement('div');
+        headerEl.style.padding = '10px 15px';
+        headerEl.style.backgroundColor = '#0f172a';
+        headerEl.style.color = '#e2e8f0';
+        headerEl.style.fontSize = '0.9rem';
+        headerEl.style.fontWeight = 'bold';
+        headerEl.style.cursor = 'pointer';
+        headerEl.style.display = 'flex';
+        headerEl.style.justifyContent = 'space-between';
+        headerEl.style.position = 'sticky'; 
+        headerEl.style.top = '48px'; 
+        headerEl.style.zIndex = '5';
+        headerEl.style.borderBottom = '1px solid #1e293b';
+        
+        headerEl.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${days.length} 天 ▸</span>`;
+
+        const containerEl = document.createElement('div');
+        containerEl.style.display = 'none'; 
+
+        headerEl.addEventListener('click', () => {
+            const isExpanded = containerEl.style.display !== 'none';
+            containerEl.style.display = isExpanded ? 'none' : 'block';
+            headerEl.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${days.length} 天 ${isExpanded ? '▸' : '▾'}</span>`;
+        });
+
+        listEl.appendChild(headerEl);
+
+        days.forEach(dateStr => {
+            const filename = `${dateStr}.json`; 
+            const formatted = `${dateStr.slice(0, 4)}/${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`;
+            const countInLog = specialTrainsByDate[dateStr].size;
+
+            const el = document.createElement('div');
+            el.className = 'file-item';
+            el.style.paddingLeft = '35px'; 
+            el.innerHTML = `<span class="file-date">${formatted}</span><span class="file-count">${countInLog} 車次</span>`;
+            
+            el.addEventListener('click', () => selectFile(filename, el));
+            containerEl.appendChild(el);
+        });
+
+        listEl.appendChild(containerEl);
+
+        monthElements[monthKey] = { header: headerEl, container: containerEl, year, month, daysLen: days.length };
+    });
+
+    jumpSelect.addEventListener('change', (e) => {
+        const targetKey = e.target.value;
+        if (!targetKey || !monthElements[targetKey]) return;
+
+        Object.values(monthElements).forEach(group => {
+            group.container.style.display = 'none';
+            group.header.innerHTML = `<span>📅 ${group.year}年 ${group.month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${group.daysLen} 天 ▸</span>`;
+        });
+
+        const { header, container, year, month, daysLen } = monthElements[targetKey];
+        container.style.display = 'block';
+        header.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${daysLen} 天 ▾</span>`;
+
+        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        jumpSelect.value = '';
+    });
+
+    document.getElementById('status').textContent = `${logDates.length} 個日期檔案 + 1 份基準檔`;
 }
 
 init().catch(err => {
