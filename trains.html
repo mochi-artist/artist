@@ -8,11 +8,74 @@
     <link rel="stylesheet" href="css/trains.css" />
     
     <!-- ==========================================
-         📱 修正版：只動時刻表與底部防護，其餘版面完全不變！
+         📱 終極手機版響應式補丁 (4:6 完美比例版)
          ========================================== -->
     <style>
         @media screen and (max-width: 768px) {
-            /* 1. 只拯救時刻表 (固定比例，只需上下滑動) */
+            /* 1. 鎖定外層，防止手機瀏覽器因為滑動而上下跳動 */
+            html, body {
+                overflow: hidden !important;
+                height: 100vh !important;
+            }
+
+            .workspace {
+                display: flex !important;
+                flex-direction: column !important; 
+                height: calc(100vh - 65px) !important; /* 扣除 Header 的高度 */
+                overflow: hidden !important;
+            }
+
+            /* ==========================================
+               🌟 上半部 40%：三個選單區塊 (左右並排)
+               ========================================== */
+            .panel-group {
+                flex: 4 !important; /* 分配 4 份空間 (40%) */
+                display: flex !important;
+                flex-direction: row !important; /* 保持左右排列 */
+                width: 100% !important;
+                height: auto !important;
+                gap: 0 !important;
+            }
+            .panel {
+                width: 33.33% !important; /* 三等分寬度 */
+                height: 100% !important;
+                border-right: 1px solid #1e293b !important;
+                border-bottom: 2px solid #1e293b !important;
+            }
+            
+            /* 窄版優化：縮小字體、隱藏小圖示以節省空間 */
+            .panel-head {
+                font-size: 0.8rem !important;
+                padding: 6px 4px !important;
+                justify-content: center !important;
+            }
+            .panel-head svg {
+                display: none !important; /* 隱藏 SVG 圖示 */
+            }
+            .panel-body {
+                height: calc(100% - 35px) !important;
+                overflow-y: auto !important;
+                padding: 4px !important; /* 減少內距 */
+            }
+            .file-item, .filter-item, .train-item {
+                padding: 6px 4px !important;
+                font-size: 0.75rem !important; /* 縮小文字避免擠爆 */
+            }
+            .file-date, .f-name, .t-num { font-size: 0.8rem !important; }
+
+            /* ==========================================
+               🌟 下半部 60%：詳細資料區塊
+               ========================================== */
+            .panel-detail {
+                flex: 6 !important; /* 分配 6 份空間 (60%) */
+                width: 100% !important;
+                margin-top: 0 !important;
+                overflow-y: auto !important; /* 允許內部上下滑動 */
+            }
+
+            /* ==========================================
+               🌟 時刻表縮放防護
+               ========================================== */
             .time-table-wrap {
                 overflow-x: hidden !important;
                 width: 100% !important;
@@ -20,25 +83,24 @@
             .time-table {
                 width: 100% !important;
                 table-layout: fixed !important; 
-                font-size: 0.8rem !important;   
+                font-size: 0.75rem !important;   
             }
             .time-table th, .time-table td {
-                padding: 8px 2px !important; 
+                padding: 6px 1px !important; 
                 text-align: center;
                 word-wrap: break-word !important; 
                 white-space: normal !important; 
                 letter-spacing: -0.5px;         
             }
-            /* 精準分配 5 個欄位的完美比例 */
-            .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 12%; } 
-            .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 22%; } 
+            /* 精準分配欄位比例 */
+            .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 10%; } 
+            .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 24%; } 
             .time-table th:nth-child(3), .time-table td:nth-child(3) { width: 26%; } 
             .time-table th:nth-child(4), .time-table td:nth-child(4) { width: 26%; } 
             .time-table th:nth-child(5), .time-table td:nth-child(5) { width: 14%; } 
 
-            /* 2. 加強底部防護罩，不讓最後一站被吃掉 */
             #detail-scroll {
-                padding-bottom: 80px !important; 
+                padding-bottom: 60px !important; 
             }
         }
     </style>
