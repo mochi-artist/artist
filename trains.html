@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/trains.css" />
     
     <!-- ==========================================
-         📱 終極手機版響應式補丁 (5:5 完美比例版)
+         📱 終極手機版響應式補丁 (比例自由調整版)
          ========================================== -->
     <style>
         @media screen and (max-width: 768px) {
@@ -25,10 +25,12 @@
             }
 
             /* ==========================================
-               🌟 上半部 50%：三個選單區塊
+               🌟 上半部：三個選單區塊
                ========================================== */
             .panel-group {
-                flex: 7 !important; /* 💡 改為 5 份空間 (50%) */
+                /* 💡 在這裡調整上半部的比例 (目前為 4 份空間) */
+                flex: 6 !important; 
+
                 display: flex !important;
                 flex-direction: row !important; 
                 width: 100% !important;
@@ -42,32 +44,44 @@
                 border-bottom: 2px solid #1e293b !important;
             }
             
-            /* 窄版優化：極致縮小字體與內距 */
             .panel-head {
                 font-size: 0.75rem !important;
                 padding: 6px 2px !important;
                 justify-content: center !important;
                 letter-spacing: -0.5px !important;
+                white-space: nowrap !important;
             }
             .panel-head svg {
                 display: none !important; 
             }
             .panel-body {
                 height: calc(100% - 35px) !important;
+                overflow-x: hidden !important;
                 overflow-y: auto !important;
                 padding: 2px !important; 
             }
+
             .file-item, .filter-item, .train-item {
-                padding: 6px 2px !important;
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 8px 4px !important;
                 font-size: 0.75rem !important; 
+                white-space: nowrap !important;
             }
-            .file-date, .f-name, .t-num { font-size: 0.75rem !important; }
+            .file-date, .file-count, .f-name, .f-count, .t-num, .t-meta { 
+                font-size: 0.75rem !important; 
+                white-space: nowrap !important;
+            }
 
             /* ==========================================
-               🌟 下半部 50%：詳細資料區塊
+               🌟 下半部：詳細資料區塊 (車次與時刻表)
                ========================================== */
             .panel-detail {
-                flex: 3 !important; /* 💡 改為 5 份空間 (50%) */
+                /* 💡 在這裡調整下半部的比例 (目前為 6 份空間) */
+                flex: 4 !important; 
+
                 width: 100% !important;
                 margin-top: 0 !important;
                 overflow-y: auto !important; 
@@ -90,7 +104,7 @@
                 text-align: center;
                 word-wrap: break-word !important; 
                 white-space: normal !important; 
-                letter-spacing: -0.5px;         
+                letter-spacing: -0.5px !important;         
             }
             .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 10%; } 
             .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 24%; } 
@@ -106,7 +120,6 @@
 </head>
 
 <body>
-
     <header>
         <h1><span class="title-full">目前所有可讀取的台鐵時刻資料 </span>抓原作者車次檔案區</h1>
         <span class="subtitle" id="status"><span class="loading-dots">載入中</span></span>
