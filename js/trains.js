@@ -289,7 +289,9 @@ function renderFilterPanel(trains) {
 
     const allFrag = tpl('tpl-filter-item');
     const allEl = allFrag.firstElementChild;
-    allEl.style.cssText = 'display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 8px 4px !important;';
+    allEl.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px !important; line-height: 1;';
+    allEl.querySelector('.f-name').style.cssText = 'float: left; font-size: 0.75rem; white-space: nowrap;';
+    allEl.querySelector('.f-count').style.cssText = 'float: right; font-size: 0.7rem; color: #94a3b8; white-space: nowrap;';
     allEl.querySelector('.f-name').textContent = '全部';
     allEl.querySelector('.f-count').textContent = trains.length;
     if (selectedType === null) allEl.classList.add('active');
@@ -303,7 +305,9 @@ function renderFilterPanel(trains) {
     CATEGORY_ORDER.filter(cat => counts[cat]).forEach(cat => {
         const frag = tpl('tpl-filter-item');
         const el = frag.firstElementChild;
-        el.style.cssText = 'display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 8px 4px !important;';
+        el.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px !important; line-height: 1;';
+        el.querySelector('.f-name').style.cssText = 'float: left; font-size: 0.75rem; white-space: nowrap;';
+        el.querySelector('.f-count').style.cssText = 'float: right; font-size: 0.7rem; color: #94a3b8; white-space: nowrap;';
         el.querySelector('.f-name').textContent = cat;
         el.querySelector('.f-count').textContent = counts[cat];
         if (selectedType === cat) el.classList.add('active');
@@ -318,9 +322,10 @@ function renderFilterPanel(trains) {
     if (overnightCount > 0) {
         const frag = tpl('tpl-filter-item');
         const el = frag.firstElementChild;
-        el.style.cssText = 'display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 8px 4px !important;';
+        el.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px !important; line-height: 1;';
+        el.querySelector('.f-name').style.cssText = 'float: left; font-size: 0.75rem; color: #eab308; white-space: nowrap;';
+        el.querySelector('.f-count').style.cssText = 'float: right; font-size: 0.7rem; color: #94a3b8; white-space: nowrap;';
         el.querySelector('.f-name').textContent = '跨夜正班'; 
-        el.querySelector('.f-name').style.color = '#eab308'; 
         el.querySelector('.f-count').textContent = overnightCount;
         if (selectedType === '跨夜正班') el.classList.add('active');
         el.addEventListener('click', () => {
@@ -356,7 +361,9 @@ function renderTrainList(trains) {
     }).forEach(train => {
         const frag = tpl('tpl-train-item');
         const el = frag.firstElementChild;
-        el.style.cssText = 'display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 8px 4px !important;';
+        el.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px !important; line-height: 1;';
+        el.querySelector('.t-num').style.cssText = 'float: left; font-size: 0.75rem; white-space: nowrap;';
+        el.querySelector('.t-meta').style.cssText = 'float: right; font-size: 0.7rem; color: #94a3b8; white-space: nowrap;';
         el.querySelector('.t-num').textContent = train.Train;
         el.querySelector('.t-meta').textContent = `${(train.TimeInfos || []).length}站`;
         if (train.Train === activeTrain) el.classList.add('active');
@@ -409,16 +416,22 @@ async function init() {
     const monthElements = {};
     const jumpSelect = document.createElement('select');
 
-    // 1. 全車次總表 (💡 強制左右並排不堆疊)
+    // 1. 全車次總表 (💡 終極強制單行排版)
     const masterEl = document.createElement('div');
     masterEl.className = 'file-item';
-    masterEl.style.cssText = 'display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 10px 4px !important;';
-    masterEl.innerHTML = `<span class="file-date" style="white-space:nowrap; font-size:0.75rem;">全車次總表</span><span class="file-count" style="white-space:nowrap; font-size:0.7rem;">基準檔</span>`;
+    masterEl.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 12px 4px !important; line-height: 1;';
+    masterEl.innerHTML = `
+        <span class="file-date" style="float: left; white-space: nowrap; font-size: 0.75rem; color: #e2e8f0;">全車次總表</span>
+        <span class="file-count" style="float: right; white-space: nowrap; font-size: 0.7rem; color: #eab308;">基準檔</span>
+    `;
     masterEl.addEventListener('click', () => {
         selectFile('final_train_diagram.json', masterEl);
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
-            group.header.innerHTML = `<span style="white-space:nowrap">${group.shortYear}年${group.month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${group.daysLen}天▸</span>`;
+            group.header.innerHTML = `
+                <span style="float: left; white-space: nowrap;">${group.shortYear}年${group.month}月</span> 
+                <span style="float: right; color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap;">${group.daysLen}天▸</span>
+            `;
         });
         jumpSelect.value = '';
     });
@@ -441,21 +454,9 @@ async function init() {
 
     // 快速跳轉選單
     const jumpContainer = document.createElement('div');
-    jumpContainer.style.padding = '6px 4px';
-    jumpContainer.style.backgroundColor = '#0f172a';
-    jumpContainer.style.position = 'sticky'; 
-    jumpContainer.style.top = '0';
-    jumpContainer.style.zIndex = '10';
-    jumpContainer.style.borderBottom = '1px solid #1e293b';
+    jumpContainer.style.cssText = 'padding: 6px 4px; background-color: #0f172a; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #1e293b;';
 
-    jumpSelect.style.width = '100%';
-    jumpSelect.style.padding = '4px 2px';
-    jumpSelect.style.fontSize = '0.75rem';
-    jumpSelect.style.backgroundColor = '#1e293b';
-    jumpSelect.style.color = '#e2e8f0';
-    jumpSelect.style.border = '1px solid #334155';
-    jumpSelect.style.borderRadius = '2px';
-    jumpSelect.style.outline = 'none';
+    jumpSelect.style.cssText = 'width: 100%; padding: 4px 2px; font-size: 0.75rem; background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 2px; outline: none;';
 
     const defaultOpt = document.createElement('option');
     defaultOpt.textContent = '跳轉月份...';
@@ -473,10 +474,13 @@ async function init() {
         jumpSelect.appendChild(new Option(`${shortYear}年${month}月`, monthKey));
 
         const headerEl = document.createElement('div');
-        // 💡 強制資料夾標題左右並排
-        headerEl.style.cssText = 'padding: 8px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; position: sticky; top: 38px; z-index: 5; border-bottom: 1px solid #1e293b;';
+        // 💡 強制資料夾標題單行排版
+        headerEl.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; position: sticky; top: 38px; z-index: 5; border-bottom: 1px solid #1e293b; line-height: 1;';
         
-        headerEl.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${days.length}天▸</span>`;
+        headerEl.innerHTML = `
+            <span style="float: left; white-space: nowrap;">${shortYear}年${month}月</span> 
+            <span style="float: right; color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap;">${days.length}天▸</span>
+        `;
 
         const containerEl = document.createElement('div');
         containerEl.style.display = 'none'; 
@@ -484,7 +488,10 @@ async function init() {
         headerEl.addEventListener('click', () => {
             const isExpanded = containerEl.style.display !== 'none';
             containerEl.style.display = isExpanded ? 'none' : 'block';
-            headerEl.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${days.length}天${isExpanded ? '▸' : '▾'}</span>`;
+            headerEl.innerHTML = `
+                <span style="float: left; white-space: nowrap;">${shortYear}年${month}月</span> 
+                <span style="float: right; color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap;">${days.length}天${isExpanded ? '▸' : '▾'}</span>
+            `;
         });
 
         listEl.appendChild(headerEl);
@@ -496,9 +503,12 @@ async function init() {
 
             const el = document.createElement('div');
             el.className = 'file-item';
-            // 💡 強制日期檔案左右並排
-            el.style.cssText = 'padding: 8px 4px !important; padding-left: 10px !important; display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important;';
-            el.innerHTML = `<span class="file-date" style="white-space:nowrap; font-size:0.75rem;">${formatted}</span><span class="file-count" style="white-space:nowrap; font-size:0.7rem;">${countInLog}車</span>`;
+            // 💡 強制日期檔案單行排版
+            el.style.cssText = 'display: block !important; clear: both; overflow: hidden; padding: 10px 4px !important; padding-left: 10px !important; line-height: 1;';
+            el.innerHTML = `
+                <span class="file-date" style="float: left; white-space: nowrap; font-size: 0.75rem;">${formatted}</span>
+                <span class="file-count" style="float: right; white-space: nowrap; font-size: 0.7rem; color: #94a3b8;">${countInLog}車</span>
+            `;
             
             el.addEventListener('click', () => selectFile(filename, el));
             containerEl.appendChild(el);
@@ -515,12 +525,18 @@ async function init() {
 
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
-            group.header.innerHTML = `<span style="white-space:nowrap">${group.shortYear}年${group.month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${group.daysLen}天▸</span>`;
+            group.header.innerHTML = `
+                <span style="float: left; white-space: nowrap;">${group.shortYear}年${group.month}月</span> 
+                <span style="float: right; color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap;">${group.daysLen}天▸</span>
+            `;
         });
 
         const { header, container, shortYear, month, daysLen } = monthElements[targetKey];
         container.style.display = 'block';
-        header.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${daysLen}天▾</span>`;
+        header.innerHTML = `
+            <span style="float: left; white-space: nowrap;">${shortYear}年${month}月</span> 
+            <span style="float: right; color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap;">${daysLen}天▾</span>
+        `;
 
         header.scrollIntoView({ behavior: 'smooth', block: 'start' });
         jumpSelect.value = '';
