@@ -37,7 +37,7 @@
         text-align: center;
     }
 
-    /* 日期格子本體 (淺米色背景) */
+    /* 日期格子本體 (淺米色背景，尺寸絕對固定) */
     .zabuto_calendar table tbody tr td .day {
         background-color: #fff3e0 !important; 
         color: #5d4037 !important;
@@ -52,24 +52,27 @@
         margin: 0 !important;
     }
 
-    /* 選擇或今日的格子 (藍色) - 直接將藍色填入固定的格子，保留粗體 */
+    /* 💡 今日或選取的格子 (藍色) - 完美填滿米色框框，保留你的粗體！ */
     .zabuto_calendar table tbody tr td .day.today,
     .zabuto_calendar table tbody tr td .day.active {
         background-color: #0d6efd !important; 
         color: white !important;
-        font-weight: bold !important;
+        font-weight: bold !important; /* 你的粗體設定回來了 */
     }
 
-    /* 💡 終極修正：強制把 Zabuto 塞進去的膠囊徽章背景與邊距徹底摧毀，只留文字 */
+    /* 💡 終極防護罩：徹底摧毀套件偷偷塞進來的 Badge，保證絕對不撐大格子 */
+    .zabuto_calendar table tbody tr td .day .badge,
     .zabuto_calendar table tbody tr td .day span[class*="badge"] {
         padding: 0 !important;
         margin: 0 !important;
         background: transparent !important; 
-        background-color: transparent !important; /* 拔掉內建藍色膠囊，讓外層的藍色透出來 */
+        background-color: transparent !important; 
         color: inherit !important;          
         font-size: inherit !important;
         font-weight: inherit !important;
-        display: inline !important;         
+        display: inline !important; 
+        border-radius: 0 !important;
+        line-height: inherit !important;
     }
 
     /* 隱藏空日期的背景，保持乾淨 */
@@ -286,7 +289,7 @@
             $("#my-calendar").zabuto_calendar({
                 year: year,
                 month: month,
-                today: true,
+                today: true, /* 💡 把今日跟隨功能正式開回來！ */
                 weekstartson: 0, 
                 language: "zh-tw", 
                 data: globalEvents, 
