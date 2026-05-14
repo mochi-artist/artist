@@ -50,7 +50,6 @@
         width: 100% !important;
         box-sizing: border-box !important;
         margin: 0 !important;
-        overflow: hidden !important; /* 🛡️ 防爆機制：強制切齊邊界，就算粗體字變寬也不准撐破格子 */
     }
 
     /* 選擇或今日的格子 (藍色) - 只能變色，無法改變大小 */
@@ -58,13 +57,22 @@
     .zabuto_calendar table tbody tr td .day.active {
         background-color: #0d6efd !important; 
         color: white !important;
-        font-weight: bold !important; /* ✨ 這裡保留了你最習慣的粗體設定！ */
+        font-weight: bold !important; /* 確保你的粗體絕對生效 */
     }
 
-    /* 💡 終極修正：徹底消滅 Bootstrap Badge 帶來的撐破問題 */
-    .zabuto_calendar table tbody tr td .day .badge,
-    .zabuto_calendar table tbody tr td .day span[class*="badge"] {
-        display: contents !important; /* 👈 真正的魔法：讓這個標籤在排版上「物理消失」，文字直接歸外層管轄 */
+    /* 💡 終極修正：徹底消滅 Bootstrap Badge 帶來的所有隱形排版破壞 */
+    .zabuto_calendar table tbody tr td .day .badge {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important; 
+        color: inherit !important;          
+        font-size: inherit !important;
+        font-weight: inherit !important;
+        line-height: inherit !important;    /* ✨ 關鍵 1：抵銷 Bootstrap 偷改的行高 */
+        vertical-align: baseline !important;/* ✨ 關鍵 2：抵銷 Bootstrap 的垂直對齊，防格子歪掉 */
+        border: none !important;
+        border-radius: 0 !important;
+        display: inline !important;         
     }
 
     /* 隱藏空日期的背景，保持乾淨 */
