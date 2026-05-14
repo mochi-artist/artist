@@ -467,7 +467,6 @@ async function init() {
     const listEl = document.getElementById('file-list');
     listEl.innerHTML = '';
 
-    // 💡 提前宣告這兩個變數，讓「全車次總表」的點擊事件可以呼叫
     const monthElements = {};
     const jumpSelect = document.createElement('select');
 
@@ -478,14 +477,10 @@ async function init() {
     
     masterEl.addEventListener('click', () => {
         selectFile('final_train_diagram.json', masterEl);
-        
-        // 💡 [新增] 當點擊全車次總表時，強制把所有的月份資料夾都收合起來！
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
-            group.header.innerHTML = `<span>📅 ${group.year}年 ${group.month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${group.daysLen} 天 ▸</span>`;
+            group.header.innerHTML = `<span style="white-space:nowrap">${group.shortYear}年${group.month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${group.daysLen}天 ▸</span>`;
         });
-        
-        // 順便把跳轉選單歸零
         jumpSelect.value = '';
     });
     listEl.appendChild(masterEl);
@@ -506,8 +501,9 @@ async function init() {
         groups[monthKey].push(dateStr);
     });
 
+    // 💡 [更新] 大幅縮減快速跳轉選單的 Padding 和字體大小
     const jumpContainer = document.createElement('div');
-    jumpContainer.style.padding = '8px 15px';
+    jumpContainer.style.padding = '6px 4px';
     jumpContainer.style.backgroundColor = '#0f172a';
     jumpContainer.style.position = 'sticky'; 
     jumpContainer.style.top = '0';
@@ -515,7 +511,8 @@ async function init() {
     jumpContainer.style.borderBottom = '1px solid #1e293b';
 
     jumpSelect.style.width = '100%';
-    jumpSelect.style.padding = '6px';
+    jumpSelect.style.padding = '4px 2px';
+    jumpSelect.style.fontSize = '0.75rem';
     jumpSelect.style.backgroundColor = '#1e293b';
     jumpSelect.style.color = '#e2e8f0';
     jumpSelect.style.border = '1px solid #334155';
@@ -523,7 +520,7 @@ async function init() {
     jumpSelect.style.outline = 'none';
 
     const defaultOpt = document.createElement('option');
-    defaultOpt.textContent = '快速跳轉至月份...';
+    defaultOpt.textContent = '跳轉月份...';
     defaultOpt.value = '';
     jumpSelect.appendChild(defaultOpt);
     jumpContainer.appendChild(jumpSelect);
@@ -532,26 +529,28 @@ async function init() {
     // 3. 依序渲染每個月份的「資料夾標題」與內含的「檔案」
     Object.keys(groups).sort().forEach(monthKey => {
         const year = monthKey.slice(0, 4);
+        const shortYear = monthKey.slice(2, 4); // 取得 26
         const month = monthKey.slice(4, 6);
         const days = groups[monthKey];
 
-        jumpSelect.appendChild(new Option(`${year}年 ${month}月`, monthKey));
+        jumpSelect.appendChild(new Option(`${year}年${month}月`, monthKey));
 
         const headerEl = document.createElement('div');
-        headerEl.style.padding = '10px 15px';
+        headerEl.style.padding = '8px 4px';
         headerEl.style.backgroundColor = '#0f172a';
         headerEl.style.color = '#e2e8f0';
-        headerEl.style.fontSize = '0.9rem';
+        headerEl.style.fontSize = '0.75rem'; // 字體縮小
         headerEl.style.fontWeight = 'bold';
         headerEl.style.cursor = 'pointer';
         headerEl.style.display = 'flex';
         headerEl.style.justifyContent = 'space-between';
         headerEl.style.position = 'sticky'; 
-        headerEl.style.top = '48px'; 
+        headerEl.style.top = '40px'; 
         headerEl.style.zIndex = '5';
         headerEl.style.borderBottom = '1px solid #1e293b';
         
-        headerEl.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${days.length} 天 ▸</span>`;
+        // 💡 [更新] 拿掉圖示，縮寫為 "26年01月"，並強制不換行 (nowrap)
+        headerEl.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${days.length}天 ▸</span>`;
 
         const containerEl = document.createElement('div');
         containerEl.style.display = 'none'; 
@@ -559,7 +558,7 @@ async function init() {
         headerEl.addEventListener('click', () => {
             const isExpanded = containerEl.style.display !== 'none';
             containerEl.style.display = isExpanded ? 'none' : 'block';
-            headerEl.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${days.length} 天 ${isExpanded ? '▸' : '▾'}</span>`;
+            headerEl.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${days.length}天 ${isExpanded ? '▸' : '▾'}</span>`;
         });
 
         listEl.appendChild(headerEl);
@@ -571,7 +570,7 @@ async function init() {
 
             const el = document.createElement('div');
             el.className = 'file-item';
-            el.style.paddingLeft = '35px'; 
+            el.style.paddingLeft = '10px'; // 大幅減少手機版的內縮空間
             el.innerHTML = `<span class="file-date">${formatted}</span><span class="file-count">${countInLog} 車次</span>`;
             
             el.addEventListener('click', () => selectFile(filename, el));
@@ -580,7 +579,7 @@ async function init() {
 
         listEl.appendChild(containerEl);
 
-        monthElements[monthKey] = { header: headerEl, container: containerEl, year, month, daysLen: days.length };
+        monthElements[monthKey] = { header: headerEl, container: containerEl, year, shortYear, month, daysLen: days.length };
     });
 
     jumpSelect.addEventListener('change', (e) => {
@@ -589,12 +588,12 @@ async function init() {
 
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
-            group.header.innerHTML = `<span>📅 ${group.year}年 ${group.month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${group.daysLen} 天 ▸</span>`;
+            group.header.innerHTML = `<span style="white-space:nowrap">${group.shortYear}年${group.month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${group.daysLen}天 ▸</span>`;
         });
 
-        const { header, container, year, month, daysLen } = monthElements[targetKey];
+        const { header, container, shortYear, month, daysLen } = monthElements[targetKey];
         container.style.display = 'block';
-        header.innerHTML = `<span>📅 ${year}年 ${month}月</span> <span style="color:#94a3b8; font-size:0.8rem; font-weight:normal;">${daysLen} 天 ▾</span>`;
+        header.innerHTML = `<span style="white-space:nowrap">${shortYear}年${month}月</span> <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space:nowrap">${daysLen}天 ▾</span>`;
 
         header.scrollIntoView({ behavior: 'smooth', block: 'start' });
         jumpSelect.value = '';
