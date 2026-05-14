@@ -4,73 +4,111 @@
 <head>
     <title id="web_name"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="description" content="" />
-    <meta name="keywords" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="index,follow" />
-    <meta name="author" content="呂卓勳 Cho Husn Lu" />
-
-    <!-- 🌟 升級為新版 Bootstrap 5 與 FontAwesome 6 (配合新版 UI) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/web.css">
-    <link rel="Shortcut Icon" type="image/x-icon" href="favicon.ico" />
 
     <style>
-    /* 1. 修正左右箭頭圖示與位置 */
-    .datepicker .prev::before { content: "❮" !important; color: #333 !important; font-weight: bold; }
-    .datepicker .next::before { content: "❯" !important; color: #333 !important; font-weight: bold; }
-    .datepicker .prev i, .datepicker .next i { display: none !important; }
-
-    /* 2. 縮小米色格子間的空隙 (針對手機版優化) */
+    /* ==========================================
+       🌟 日曆基礎美化與格子調整
+       ========================================== */
     .datepicker table {
         border-collapse: separate !important;
-        border-spacing: 2px !important; /* 調小這個數值，空隙就會變小 */
+        border-spacing: 2px !important; 
         width: 100% !important;
     }
 
-    /* 3. 設定米色格子基礎樣式 */
+    /* 💡 星期列 (淺灰色背景，文字深灰，高度適中) */
+    .zabuto_calendar table thead tr th {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;            
+        padding: 12px 0 !important;           
+        font-size: 14px !important;
+        font-weight: bold;
+        border: none !important;
+        text-align: center;
+    }
+
+    /* 日期格子 (淺米色背景) */
     .datepicker table tr td.day {
-        background-color: #fff3e0 !important; /* 淺米色 */
+        background-color: #fff3e0 !important; 
         color: #5d4037 !important;
         border-radius: 4px !important;
-        padding: 8px 0 !important; /* 縮減上下內距讓格子更緊湊 */
+        padding: 8px 0 !important; 
         font-size: 14px !important;
-        position: relative; /* 為了讓藍色格子可以精準定位 */
         border: none !important;
     }
 
-    /* 4. 藍色格子：限定在米色格子的範圍內，並自動跟隨今日日期 */
-    /* .today 是外掛自動判斷當下系統日期的 Class */
+    /* 選擇或今日的格子 (藍色) */
     .datepicker table tr td.today,
     .datepicker table tr td.active {
-        background-color: #0d6efd !important; /* 強制覆蓋為藍色 */
+        background-color: #0d6efd !important; 
         color: white !important;
         font-weight: bold;
-        box-shadow: inset 0 0 0 2px #0d6efd !important; /* 確保邊界貼合 */
-        z-index: 1;
     }
 
-    /* 無資料或非本月的格子顏色稍微淡化 (可選) */
-    .datepicker table tr td.old, 
-    .datepicker table tr td.new {
-        background-color: #f5f5f5 !important;
-        color: #999 !important;
+    /* ==========================================
+       🌟 終極控制面板：淺灰色長方形與跳轉選單
+       ========================================== */
+    /* 隱藏套件內建的標題列 */
+    .zabuto_calendar .calendar-month-header {
+        display: none !important;
     }
 
-    /* 手機版觸控反應 */
-    .datepicker table tr td.day:active {
-        background-color: #ffe0b2 !important;
+    .custom-calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f1f5f9; 
+        border-radius: 8px;        
+        padding: 5px 10px;
+        margin-bottom: 12px;       
     }
-</style>
+
+    .custom-calendar-header .nav-btn {
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        color: #475569;
+        cursor: pointer;
+        padding: 8px 15px;
+        border-radius: 6px;
+    }
+    
+    .custom-calendar-header .nav-btn:hover {
+        background-color: #e2e8f0;
+    }
+
+    .custom-title-container {
+        position: relative;
+        flex-grow: 1;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #1e293b;
+        text-align: center;
+    }
+
+    .custom-title-container span i {
+        font-size: 0.8rem;
+        margin-left: 6px;
+        color: #64748b;
+        vertical-align: middle;
+    }
+
+    /* 透明選單疊加 */
+    .custom-title-container select {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        opacity: 0; cursor: pointer;
+        appearance: none;
+    }
+    </style>
 </head>
 
-<!-- ⚠️ 已經把會造成白邊的 style="padding-top:..." 拿掉了！ -->
 <body>
-
     <navbar></navbar>
 
-    <!-- 🌟 換成新版的深藍色大標題 (取代舊的 jumbotron) -->
     <div class="hero-section">
         <div class="container text-center">
             <h1 class="fw-bold mb-1" id="main_title"></h1>
@@ -78,147 +116,157 @@
         </div>
     </div>
 
-    <!-- 🧠 下方保留你原本的 Zabuto 日曆與排版 -->
     <div class="container text-center py-4">
         <div class="row justify-content-center">
             <div class="col-xs-12 col-md-10 col-lg-8">
-                <div id="my-calendar"></div>
+                
+                <!-- 控制面板 -->
+                <div class="custom-calendar-header" id="custom-header" style="display:none;">
+                    <button id="custom-prev" class="nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="custom-title-container">
+                        <span id="custom-title"></span>
+                        <select id="custom-month-select"></select>
+                    </div>
+                    <button id="custom-next" class="nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+
+                <!-- 日曆容器 -->
+                <div id="calendar-wrap">
+                    <div id="my-calendar"></div>
+                </div>
+
             </div>
         </div>
-        <br>
         <footer class="alert alert-warning mt-4" role="alert"></footer>
     </div>
 
-    <!-- 載入 JS 腳本 -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 💡 確保這裡載入的是你剛剛修改過、內建 zh-tw 的 zabuto_calendar.min.js -->
     <script src="js/calendar/zabuto_calendar.min.js"></script>
     <link rel="stylesheet" type="text/css" href="js/calendar/zabuto_calendar.css">
     <script src="js/url.min.js"></script>
     <script src="js/config.js"></script>
 
-    <!-- 🧠 你的 GitHub 抓取與日曆邏輯 (完全保留) -->
     <script>
-        const owner = 'mochi-artist';                  // GitHub 使用者名稱
-        const repo = 'artist';                         // GitHub 倉庫名稱
-        const path = 'data';                           // GitHub 倉庫中的路徑
-        const url = new URL(location.href);            // 取得當前頁面的 URL
-        const line_kind = $.url('?lineKind');          // 從 URL 取得 lineKind 參數
+        const owner = 'mochi-artist';                  
+        const repo = 'artist';                          
+        const path = 'data';                            
+        const line_kind = $.url('?lineKind');          
 
-        const kind_realtime = dict_line[line_kind];    // 取得對應的實時線路類型
+        let globalEvents = [];
+        let currentYear, currentMonth;
 
         async function getGitHubFileNames(owner, repo, path = '') {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`GitHub API request failed: ${response.status}`);
                 const data = await response.json();
-
                 let allDates = new Set(); 
-
                 const parseDateStr = (str) => new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8));
-                
-                const formatDate = (d) => {
-                    const y = d.getFullYear();
-                    const m = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    return `${y}-${m}-${day}`;
-                };
+                const formatDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
                 data.forEach(item => {
                     const name = item.name;
-
                     if (line_kind === 'LINE_Alishan' || line_kind === '林鐵') {
                         const match = name.match(/林鐵_(\d{8})~(\d{8})\.json$/);
                         if (match) {
                             const start = parseDateStr(match[1]);
                             const end = parseDateStr(match[2]);
-                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                                allDates.add(formatDate(d));
-                            }
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) { allDates.add(formatDate(d)); }
                         }
-                    }
-                    else if (line_kind === 'thsr' || line_kind === '高鐵') {
+                    } else if (line_kind === 'thsr' || line_kind === '高鐵') {
                         const match = name.match(/高鐵_(.)_(\d{8})~(\d{8})\.json$/);
                         if (match) {
                             const weekdayMap = { "日": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6 };
                             const targetWeekday = weekdayMap[match[1]];
                             const start = parseDateStr(match[2]);
                             const end = parseDateStr(match[3]);
-
                             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                                if (d.getDay() === targetWeekday) {
-                                    allDates.add(formatDate(d));
-                                }
+                                if (d.getDay() === targetWeekday) { allDates.add(formatDate(d)); }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         const match = name.match(/^(\d{8})\.json$/);
-                        if (match) {
-                            allDates.add(formatDate(parseDateStr(match[1])));
-                        }
+                        if (match) { allDates.add(formatDate(parseDateStr(match[1]))); }
                     }
                 });
-
-                const events = Array.from(allDates).map(date => ({
-                    date: date,
-                    title: "SVG available",
-                    body: `<p>${date.replace(/-/g, '')}.json 或相關區間檔</p>`
-                }));
-
-                return events;
-            } catch (error) {
-                console.error('Error fetching GitHub files:', error);
-                return [];
-            }
+                return Array.from(allDates).map(date => ({ date: date, title: "SVG" }));
+            } catch (error) { return []; }
         }
 
         $(document).ready(async function () {
-            const events = await getGitHubFileNames(owner, repo, path);
+            globalEvents = await getGitHubFileNames(owner, repo, path);
+            const now = new Date();
+            currentYear = now.getFullYear();
+            currentMonth = now.getMonth() + 1; 
 
-            $("#my-calendar").zabuto_calendar({
-                today: true,
-                weekstartson: 0,
-                language: "en",
-                data: events, 
-                // 👇 魔法就在這裡！強制指派新版 FontAwesome 6 的箭頭圖示給它
-                nav_icon: {
-                    prev: '<i class="fa-solid fa-chevron-left"></i>',
-                    next: '<i class="fa-solid fa-chevron-right"></i>'
-                },
-                action: function () {
-                    const date = $(this).data('date'); 
-                    const isValidDate = events.some(event => event.date === date);
-
-                    if (!isValidDate) {
-                        return false;
-                    }
-
-                    return showDiagram(this.id, false, line_kind);
-                }
-            });
+            initCustomHeader();
+            renderCalendar(currentYear, currentMonth);
 
             $("#main_title").text(dict_line[line_kind]);     
             $("#web_name").text(dict_line[line_kind]);       
+            
             $('footer').append(footer);
             $("navbar").load("navbar.html");
         });
 
-        function showDiagram(id, fromModal, line_kind) {
-            const date = $("#" + id).data("date");
-            const formattedDate = date.replace(/-/g, ''); 
+        function initCustomHeader() {
+            $('#custom-header').show();
+            const select = $('#custom-month-select');
+            select.empty();
 
-            if (formattedDate) {
-                const targetUrl = `diagram_output.html?formattedDate=${formattedDate}&lineKind=${line_kind}&scrollToCurrentTime=false`;
-                window.open(targetUrl, '_blank');
-            } else {
-                alert('此日期沒有對應的 SVG 檔案。');
-            }
-            return true;
+            const monthsSet = new Set();
+            globalEvents.forEach(e => monthsSet.add(e.date.substring(0, 7)));
+            const sortedMonths = Array.from(monthsSet).sort();
+            sortedMonths.forEach(ym => {
+                const [y, m] = ym.split('-');
+                select.append(new Option(`${y}年${m}月`, ym));
+            });
+
+            select.on('change', function() {
+                const [y, m] = $(this).val().split('-');
+                currentYear = parseInt(y, 10);
+                currentMonth = parseInt(m, 10);
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            $('#custom-prev').on('click', () => {
+                currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+                renderCalendar(currentYear, currentMonth);
+            });
+
+            $('#custom-next').on('click', () => {
+                currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+                renderCalendar(currentYear, currentMonth);
+            });
+        }
+
+        function renderCalendar(year, month) {
+            const mStr = String(month).padStart(2, '0');
+            $('#custom-title').html(`${year}年${mStr}月 <i class="fa-solid fa-caret-down"></i>`);
+            $('#custom-month-select').val(`${year}-${mStr}`);
+
+            // 重置日曆容器
+            $('#calendar-wrap').html('<div id="my-calendar"></div>');
+
+            // 啟動日曆
+            $("#my-calendar").zabuto_calendar({
+                year: year,
+                month: month,
+                today: true,
+                weekstartson: 0,
+                language: "zh-tw", // 💡 魔法生效！直接呼叫我們改好的 zh-tw 語系
+                data: globalEvents, 
+                action: function () {
+                    const date = $(this).data('date'); 
+                    if (!globalEvents.some(e => e.date === date)) return false;
+                    const formattedDate = date.replace(/-/g, ''); 
+                    const targetUrl = `diagram_output.html?formattedDate=${formattedDate}&lineKind=${line_kind}&scrollToCurrentTime=false`;
+                    window.open(targetUrl, '_blank');
+                }
+            });
         }
     </script>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3628172690328777" crossorigin="anonymous"></script>
 </body>
 </html>
