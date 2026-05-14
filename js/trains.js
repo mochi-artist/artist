@@ -82,7 +82,8 @@ let specialTrainsByDate = {};
 
 async function loadSpecialTrainsLog() {
     try {
-        const res = await fetch('scan_log.txt');
+        // 讀取日誌檔也加上不留快取，確保永遠抓到最新掃描結果
+        const res = await fetch('scan_log.txt', { cache: 'no-store' });
         const text = await res.text();
         
         let currentDate = null;
@@ -211,7 +212,9 @@ async function loadFile(filename) {
         // 🚀 第一關：優先找你的 GitHub 庫 (你的專屬資料庫與舊資料寶藏)
         console.log(`⏳ [1] 正在尋找你的 GitHub: ${filename} ...`);
         const myGithubUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/data/${filename}`;
-        const res = await fetch(myGithubUrl);
+        
+        // 💡 [防止快取爆炸] 加入 { cache: 'no-store' } 阻擋手機瀏覽器偷存這 6MB 檔案
+        const res = await fetch(myGithubUrl, { cache: 'no-store' });
         
         if (!res.ok) throw new Error('你的 GitHub 尚未上傳或無此檔案');
         
@@ -223,7 +226,9 @@ async function loadFile(filename) {
             // 🚀 第二關：你這邊沒資料，前往 Billy 的 GitHub 尋找最新版
             console.log(`⏳ [2] 你這邊沒資料，前往 Billy 的雲端尋找備用資料...`);
             const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/data/${filename}`;
-            const res2 = await fetch(billyUrl);
+            
+            // 💡 [防止快取爆炸] 同樣加入不快取機制
+            const res2 = await fetch(billyUrl, { cache: 'no-store' });
             
             if (!res2.ok) throw new Error('Billy 那邊也刪除或沒有了');
             
@@ -252,7 +257,7 @@ async function loadFile(filename) {
 
     console.log(`✅ 成功從 [${source}] 讀取，解析出 ${trainArray.length} 筆車次！`);
 
-    // 存入快取並回傳
+    // 存入這一次工作階段的記憶體 (重整網頁後就會消失，不會堆積在手機實體硬碟)
     cache[filename] = trainArray;
     return cache[filename];
 }
@@ -374,7 +379,7 @@ async function init() {
     // 1. 初始化時，先去讀取並解析 TXT 日誌檔
     await loadSpecialTrainsLog();
 
-    // 2. 取得 Route.json (為了顯示車站中文名稱)
+    // 2. 取得 Route.json (為了顯示車站中文名稱) (此為小檔，且不常變動，保持預設快取即可)
     const routeData = await fetch('js/references/Route.json').then(r => r.json());
     Route = routeData;
 
