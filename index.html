@@ -272,27 +272,6 @@
 <script>
     const diagram_data = localStorage.getItem('is_confirmed');
     const today_date = getTodayFormattedDate();
-    if (diagram_data == null || typeof (diagram_data) == "undefined" || diagram_data !== "ok") {
-        Swal.fire({
-            title: '本網站聲明',
-            icon: 'warning',
-            text: '本站所提供的資料，僅供參考，實際鐵路運行情況，請以現場、各鐵路與軌道系統的管理單位所公布資訊或實際鐵路運作為準',
-            width: 500,
-            heightAuto: true,
-            padding: '3em',
-            backdrop: `rgba(255, 255, 0, 0.2) no-repeat`,
-            showDenyButton: true,
-            confirmButtonText: '我了解了',
-            denyButtonText: '我不同意',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire('您將開始瀏覽本網站，本聲明將不再出現', '', 'success');
-                window.localStorage.setItem("is_confirmed", "ok");
-            } else if (result.isDenied) {
-                window.localStorage.setItem("is_confirmed", "nook");
-            }
-        })
-    }
 
     function searchByTrainNumber(trainNo) {
         Swal.fire({ title: `你要找的是 ${trainNo} 車次嗎？`, icon: 'question', showCancelButton: true, confirmButtonText: '是', cancelButtonText: '取消' });
