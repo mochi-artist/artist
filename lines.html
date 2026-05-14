@@ -17,9 +17,16 @@
         border-collapse: separate !important;
         border-spacing: 2px !important; 
         width: 100% !important;
+        table-layout: fixed !important; /* 💡 關鍵修復：強制表格固定比例，絕對不被內容撐開 */
     }
 
-    /* 💡 星期列 (淺灰色背景，文字深灰，高度適中) */
+    /* 💡 關鍵修復：確保所有的星期標題與日期格子，嚴格平分 1/7 寬度 */
+    .zabuto_calendar table thead tr th,
+    .datepicker table tr td {
+        width: 14.285% !important; 
+    }
+
+    /* 星期列 (淺灰色背景，文字深灰，高度適中) */
     .zabuto_calendar table thead tr th {
         background-color: #f1f5f9 !important;
         color: #475569 !important;            
@@ -38,9 +45,10 @@
         padding: 8px 0 !important; 
         font-size: 14px !important;
         border: none !important;
+        text-align: center;
     }
 
-    /* 選擇或今日的格子 (藍色) */
+    /* 選擇或今日的格子 (藍色) - 只變顏色與粗體，不改變格子大小 */
     .datepicker table tr td.today,
     .datepicker table tr td.active {
         background-color: #0d6efd !important; 
@@ -142,7 +150,6 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- 💡 確保這裡載入的是你剛剛修改過、內建 zh-tw 的 zabuto_calendar.min.js -->
     <script src="js/calendar/zabuto_calendar.min.js"></script>
     <link rel="stylesheet" type="text/css" href="js/calendar/zabuto_calendar.css">
     <script src="js/url.min.js"></script>
@@ -196,6 +203,16 @@
         }
 
         $(document).ready(async function () {
+            // 💡 外部注入魔法：強迫套件學會繁體中文
+            if (typeof $.fn.zabuto_calendar_language === 'function') {
+                $.fn.zabuto_calendar_language = function () {
+                    return {
+                        month_labels: ["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],
+                        dow_labels: ["一","二","三","四","五","六","日"] 
+                    };
+                };
+            }
+
             globalEvents = await getGitHubFileNames(owner, repo, path);
             const now = new Date();
             currentYear = now.getFullYear();
@@ -250,13 +267,13 @@
             // 重置日曆容器
             $('#calendar-wrap').html('<div id="my-calendar"></div>');
 
-            // 啟動日曆
+            // 啟動日曆 
             $("#my-calendar").zabuto_calendar({
                 year: year,
                 month: month,
                 today: true,
-                weekstartson: 0,
-                language: "zh-tw", // 💡 魔法生效！直接呼叫我們改好的 zh-tw 語系
+                weekstartson: 0, // 0 代表星期日排最前面
+                language: "zh-tw", 
                 data: globalEvents, 
                 action: function () {
                     const date = $(this).data('date'); 
