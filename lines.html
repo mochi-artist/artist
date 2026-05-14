@@ -11,66 +11,63 @@
 
     <style>
     /* ==========================================
-       🌟 日曆基礎美化與格子調整
+       🌟 日曆基礎美化與格子嚴格限制
        ========================================== */
-    /* 💡 修正 1：正確對準 zabuto_calendar，並啟動最強鎖定防護 */
     .zabuto_calendar table {
-        border-collapse: separate !important;
-        border-spacing: 2px !important; 
+        table-layout: fixed !important; 
         width: 100% !important;
-        table-layout: fixed !important; /* 絕對不被粗體字撐開 */
+        border-collapse: separate !important;
+        border-spacing: 4px !important; 
     }
 
-    /* 💡 修正 2：確保所有的星期標題與日期格子，嚴格平分 1/7 寬度 */
-    .zabuto_calendar table thead tr th,
-    .zabuto_calendar table tbody tr td {
+    .zabuto_calendar table th,
+    .zabuto_calendar table td {
         width: 14.285% !important; 
-        padding: 0 !important; /* 把內距交給裡面的方塊控制 */
+        padding: 0 !important; 
+        text-align: center;
+        vertical-align: middle;
+        border: none !important;
     }
 
-    /* 星期列 (淺灰色背景，文字深灰，高度適中) */
+    /* 星期列 (淺灰色背景) */
     .zabuto_calendar table thead tr th {
         background-color: #f1f5f9 !important;
         color: #475569 !important;            
-        padding: 12px 0 !important;           
+        padding: 10px 0 !important;           
         font-size: 14px !important;
         font-weight: bold;
-        border: none !important;
-        text-align: center;
+        border-radius: 4px !important;
     }
 
-    /* 日期格子本體 (淺米色背景) */
-    .zabuto_calendar table tbody tr td .day {
+    /* 日期格子 (純淨的米色方塊) */
+    .zabuto_calendar table td .day {
         background-color: #fff3e0 !important; 
         color: #5d4037 !important;
         border-radius: 4px !important;
-        padding: 8px 0 !important; 
+        padding: 10px 0 !important; 
         font-size: 14px !important;
-        border: none !important;
-        text-align: center;
-        /* 💡 修正 3：讓方塊填滿 td 但不超出，限制藍色活動範圍 */
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
+        display: block !important; 
+        margin: 0 auto !important;
+        box-sizing: border-box;
+        width: 100%;
     }
 
-    /* 選擇或今日的格子 (藍色) - 只能變色，無法改變大小 */
-    .zabuto_calendar table tbody tr td .day.today,
-    .zabuto_calendar table tbody tr td .day.active {
+    /* 今日或選取的格子 (藍色) - 尺寸絕對不變 */
+    .zabuto_calendar table td .day.today,
+    .zabuto_calendar table td .day.active {
         background-color: #0d6efd !important; 
         color: white !important;
         font-weight: bold;
     }
 
-    /* 隱藏空日期的背景，保持乾淨 */
-    .zabuto_calendar table tbody tr td:empty,
-    .zabuto_calendar table tbody tr td .day:empty {
+    /* 隱藏空日期背景 */
+    .zabuto_calendar table td:empty,
+    .zabuto_calendar table td .day:empty {
         background-color: transparent !important;
     }
 
     /* ==========================================
-       🌟 終極控制面板：淺灰色長方形與跳轉選單
+       🌟 控制面板：淺灰色長方形與跳轉選單
        ========================================== */
     .zabuto_calendar .calendar-month-header {
         display: none !important;
@@ -277,7 +274,7 @@
             $("#my-calendar").zabuto_calendar({
                 year: year,
                 month: month,
-                today: true,
+                today: false, // 💡 關鍵就在這行：設為 false，關閉內建的撐破螢幕的 badge
                 weekstartson: 0, 
                 language: "zh-tw", 
                 data: globalEvents, 
