@@ -20,114 +20,30 @@
        🌟 日曆基礎美化與格子調整（最穩定版）
        ========================================== */
 
-    .zabuto_calendar table {
-        width: 100% !important;
-
-        table-layout: fixed !important;
-
-        border-collapse: separate !important;
-
-        border-spacing: 2px !important;
-    }
+    .zabuto_calendar table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; }
 
     .zabuto_calendar table thead tr th,
-    .zabuto_calendar table tbody tr td {
-        width: 14.285714% !important;
-
-        padding: 0 !important;
-    }
+    .zabuto_calendar table tbody tr td { width: 14.285714% !important; max-width: 14.285714% !important; min-width: 14.285714% !important; padding: 2px !important; box-sizing: border-box !important; }
 
     /* 星期列 */
 
-    .zabuto_calendar table thead tr th {
-        background-color: #f1f5f9 !important;
-
-        color: #475569 !important;
-
-        font-size: 14px !important;
-
-        font-weight: 700 !important;
-
-        text-align: center !important;
-
-        padding: 12px 0 !important;
-
-        border: none !important;
-    }
+    .zabuto_calendar table thead tr th { width: 14.285714% !important; padding: 10px 0 !important; text-align: center !important; background: #f1f5f9 !important; color: #475569 !important; border: none !important; font-size: 14px !important; }
 
     /* 日期格子 */
 
-    .zabuto_calendar table tbody tr td .day {
-
-        background-color: #fff3e0 !important;
-
-        color: #5d4037 !important;
-
-        border-radius: 4px !important;
-
-        border: none !important;
-
-        margin: 0 !important;
-
-        padding: 8px 0 !important;
-
-        font-size: 14px !important;
-
-        font-weight: 500 !important;
-
-        box-sizing: border-box !important;
-
-        min-height: 44px !important;
-
-        /* ⭐ 最穩定置中 */
-
-        display: flex !important;
-
-        align-items: center !important;
-
-        justify-content: center !important;
-
-        text-align: center !important;
-
-        line-height: 1 !important;
-    }
+    .zabuto_calendar table tbody tr td .day { width: 100% !important; height: 42px !important; padding: 0 !important; margin: 0 !important; border: none !important; border-radius: 4px !important; background: #fff3e0 !important; color: #5d4037 !important; font-size: 14px !important; font-weight: 500 !important; box-sizing: border-box !important; display: flex !important; align-items: center !important; justify-content: center !important; position: relative !important; }
 
     /* 今日 / 選擇 */
 
-    .zabuto_calendar table tbody tr td .day.today,
-    .zabuto_calendar table tbody tr td .day.active {
-
-        background-color: #0d6efd !important;
-
-        color: #ffffff !important;
-
-        font-weight: 700 !important;
-    }
+    .zabuto_calendar table tbody tr td .day.today, .zabuto_calendar table tbody tr td .day.active { background: #0d6efd !important; color: white !important; font-weight: 700 !important; }
 
     /* 清除 Zabuto badge */
 
-    .zabuto_calendar table tbody tr td .day span,
-    .zabuto_calendar table tbody tr td .day span[class*="badge"] {
-
-        all: unset !important; 
-
-        display: inline !important; 
-
-        color: inherit !important; 
-
-        font: inherit !important; 
-
-        line-height: inherit !important;
-
-    }
+    .zabuto_calendar table tbody tr td .day *, .zabuto_calendar table tbody tr td .day span, .zabuto_calendar table tbody tr td .day div { all: unset !important; color: inherit !important; font: inherit !important; display: inline !important; line-height: 1 !important; }
 
     /* 空白日期 */
 
-    .zabuto_calendar table tbody tr td:empty,
-    .zabuto_calendar table tbody tr td .day:empty {
-
-        background: transparent !important;
-    }
+    .zabuto_calendar table tbody tr td:empty { background: transparent !important; }
 
     /* ==========================================
        🌟 自訂月曆控制列
@@ -225,17 +141,7 @@
 
     @media (max-width: 576px) {
 
-        .zabuto_calendar table {
-
-            border-spacing: 1px !important;
-        }
-
-        .zabuto_calendar table thead tr th {
-
-            font-size: 13px !important;
-
-            padding: 10px 0 !important;
-        }
+        @media (max-width: 576px) { .zabuto_calendar table tbody tr td .day { height: 38px !important; font-size: 13px !important; } .zabuto_calendar table thead tr th { font-size: 13px !important; } }
 
         .zabuto_calendar table tbody tr td .day { background-color: #fff3e0 !important; color: #5d4037 !important; border-radius: 4px !important; border: none !important; margin: 0 !important; padding: 8px 0 !important; font-size: 14px !important; font-weight: 500 !important; box-sizing: border-box !important; min-height: 44px !important; display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; line-height: 1 !important; }
 
