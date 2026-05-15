@@ -9,132 +9,229 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/web.css">
 
-    <style>
-    /* ==========================================
-       🌟 日曆基礎美化與格子調整
-       ========================================== */
+    ```html
+<style>
+/* ==========================================
+   🌟 日曆基礎美化與格子調整（手機穩定版）
+   ========================================== */
+
+/* 整個日曆表格 */
+.zabuto_calendar table {
+    border-collapse: separate !important;
+    border-spacing: 2px !important;
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+/* 星期列與日期格 */
+.zabuto_calendar table thead tr th,
+.zabuto_calendar table tbody tr td {
+    width: 14.285% !important;
+    padding: 0 !important;
+}
+
+/* 星期列 */
+.zabuto_calendar table thead tr th {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+
+    padding: 12px 0 !important;
+
+    font-size: 14px !important;
+    font-weight: bold !important;
+
+    border: none !important;
+
+    text-align: center !important;
+}
+
+/* 日期格子 */
+.zabuto_calendar table tbody tr td .day {
+    background-color: #fff3e0 !important;
+    color: #5d4037 !important;
+
+    border-radius: 4px !important;
+
+    padding: 8px 0 !important;
+
+    font-size: 14px !important;
+
+    border: none !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 !important;
+
+    min-height: 44px !important;
+
+    /* ⭐ 最穩定置中 */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    overflow: hidden !important;
+}
+
+/* 今日 / 選擇日期 */
+.zabuto_calendar table tbody tr td .day.today,
+.zabuto_calendar table tbody tr td .day.active {
+    background-color: #0d6efd !important;
+    color: white !important;
+
+    font-weight: bold !important;
+}
+
+/* 清除 Zabuto 內建 badge */
+.zabuto_calendar table tbody tr td .day span[class*="badge"] {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: none !important;
+    box-shadow: none !important;
+
+    color: inherit !important;
+
+    font-size: inherit !important;
+    font-weight: inherit !important;
+
+    line-height: inherit !important;
+
+    display: contents !important;
+}
+
+/* 空白日期 */
+.zabuto_calendar table tbody tr td:empty,
+.zabuto_calendar table tbody tr td .day:empty {
+    background-color: transparent !important;
+}
+
+/* ==========================================
+   🌟 終極控制面板：淺灰色長方形與跳轉選單
+   ========================================== */
+
+.zabuto_calendar .calendar-month-header {
+    display: none !important;
+}
+
+.custom-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: #f1f5f9;
+
+    border-radius: 8px;
+
+    padding: 5px 10px;
+
+    margin-bottom: 12px;
+}
+
+.custom-calendar-header .nav-btn {
+    background: transparent;
+
+    border: none;
+
+    font-size: 1.2rem;
+
+    color: #475569;
+
+    cursor: pointer;
+
+    padding: 8px 15px;
+
+    border-radius: 6px;
+}
+
+.custom-calendar-header .nav-btn:hover {
+    background-color: #e2e8f0;
+}
+
+.custom-title-container {
+    position: relative;
+
+    flex-grow: 1;
+
+    font-size: 1.1rem;
+
+    font-weight: bold;
+
+    color: #1e293b;
+
+    text-align: center;
+}
+
+.custom-title-container span i {
+    font-size: 0.8rem;
+
+    margin-left: 6px;
+
+    color: #64748b;
+
+    vertical-align: middle;
+}
+
+.custom-title-container select {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    cursor: pointer;
+
+    appearance: none;
+}
+
+/* ==========================================
+   🌟 手機最佳化
+   ========================================== */
+
+@media (max-width: 576px) {
+
     .zabuto_calendar table {
-        border-collapse: separate !important;
-        border-spacing: 2px !important; 
-        width: 100% !important;
-        table-layout: fixed !important; 
+        border-spacing: 1px !important;
     }
 
-    .zabuto_calendar table thead tr th,
-    .zabuto_calendar table tbody tr td {
-        width: 14.285% !important; 
-        padding: 0 !important; 
-    }
-
-    /* 星期列 (淺灰色背景，文字深灰，高度適中) */
-    .zabuto_calendar table thead tr th {
-        background-color: #f1f5f9 !important;
-        color: #475569 !important;            
-        padding: 12px 0 !important;           
-        font-size: 14px !important;
-        font-weight: bold;
-        border: none !important;
-        text-align: center;
-    }
-
-    /* 日期格子本體 (淺米色背景) */
     .zabuto_calendar table tbody tr td .day {
-        background-color: #fff3e0 !important; 
-        color: #5d4037 !important;
-        border-radius: 4px !important;
-        padding: 8px 0 !important; 
-        font-size: 14px !important;
-        border: none !important;
-        text-align: center;
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
+        min-height: 40px !important;
+
+        font-size: 13px !important;
+
+        padding: 6px 0 !important;
     }
 
-    /* 選擇或今日的格子 (藍色) - 只能變色，無法改變大小 */
-    .zabuto_calendar table tbody tr td .day.today,
-    .zabuto_calendar table tbody tr td .day.active {
-        background-color: #0d6efd !important; 
-        color: white !important;
-        font-weight: bold !important; /* 確保你的粗體絕對生效 */
-    }
+    .zabuto_calendar table thead tr th {
+        font-size: 13px !important;
 
-    /* 💡 終極修正：徹底消滅 Bootstrap Badge 帶來的所有隱形排版破壞 */
-    .zabuto_calendar table tbody tr td .day .badge {
-        padding: 0 !important;
-        margin: 0 !important;
-        background: transparent !important; 
-        color: inherit !important;          
-        font-size: inherit !important;
-        font-weight: inherit !important;
-        line-height: inherit !important;    /* ✨ 關鍵 1：抵銷 Bootstrap 偷改的行高 */
-        vertical-align: baseline !important;/* ✨ 關鍵 2：抵銷 Bootstrap 的垂直對齊，防格子歪掉 */
-        border: none !important;
-        border-radius: 0 !important;
-        display: inline !important;         
-    }
-
-    /* 隱藏空日期的背景，保持乾淨 */
-    .zabuto_calendar table tbody tr td:empty,
-    .zabuto_calendar table tbody tr td .day:empty {
-        background-color: transparent !important;
-    }
-
-    /* ==========================================
-       🌟 終極控制面板：淺灰色長方形與跳轉選單
-       ========================================== */
-    .zabuto_calendar .calendar-month-header {
-        display: none !important;
+        padding: 10px 0 !important;
     }
 
     .custom-calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #f1f5f9; 
-        border-radius: 8px;        
-        padding: 5px 10px;
-        margin-bottom: 12px;       
+        padding: 4px 6px;
     }
 
     .custom-calendar-header .nav-btn {
-        background: transparent;
-        border: none;
-        font-size: 1.2rem;
-        color: #475569;
-        cursor: pointer;
-        padding: 8px 15px;
-        border-radius: 6px;
-    }
-    
-    .custom-calendar-header .nav-btn:hover {
-        background-color: #e2e8f0;
+        padding: 6px 10px;
+        font-size: 1rem;
     }
 
     .custom-title-container {
-        position: relative;
-        flex-grow: 1;
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #1e293b;
-        text-align: center;
+        font-size: 1rem;
     }
+}
+</style>
 
-    .custom-title-container span i {
-        font-size: 0.8rem;
-        margin-left: 6px;
-        color: #64748b;
-        vertical-align: middle;
-    }
 
-    .custom-title-container select {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        opacity: 0; cursor: pointer;
-        appearance: none;
-    }
-    </style>
 </head>
 
 <body>
@@ -289,7 +386,7 @@
             $("#my-calendar").zabuto_calendar({
                 year: year,
                 month: month,
-                today: true, 
+                today: true,
                 weekstartson: 0, 
                 language: "zh-tw", 
                 data: globalEvents, 
