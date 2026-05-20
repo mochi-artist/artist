@@ -18,7 +18,7 @@ const dependencies = [
     'js/config.js',
     'js/util.js',
     'js/time_space.js',
-    'js/diagram.js'
+    'js/diagram_d3.js'
 ];
 
 // 開始程式流程
@@ -32,7 +32,7 @@ const staticSchedules = {
     "林鐵": [
         // 🟢 第一個時段：1月 (舊班表)
         { 
-            file: "data/林鐵_20260110~20260228.json" 
+            file: "data/林鐵_20260101~20260228.json" 
         }, // 👈 這裡一定要加逗號！把兩段分開
         
         // 🔵 第二個時段：2月以後 (新班表/測試用)
