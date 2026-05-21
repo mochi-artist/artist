@@ -3,7 +3,7 @@
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
-//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
+//   四、視覺絕對鎖定：VisualViewport 抗縮放技術，確保按鈕在手機縮放時「絕對固定」在畫面右下角
 //   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
 
 // ── 模組層級狀態 ──
@@ -118,13 +118,12 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯（終極定位修正版）
+// 🌟 畫面跳轉與無限清單邏輯
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
 
-    // 計算 SVG 畫布在網頁中的絕對起點（避免外層有 padding 影響座標）
     let offsetX = 0;
     let offsetY = 0;
     if (_d3Svg && _d3Svg.node()) {
@@ -133,16 +132,12 @@ function _panToTrain(pathId) {
         offsetY = rect.top + window.scrollY;
     }
 
-    // 取得手機目前的真實可視寬高
     const viewWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
     const viewHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
-    // 絕對目標座標 = 畫布起點 + 第一站座標 - 螢幕一半寬高 (使其置中)
     const targetX = offsetX + data.firstX - (viewWidth / 2);
     const targetY = offsetY + data.firstY - (viewHeight / 2);
 
-    // ⚠️ 關鍵修正：取消 smooth，改用 auto。
-    // 在手機縮放狀態下使用 smooth 會被瀏覽器中斷導致停在原地。使用 auto 可強制瞬間完成跳轉。
     window.scrollTo({
         left: Math.max(0, targetX),
         top: Math.max(0, targetY),
@@ -218,7 +213,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心
+// 🌟 UI 控制中心 (無敵抗縮放鎖定版)
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
@@ -230,7 +225,9 @@ function _init_ui_panels() {
         bottom: '24px',
         right: '24px',
         zIndex: '2000',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        // 確保縮放時原點始終錨定在右下角
+        transformOrigin: 'bottom right' 
     });
 
     const container = document.createElement('div');
@@ -239,8 +236,7 @@ function _init_ui_panels() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end', 
-        pointerEvents: 'none',
-        transformOrigin: 'bottom right'
+        pointerEvents: 'none'
     });
 
     const panelBody = document.createElement('div');
@@ -370,13 +366,21 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
+    // 🎯 超強效「絕對抗縮放」鎖定核心
     if (window.visualViewport) {
         const vv = window.visualViewport;
         const updatePos = () => {
-            const scale = vv.scale;
-            const offsetX = (window.innerWidth - vv.width) - vv.offsetLeft;
-            const offsetY = (window.innerHeight - vv.height) - vv.offsetTop;
-            container.style.transform = `translate(${-offsetX}px, ${-offsetY}px) scale(${1 / scale})`;
+            // 排版視窗寬高
+            const layoutW = window.innerWidth;
+            const layoutH = window.innerHeight;
+            
+            // 計算真實可視視窗距離排版視窗右下角的偏移量
+            const shiftX = layoutW - (vv.offsetLeft + vv.width);
+            const shiftY = layoutH - (vv.offsetTop + vv.height);
+            
+            // 直接將最外層 wrapper 進行偏移補償，並反向縮放！
+            // 這樣按鈕在視覺上會永遠保持相同大小，且牢牢黏在右下角
+            wrapper.style.transform = `translate(${-shiftX}px, ${-shiftY}px) scale(${1 / vv.scale})`;
         };
 
         vv.addEventListener('scroll', updatePos);
@@ -529,11 +533,9 @@ function find_uncontinuous_index(value) {
     return index;
 }
 
-// 🌟 嚴格綁定第一個站點座標
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
 
-    // 🎯 直接拿 `value[0]` 第一站資料換算實體座標 (不管有沒有停靠)
     const first_time = value[0][2];
     const first_loc = value[0][3];
     const firstX = Math.round((first_time * 10 - 1200 * DiagramHours[0] + 50 + Number.EPSILON) * 100) / 100;
@@ -556,7 +558,6 @@ function set_path(lk, train_no, train_kind, value) {
     }
 
     const pathId = lk + train_no;
-    // 將算好的第一個點儲存起來供搜尋點擊時跳轉
     _trainDataMap.set(pathId, { train_no, train_kind, style, firstX, firstY });
 
     const text_position = calculate_text_position(coordinates, style);
@@ -709,7 +710,6 @@ function calculate_distance(a, b) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-// 內插計算
 function interpolateArray(A, B) {
     const result = [];
     for (let i = 0; i < A.length; i++) {
