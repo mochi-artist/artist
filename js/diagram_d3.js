@@ -5,6 +5,7 @@
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
 //   四、純 CSS 固定選單：利用架構優勢，免去 JS 實時計算，回歸最穩定的 position: fixed
 //   五、暴力精準定位：配合滾動容器優化 scrollIntoView，縮放狀態下依然 100% 完美置中
+//   六、🚀 抗縮放引擎：加入 VisualViewport 偵測，雙指放大時自動反向縮小 UI，維持版面完美
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -32,6 +33,15 @@ const _filterCategories = [
     { id: 'others', name: '客迴', styles: [] }, 
     { id: 'special', name: '特殊列車', styles: [] } 
 ];
+
+const _carKindLabel = {
+    taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
+    emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
+    zhongxing: '中興號', direct: '直快', chu_kuang: '莒光號', chushan1: '曙山（早）',
+    chushan2: '曙山（晚）', local: '區間車', local_express: '區間快', fu_hsing: '復興號',
+    ordinary: '普快', skip_stop: '跳停', alishan: '阿里山', alishan_local: '阿里山區間',
+    all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
+};
 
 // 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
@@ -97,31 +107,21 @@ function _panToTrain(pathId) {
     const container = document.getElementById('d3-diagram-container');
     if (!container) return;
 
-    // 在獨立滾動容器架構下，直接在容器內動態建立隱形錨點
+    // 動態建立隱形錨點，強制瀏覽器將其置中
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
-        position: 'absolute',
-        left: `${data.firstX}px`,
-        top: `${data.firstY}px`,
-        width: '1px',
-        height: '1px',
-        pointerEvents: 'none',
-        visibility: 'hidden'
+        position: 'absolute', left: `${data.firstX}px`, top: `${data.firstY}px`,
+        width: '1px', height: '1px', pointerEvents: 'none', visibility: 'hidden'
     });
 
     container.appendChild(anchor);
-
-    // 讓瀏覽器原生引擎去處理「該容器內在任何縮放比例下的精準置中」
-    anchor.scrollIntoView({
-        behavior: 'auto', 
-        block: 'center',  
-        inline: 'center'  
-    });
-
-    // 清除錨點
+    anchor.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
     setTimeout(() => anchor.remove(), 100);
 }
 
+// ==========================================
+// 🌟 搜尋結果渲染邏輯
+// ==========================================
 function _refreshSearchResults() {
     const inp  = document.getElementById('d3-search-input');
     const cont = document.getElementById('d3-search-results');
@@ -147,7 +147,6 @@ function _renderSearchResults(query, container) {
     }
 
     matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
-
     const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
@@ -169,12 +168,8 @@ function _renderSearchResults(query, container) {
         item.addEventListener('mouseleave', () => { if (_selectedPathId !== pathId) item.style.background = 'transparent'; });
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (_selectedPathId === pathId) {
-                _clearHighlight();
-            } else {
-                _highlight(pathId);
-                _panToTrain(pathId); 
-            }
+            if (_selectedPathId === pathId) _clearHighlight();
+            else { _highlight(pathId); _panToTrain(pathId); }
         });
         fragment.appendChild(item);
     }
@@ -190,7 +185,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化 (直接對接 HTML 靜態標籤)
+// 🌟 UI 控制中心初始化 (對接 HTML 並啟動抗縮放引擎)
 // ==========================================
 function _init_ui_panels() {
     const toggleBtn = document.getElementById('d3-toggle-btn');
@@ -198,9 +193,12 @@ function _init_ui_panels() {
     const searchInput = document.getElementById('d3-search-input');
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
+    
+    // 用來掛載變形的控制容器
+    const controlContainer = document.getElementById('d3-control-container'); 
 
-    if (!toggleBtn || !panelBody) return;
-    if (toggleBtn.dataset.bound === 'true') return; // 防止重複綁定事件
+    if (!toggleBtn || !panelBody || !controlContainer) return;
+    if (toggleBtn.dataset.bound === 'true') return; 
     toggleBtn.dataset.bound = 'true';
 
     function _renderFilterList() {
@@ -259,19 +257,29 @@ function _init_ui_panels() {
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
     searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
     panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // 🚀 加入 VisualViewport 抗縮放引擎
+    // 當使用者在手機上雙指放大畫面時，自動反向縮小 UI 面板，保持完美比例
+    if (window.visualViewport) {
+        const updateVVScale = () => {
+            const vv = window.visualViewport;
+            if (vv.scale > 1) {
+                // 設定縮放原點為右下角，並反向縮小
+                controlContainer.style.transformOrigin = 'bottom right';
+                controlContainer.style.transform = `translateZ(0) scale(${1 / vv.scale})`;
+            } else {
+                controlContainer.style.transform = 'translateZ(0) scale(1)';
+            }
+        };
+
+        window.visualViewport.addEventListener('resize', updateVVScale);
+        window.visualViewport.addEventListener('scroll', updateVVScale);
+        requestAnimationFrame(updateVVScale); // 初始化執行
+    }
 }
 
-const _carKindLabel = {
-    taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
-    emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
-    zhongxing: '中興號', direct: '直快', chu_kuang: '莒光號', chushan1: '曙山（早）',
-    chushan2: '曙山（晚）', local: '區間車', local_express: '區間快', fu_hsing: '復興號',
-    ordinary: '普快', skip_stop: '跳停', alishan: '阿里山', alishan_local: '阿里山區間',
-    all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
-};
-
 // ==========================================
-// ── 公開 API ──
+// ── 公開 API (D3 繪圖引擎) ──
 // ==========================================
 function draw_diagram_background(line_kind, date) {
     Object.entries(OperationLines).forEach(([key, value]) => {
@@ -288,10 +296,8 @@ function draw_diagram_background(line_kind, date) {
         // 初始化面版事件綁定
         _init_ui_panels(); 
 
-        // 直接選取 HTML 中已經寫好的獨立滾動容器
         const container = d3.select('#d3-diagram-container');
 
-        // 將 SVG 掛在獨立滾動容器中
         const svg = container.append('svg')
             .attr('class', 'd3-diagram-svg')
             .attr('width', totalWidth)
@@ -313,7 +319,6 @@ function draw_diagram_background(line_kind, date) {
             initDy = (parseInt(stationAxisY) + 50) - vh / 2;
         }
         
-        // 使用容器自身的滾動進行精確初始定位
         if (initDx > 0 || initDy > 0) {
             const containerEl = document.getElementById('d3-diagram-container');
             if (containerEl) {
@@ -334,11 +339,9 @@ function draw_diagram_background(line_kind, date) {
                 const hour = DiagramHours[i];
                 const hour_text = hour.toString().padStart(2, '0');
                 let after_midnight, css;
-                if (hour === 24) {
-                    after_midnight = '隔日'; css = 'hour_midnight';
-                } else {
-                    after_midnight = ''; css = 'hour';
-                }
+                if (hour === 24) { after_midnight = '隔日'; css = 'hour_midnight'; } 
+                else { after_midnight = ''; css = 'hour'; }
+                
                 if (y <= totalHeight) add_text(g, `${hour_text}00 ${after_midnight}`, x, y + 30, css);
                 else break;
                 y += text_spacing_factor;
@@ -490,8 +493,9 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
     let now_time_x_axis = null;
     const coords = [];
 
-    if (realtime_data.StationID > 0)
+    if (realtime_data && realtime_data.StationID > 0) {
         now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
+    }
 
     for (const [, id, time, loc, stop] of value) {
         let x = time * 10 - 1200 * DiagramHours[0] + 50;
