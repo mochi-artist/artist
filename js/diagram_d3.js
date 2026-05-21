@@ -4,7 +4,7 @@
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
 //   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
-//   五、精準飛航跳轉：不論首站停靠與否，皆能精準置中第一個車站的到達時間（最新手機端修正版）
+//   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -75,7 +75,7 @@ function _getTrainCategoryId(style, train_no) {
 }
 
 // ==========================================
-// 🌟 统一視覺更新引擎
+// 🌟 統一視覺更新引擎
 // ==========================================
 function _updateAllPathVisuals() {
     _allPathEls.forEach((el, pathId) => {
@@ -118,30 +118,36 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯（精準定位修正版）
+// 🌟 畫面跳轉與無限清單邏輯（終極定位修正版）
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
-    
-    // 取得手機目前的真實可視寬高（考慮到雙指縮放時，以 visualViewport 的寬高為準）
+
+    // 計算 SVG 畫布在網頁中的絕對起點（避免外層有 padding 影響座標）
+    let offsetX = 0;
+    let offsetY = 0;
+    if (_d3Svg && _d3Svg.node()) {
+        const rect = _d3Svg.node().getBoundingClientRect();
+        offsetX = rect.left + window.scrollX;
+        offsetY = rect.top + window.scrollY;
+    }
+
+    // 取得手機目前的真實可視寬高
     const viewWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
     const viewHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
 
-    // 精準計算將該車次第一站置中所需要的 Scroll 頂點座標
-    const scrollTargetX = data.firstX - viewWidth / 2;
-    const scrollTargetY = data.firstY - viewHeight / 2;
+    // 絕對目標座標 = 畫布起點 + 第一站座標 - 螢幕一半寬高 (使其置中)
+    const targetX = offsetX + data.firstX - (viewWidth / 2);
+    const targetY = offsetY + data.firstY - (viewHeight / 2);
 
-    const scrollOptions = {
-        left: Math.max(0, scrollTargetX),
-        top: Math.max(0, scrollTargetY),
-        behavior: 'smooth'
-    };
-
-    // 進行多層級滾動覆蓋，解決不同手機瀏覽器渲染核心的相容性問題
-    window.scrollTo(scrollOptions);
-    if (document.documentElement) document.documentElement.scrollTo(scrollOptions);
-    if (document.body) document.body.scrollTo(scrollOptions);
+    // ⚠️ 關鍵修正：取消 smooth，改用 auto。
+    // 在手機縮放狀態下使用 smooth 會被瀏覽器中斷導致停在原地。使用 auto 可強制瞬間完成跳轉。
+    window.scrollTo({
+        left: Math.max(0, targetX),
+        top: Math.max(0, targetY),
+        behavior: 'auto' 
+    });
 }
 
 function _refreshSearchResults() {
@@ -212,12 +218,11 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心（手機端抗縮放極致修正版）
+// 🌟 UI 控制中心
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
 
-    // 最外層包裹：固定在畫面，不干擾滑動
     const wrapper = document.createElement('div');
     wrapper.id = 'd3-ui-wrapper';
     Object.assign(wrapper.style, {
@@ -228,7 +233,6 @@ function _init_ui_panels() {
         pointerEvents: 'none'
     });
 
-    // 內層控制容器
     const container = document.createElement('div');
     container.id = 'd3-control-container';
     Object.assign(container.style, {
@@ -239,7 +243,6 @@ function _init_ui_panels() {
         transformOrigin: 'bottom right'
     });
 
-    // 面板本體
     const panelBody = document.createElement('div');
     panelBody.id = 'd3-panel-body';
     Object.assign(panelBody.style, {
@@ -250,7 +253,6 @@ function _init_ui_panels() {
         pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
     });
 
-    // 左側車種過濾
     const filterSection = document.createElement('div');
     filterSection.className = 'd3-filter-section d3-custom-scrollbar';
     Object.assign(filterSection.style, { 
@@ -300,7 +302,6 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(filterList);
 
-    // 右側搜尋
     const searchSection = document.createElement('div');
     searchSection.className = 'd3-search-section';
     Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
@@ -328,7 +329,6 @@ function _init_ui_panels() {
     panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
-    // 圓形按鈕
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = '🔍';
     Object.assign(toggleBtn.style, {
@@ -370,7 +370,6 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 🌟 手機端超強效「抗縮放與視角鎖定」核心邏輯
     if (window.visualViewport) {
         const vv = window.visualViewport;
         const updatePos = () => {
@@ -530,11 +529,11 @@ function find_uncontinuous_index(value) {
     return index;
 }
 
-// 🌟 車次渲染與精準端點捕獲
+// 🌟 嚴格綁定第一個站點座標
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
 
-    // 🎯 核心修正：不論第一站有沒有停靠，直接精準取得該車次最初始車站的 X / Y 軸真實物理座標
+    // 🎯 直接拿 `value[0]` 第一站資料換算實體座標 (不管有沒有停靠)
     const first_time = value[0][2];
     const first_loc = value[0][3];
     const firstX = Math.round((first_time * 10 - 1200 * DiagramHours[0] + 50 + Number.EPSILON) * 100) / 100;
@@ -542,11 +541,10 @@ function set_path(lk, train_no, train_kind, value) {
 
     let pathData = 'M';
     const coordinates = [];
-    const stationPoints = []; 
     const style = CarKind[train_kind] || 'others';
     const diagram_need_stop = find_diagram_need_to_stop(lk);
 
-    for (const [dsc, id, time, loc, stop] of value) {
+    for (const [, id, time, loc, stop] of value) {
         let x = time * 10 - 1200 * DiagramHours[0] + 50;
         let y = loc + 50;
         x = Math.round((x + Number.EPSILON) * 100) / 100;
@@ -554,13 +552,12 @@ function set_path(lk, train_no, train_kind, value) {
         if (stop !== -1 || diagram_need_stop.includes(id)) {
             pathData += `${x},${y} `;
             coordinates.push([x, y]);
-            stationPoints.push({ x, y, dsc, time }); 
         }
     }
 
     const pathId = lk + train_no;
-    // 注入 firstX 與 firstY 供跳轉引擎呼叫
-    _trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints, firstX, firstY });
+    // 將算好的第一個點儲存起來供搜尋點擊時跳轉
+    _trainDataMap.set(pathId, { train_no, train_kind, style, firstX, firstY });
 
     const text_position = calculate_text_position(coordinates, style);
     add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
