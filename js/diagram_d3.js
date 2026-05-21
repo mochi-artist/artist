@@ -194,12 +194,17 @@ function _init_ui_panels() {
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
     
-    // 用來掛載變形的控制容器
-    const controlContainer = document.getElementById('d3-control-container'); 
+    // 🎯 修改點 1：對齊 CSS，改抓 d3-ui-wrapper 作為變形控制容器
+    const controlContainer = document.getElementById('d3-ui-wrapper'); 
 
     if (!toggleBtn || !panelBody || !controlContainer) return;
     if (toggleBtn.dataset.bound === 'true') return; 
     toggleBtn.dataset.bound = 'true';
+
+    // 🎯 修改點 2：暴力斷後，將控制容器強行移出任何具備相對定位的父層 (如 SVG 容器)
+    if (controlContainer.parentElement !== document.body) {
+        document.body.appendChild(controlContainer);
+    }
 
     function _renderFilterList() {
         if (!filterList) return;
@@ -272,36 +277,35 @@ function _init_ui_panels() {
     if (window.visualViewport) {
         const updateVVPos = () => {
             const vv = window.visualViewport;
-            if (vv.scale > 1) {
-                // 畫面放大時，改用絕對定位死死跟隨螢幕「真實」邊界
+            // vv.scale > 1.01 避免細微誤差
+            if (vv.scale > 1.01) { 
                 controlContainer.style.position = 'absolute';
                 
-                // 定位在真實視窗的右下角座標 (扣除 24px 的安全邊距)
+                // 追蹤實際視覺視窗 (Visual Viewport) 的右下角，並預留 24px 邊距
                 controlContainer.style.left = `${vv.pageLeft + vv.width - 24}px`;
                 controlContainer.style.top = `${vv.pageTop + vv.height - 24}px`;
                 controlContainer.style.bottom = 'auto';
                 controlContainer.style.right = 'auto';
                 
-                // 設定縮放原點在右下角，並利用 translate(-100%, -100%) 將面板本身對齊到剛剛設定的座標
-                // scale(1 / vv.scale) 負責把按鈕反向縮小，維持原尺寸
+                // 1. translate(-100%, -100%) 將面板錨點改為右下角對齊
+                // 2. scale(1 / vv.scale) 反向縮小，讓按鈕看起來維持原尺寸
                 controlContainer.style.transformOrigin = 'bottom right';
                 controlContainer.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
             } else {
-                // 畫面無放大時，恢復正常的 fixed 定位
+                // 沒放大時，交還給 CSS 的 position: fixed 處理
                 controlContainer.style.position = 'fixed';
                 controlContainer.style.left = 'auto';
                 controlContainer.style.top = 'auto';
-                controlContainer.style.bottom = 'max(24px, calc(env(safe-area-inset-bottom) + 16px))';
+                controlContainer.style.bottom = '24px';
                 controlContainer.style.right = '24px';
                 controlContainer.style.transform = 'none';
             }
         };
         
-        // 監聽各種會改變視覺大小的事件 (iOS 縮放有時只會觸發 scroll)
         window.visualViewport.addEventListener('scroll', updateVVPos);
         window.visualViewport.addEventListener('resize', updateVVPos);
         
-        // 延遲初始化，確保手機底部的工具列高度已經計算完畢
+        // 初始化校正
         setTimeout(updateVVPos, 100);
     }
 }
