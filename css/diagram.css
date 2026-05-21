@@ -1,24 +1,6 @@
-/* ── D3 互動版：SVG 撐滿視窗，關閉頁面捲動（由 d3.zoom 接管導覽） ── */
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-}
-
-.d3-diagram-svg {
-    display: block;
-    cursor: grab;
-    user-select: none;
-}
-
-.d3-diagram-svg:active {
-    cursor: grabbing;
-}
-
-/* ── 舊有保留：訊息與彈出視窗樣式 ── */
+/* ==========================================================================
+   1. 你原本舊有的樣式（原封不動保留，確保原功能正常）
+   ========================================================================== */
 .popup {
     position: fixed;
     top: 0;
@@ -47,18 +29,19 @@ html, body {
     border-radius: 10px;
 }
 
-/* ── 🎯 整合新增：搜尋與篩選功能面板（完全釘死在右下角，不隨 D3 滾動縮放） ── */
+/* ==========================================================================
+   2. 🎯 只新增這段：單獨把右下角 UI 面板釘死（絕不干擾 D3 畫圖與視窗）
+   ========================================================================== */
 #d3-ui-wrapper {
-    position: fixed !important; /* 釘死在瀏覽器視窗上 */
+    position: fixed !important; /* 強制釘在瀏覽器視窗上，不跟隨網頁滾動 */
     bottom: 24px !important;    /* 距離底部 24px */
     right: 24px !important;     /* 距離右側 24px */
-    z-index: 9999 !important;   /* 確保層級最高，蓋在 SVG 圖表上方 */
-    pointer-events: none;       /* 讓空白透明區域穿透，不擋住底下的 SVG 拖曳 */
-    transform: none !important; /* 徹底阻斷任何外部 JS 對位置的干擾 */
+    z-index: 9999 !important;   /* 確保層級最高，蓋在運行圖上方 */
+    pointer-events: none;       /* 讓外框透明區塊穿透，不擋住底下的地圖拖曳 */
+    transform: none !important; /* 徹底阻斷任何外部 JS 對它的位移干擾 */
 }
 
-/* 確保面板內部的按鈕與選單可以正常接收點擊事件 */
-#d3-toggle-btn, 
-#d3-panel-body {
+/* 確保 UI 面板裡面的所有按鈕、選單、輸入框都能正常點擊 */
+#d3-ui-wrapper * {
     pointer-events: auto;
 }
