@@ -30,20 +30,15 @@
 }
 
 /* ==========================================================================
-   2. UI 控制面板外層 (修正：解除 JS 封印，允許縮放與絕對定位)
+   2. 按鈕與 UI 面板一體化定死（利用底層相對座標，完美抗滾動與縮放）
    ========================================================================== */
 #d3-ui-wrapper {
-    /* 拿掉 !important，讓 JS 在放大時可以順利切換成 absolute */
-    position: fixed;            
-    bottom: 24px;               
-    right: 24px;                
+    position: fixed !important; /* 釘死在視覺視窗上，絕不隨內部 D3 畫布滾動 */
+    bottom: 0 !important;       /* 設為 0，由 JS 動態精準計算 24px 螢幕邊距 */
+    right: 0 !important;        /* 設為 0，由 JS 動態精準計算 24px 螢幕邊距 */
+    z-index: 9999 !important;   /* 確保層級最高，永遠蓋在 D3 畫布上方 */
     
-    /* 確保層級最高，永遠蓋在畫布上方，這行保留 !important 沒關係 */
-    z-index: 9999 !important;   
-    
-    /* ❌ 原本的 transform: none !important; 已刪除，讓 JS 可以控制反向縮放 */
-    
-    /* 限制容器寬高只包裹內容物，點擊事件自然正常傳遞 */
-    width: max-content;
-    height: max-content;
+    /* 限制容器寬高只包裹內容物，當內部 UI 面板打開時，會自動向左上角自然展開 */
+    width: max-content !important;
+    height: max-content !important;
 }
