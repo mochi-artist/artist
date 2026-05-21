@@ -30,15 +30,13 @@
 }
 
 /* ==========================================================================
-   2. 按鈕與 UI 面板一體化定死（利用底層相對座標，完美抗滾動與縮放）
+   控制中心一體化定死（不破壞原本 HTML 結構，強制 fixed）
    ========================================================================== */
-#d3-ui-wrapper {
-    position: fixed !important; /* 釘死在視覺視窗上，絕不隨內部 D3 畫布滾動 */
-    bottom: 0 !important;       /* 設為 0，由 JS 動態精準計算 24px 螢幕邊距 */
-    right: 0 !important;        /* 設為 0，由 JS 動態精準計算 24px 螢幕邊距 */
-    z-index: 9999 !important;   /* 確保層級最高，永遠蓋在 D3 畫布上方 */
-    
-    /* 限制容器寬高只包裹內容物，當內部 UI 面板打開時，會自動向左上角自然展開 */
+#d3-control-container {
+    position: fixed !important; /* 釘死在螢幕視窗上，絕不隨內部畫布滾動 */
+    bottom: 0 !important;       /* 設為 0，由 JS 進行精密視窗邊緣增量計算 */
+    right: 0 !important;        /* 設為 0，由 JS 進行精密視窗邊緣增量計算 */
+    z-index: 9999 !important;   /* 確保最高層級，蓋在 SVG 上方 */
     width: max-content !important;
     height: max-content !important;
 }
