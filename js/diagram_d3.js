@@ -2,7 +2,8 @@
 // 互動功能：
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
-//   三、手機版完美優化：響應式寬度、防止鍵盤自動彈出、精準抗縮放錨點定位
+//   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
+//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -31,18 +32,16 @@ const _filterCategories = [
     { id: 'special', name: '特殊列車', styles: [] } 
 ];
 
-// 注入美化與手機響應式 (RWD) CSS
+// 注入美化捲軸與響應式 CSS
 if (!document.getElementById('d3-custom-styles')) {
     const style = document.createElement('style');
     style.id = 'd3-custom-styles';
     style.innerHTML = `
-        /* 捲軸美化 */
         .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
         .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
         
-        /* 電腦版預設尺寸 */
         #d3-panel-body { width: 420px; }
         .d3-filter-section { width: 180px; flex: 0 0 auto; }
         .d3-search-section { flex: 1; min-width: 0; }
@@ -50,17 +49,11 @@ if (!document.getElementById('d3-custom-styles')) {
         .d3-item-text { font-size: 14px; }
         .d3-item-badge { font-size: 11px; padding: 2px 8px; }
 
-        /* 手機版 (小螢幕) 自動適應 */
         @media (max-width: 500px) {
-            #d3-panel-body { 
-                width: calc(100vw - 32px) !important; /* 貼齊螢幕兩側 */
-            }
+            #d3-panel-body { width: calc(100vw - 32px) !important; }
             .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
             .d3-search-section { padding: 10px 8px !important; }
-            .d3-search-input-field { 
-                font-size: 16px !important; /* 關鍵：設定 16px 可防止 iOS Safari 點擊時強制放大畫面 */
-                padding: 6px !important;
-            }
+            .d3-search-input-field { font-size: 16px !important; padding: 6px !important; }
             .d3-item-text { font-size: 12px !important; }
             .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
             .d3-panel-title { font-size: 12px !important; }
@@ -206,64 +199,48 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心：完美適應手機版的按鈕與面板
+// 🌟 UI 控制中心
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
 
-    // 1. 建立「零尺寸超級錨點」，徹底解決手機雙指放大時按鈕跑掉的問題
     const wrapper = document.createElement('div');
     wrapper.id = 'd3-ui-wrapper';
     Object.assign(wrapper.style, {
-        position: 'fixed', 
-        bottom: '24px', 
-        right: '24px',
-        width: '0px', 
-        height: '0px',
-        zIndex: '1500', 
-        pointerEvents: 'none'
+        position: 'fixed', bottom: '24px', right: '24px',
+        width: '0px', height: '0px', zIndex: '1500', pointerEvents: 'none'
     });
 
-    // 2. 建立 UI 容器，以錨點為基準向外擴展
     const container = document.createElement('div');
+    container.id = 'd3-control-container';
     Object.assign(container.style, {
-        position: 'absolute', 
-        bottom: '0', 
-        right: '0',
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'flex-end', 
-        pointerEvents: 'none',
-        transformOrigin: 'bottom right', // 縮放永遠以右下角為基準點
+        position: 'absolute', bottom: '0', right: '0',
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', 
+        pointerEvents: 'none', transformOrigin: 'bottom right', transition: 'transform 0.05s linear' 
     });
 
-    // 3. 整合式面板主體
     const panelBody = document.createElement('div');
-    panelBody.id = 'd3-panel-body'; // 使用 CSS class 控制響應式寬度
+    panelBody.id = 'd3-panel-body';
     Object.assign(panelBody.style, {
         position: 'absolute', bottom: '60px', right: '0',
         background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
         boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
         fontFamily: 'Tahoma, Verdana, sans-serif',
-        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.25s, transform 0.25s',
+        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
         pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
     });
 
-    // [左側 - 車種過濾]
     const filterSection = document.createElement('div');
     filterSection.className = 'd3-filter-section d3-custom-scrollbar';
     Object.assign(filterSection.style, { 
         padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
-        maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
     });
 
     const filterTitle = document.createElement('div');
     filterTitle.className = 'd3-panel-title';
     filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
-    Object.assign(filterTitle.style, { 
-        fontWeight: 'bold', color: '#8ab4f8', 
-        marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)'
-    });
+    Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
 
     const filterList = document.createElement('div');
     
@@ -288,21 +265,13 @@ function _init_ui_panels() {
             
             Object.assign(item.style, {
                 padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-                borderRadius: '6px',
-                transition: 'background 0.1s', userSelect: 'none', 
-                color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
+                background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderRadius: '6px',
+                transition: 'background 0.1s', userSelect: 'none', color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
             });
             
-            item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:12px; color:#cbd5e1">${counts[cat.id]}</span>`;
+            item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
             
-            item.addEventListener('mouseenter', () => { if (!isActive) item.style.background = 'rgba(255,255,255,0.05)'; });
-            item.addEventListener('mouseleave', () => { if (!isActive) item.style.background = 'transparent'; });
-            item.addEventListener('click', () => {
-                _activeFilter = cat.id;
-                _renderFilterList(); 
-                _applyFilter();
-            });
+            item.addEventListener('click', () => { _activeFilter = cat.id; _renderFilterList(); _applyFilter(); });
             filterList.appendChild(item);
         });
     }
@@ -310,18 +279,15 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(filterList);
 
-    // [右側 - 車次搜尋]
     const searchSection = document.createElement('div');
     searchSection.className = 'd3-search-section';
-    Object.assign(searchSection.style, { 
-        padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' 
-    });
+    Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
 
     const searchInput = document.createElement('input');
     searchInput.id = 'd3-search-input';
     searchInput.className = 'd3-search-input-field';
     searchInput.type = 'text';
-    searchInput.placeholder = '🔍 搜尋車次號...';
+    searchInput.placeholder = '🔍 車次號碼...';
     Object.assign(searchInput.style, {
         width: '100%', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
         background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box', outline: 'none',
@@ -332,9 +298,7 @@ function _init_ui_panels() {
     const searchResults = document.createElement('div');
     searchResults.id = 'd3-search-results';
     searchResults.className = 'd3-custom-scrollbar';
-    Object.assign(searchResults.style, { 
-        maxHeight: '240px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' 
-    });
+    Object.assign(searchResults.style, { maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
 
     searchSection.appendChild(searchInput);
     searchSection.appendChild(searchResults);
@@ -342,14 +306,12 @@ function _init_ui_panels() {
     panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
-    // --- 觸發按鈕 ---
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = '🔍';
     Object.assign(toggleBtn.style, {
         width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
         fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', 
-        pointerEvents: 'all', marginTop: '8px'
+        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', pointerEvents: 'all', marginTop: '8px'
     });
 
     let isPanelOpen = false;
@@ -359,14 +321,9 @@ function _init_ui_panels() {
         if (isPanelOpen) {
             _renderFilterList(); 
             panelBody.style.display = 'flex';
-            requestAnimationFrame(() => { 
-                panelBody.style.opacity = '1'; 
-                panelBody.style.transform = 'translateY(0)'; 
-            });
+            requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
             toggleBtn.textContent = '✕';
             toggleBtn.style.background = '#c5221f';
-            
-            // ⛔ 拔除 searchInput.focus()，讓手機鍵盤不會自動彈出！
             _renderSearchResults('', searchResults);
         } else {
             panelBody.style.opacity = '0'; 
@@ -387,22 +344,18 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // ==========================================
-    // 🌟 手機視角跟隨與抗縮放邏輯 (確保按鈕永遠在右下角)
-    // ==========================================
+    // 手機視角跟隨與抗縮放邏輯
     if (window.visualViewport) {
         const updatePos = () => {
             const vv = window.visualViewport;
-            // 如果畫面被雙指放大，改用絕對定位死死跟隨螢幕真實邊界
             if (vv.scale > 1) {
                 wrapper.style.position = 'absolute';
-                wrapper.style.left = \`\${vv.pageLeft + vv.width - 24}px\`;
-                wrapper.style.top = \`\${vv.pageTop + vv.height - 24}px\`;
+                wrapper.style.left = (vv.pageLeft + vv.width - 24) + 'px';
+                wrapper.style.top = (vv.pageTop + vv.height - 24) + 'px';
                 wrapper.style.bottom = 'auto';
                 wrapper.style.right = 'auto';
-                container.style.transform = \`scale(\${1 / vv.scale})\`; // 反向縮小，維持按鈕原始尺寸
+                container.style.transform = 'scale(' + (1 / vv.scale) + ')';
             } else {
-                // 沒有放大時，恢復最穩定的 fixed 定位
                 wrapper.style.position = 'fixed';
                 wrapper.style.left = 'auto';
                 wrapper.style.top = 'auto';
@@ -411,7 +364,6 @@ function _init_ui_panels() {
                 container.style.transform = 'none';
             }
         };
-        // 綁定滾動與縮放事件
         vv.addEventListener('scroll', updatePos);
         vv.addEventListener('resize', updatePos);
         setTimeout(updatePos, 100);
