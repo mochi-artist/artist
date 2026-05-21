@@ -235,46 +235,74 @@ function _init_ui_panels() {
     }
 
     let isPanelOpen = false;
+    
+    function openPanel() {
+        isPanelOpen = true;
+        _renderFilterList(); 
+        panelBody.style.display = 'flex';
+        requestAnimationFrame(() => { 
+            panelBody.style.opacity = '1'; 
+            panelBody.style.transform = 'translateY(0)'; 
+        });
+        toggleBtn.textContent = '✕';
+        toggleBtn.style.background = '#c5221f';
+        searchInput.focus();
+        _renderSearchResults('', searchResults);
+    }
+    
+    function closePanel() {
+        isPanelOpen = false;
+        panelBody.style.opacity = '0'; 
+        panelBody.style.transform = 'translateY(12px)';
+        setTimeout(() => { panelBody.style.display = 'none'; }, 200);
+        toggleBtn.textContent = '🔍';
+        toggleBtn.style.background = '#1a73e8';
+    }
+
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        isPanelOpen = !isPanelOpen;
-        if (isPanelOpen) {
-            _renderFilterList(); 
-            panelBody.style.display = 'flex';
-            requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
-            toggleBtn.textContent = '✕';
-            toggleBtn.style.background = '#c5221f';
-            _renderSearchResults('', searchResults);
-        } else {
-            panelBody.style.opacity = '0'; 
-            panelBody.style.transform = 'translateY(12px)';
-            setTimeout(() => { panelBody.style.display = 'none'; }, 200);
-            toggleBtn.textContent = '🔍';
-            toggleBtn.style.background = '#1a73e8';
-        }
+        isPanelOpen ? closePanel() : openPanel();
     });
 
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
-    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) closePanel(); });
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 🚀 加入 VisualViewport 抗縮放引擎
-    // 當使用者在手機上雙指放大畫面時，自動反向縮小 UI 面板，保持完美比例
+    // 🚀 核心抗縮放引擎：精準鎖定視覺右下角 + 反向縮放
     if (window.visualViewport) {
-        const updateVVScale = () => {
+        const updateVVPos = () => {
             const vv = window.visualViewport;
             if (vv.scale > 1) {
-                // 設定縮放原點為右下角，並反向縮小
+                // 畫面放大時，改用絕對定位死死跟隨螢幕「真實」邊界
+                controlContainer.style.position = 'absolute';
+                
+                // 定位在真實視窗的右下角座標 (扣除 24px 的安全邊距)
+                controlContainer.style.left = `${vv.pageLeft + vv.width - 24}px`;
+                controlContainer.style.top = `${vv.pageTop + vv.height - 24}px`;
+                controlContainer.style.bottom = 'auto';
+                controlContainer.style.right = 'auto';
+                
+                // 設定縮放原點在右下角，並利用 translate(-100%, -100%) 將面板本身對齊到剛剛設定的座標
+                // scale(1 / vv.scale) 負責把按鈕反向縮小，維持原尺寸
                 controlContainer.style.transformOrigin = 'bottom right';
-                controlContainer.style.transform = `translateZ(0) scale(${1 / vv.scale})`;
+                controlContainer.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
             } else {
-                controlContainer.style.transform = 'translateZ(0) scale(1)';
+                // 畫面無放大時，恢復正常的 fixed 定位
+                controlContainer.style.position = 'fixed';
+                controlContainer.style.left = 'auto';
+                controlContainer.style.top = 'auto';
+                controlContainer.style.bottom = 'max(24px, calc(env(safe-area-inset-bottom) + 16px))';
+                controlContainer.style.right = '24px';
+                controlContainer.style.transform = 'none';
             }
         };
-
-        window.visualViewport.addEventListener('resize', updateVVScale);
-        window.visualViewport.addEventListener('scroll', updateVVScale);
-        requestAnimationFrame(updateVVScale); // 初始化執行
+        
+        // 監聽各種會改變視覺大小的事件 (iOS 縮放有時只會觸發 scroll)
+        window.visualViewport.addEventListener('scroll', updateVVPos);
+        window.visualViewport.addEventListener('resize', updateVVPos);
+        
+        // 延遲初始化，確保手機底部的工具列高度已經計算完畢
+        setTimeout(updateVVPos, 100);
     }
 }
 
