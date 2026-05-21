@@ -118,7 +118,7 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯
+// 🌟 畫面跳轉與無限清單邏輯 (精準定位更新版)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -128,21 +128,38 @@ function _panToTrain(pathId) {
     let offsetY = 0;
     if (_d3Svg && _d3Svg.node()) {
         const rect = _d3Svg.node().getBoundingClientRect();
+        // 取得 SVG 容器在整張網頁中的絕對座標起點
         offsetX = rect.left + window.scrollX;
         offsetY = rect.top + window.scrollY;
     }
 
-    const viewWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-    const viewHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    // 算出該車次起點在整張網頁裡的絕對座標
+    const targetX = offsetX + data.firstX;
+    const targetY = offsetY + data.firstY;
 
-    const targetX = offsetX + data.firstX - (viewWidth / 2);
-    const targetY = offsetY + data.firstY - (viewHeight / 2);
-
-    window.scrollTo({
-        left: Math.max(0, targetX),
-        top: Math.max(0, targetY),
-        behavior: 'auto' 
+    // 動態建立一個 1x1 像素的隱形錨點
+    const anchor = document.createElement('div');
+    Object.assign(anchor.style, {
+        position: 'absolute',
+        left: `${targetX}px`,
+        top: `${targetY}px`,
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none',
+        visibility: 'hidden'
     });
+
+    document.body.appendChild(anchor);
+
+    // 交給瀏覽器原生引擎處理任何縮放狀態下的精準置中
+    anchor.scrollIntoView({
+        behavior: 'auto', // 直接跳轉
+        block: 'center',  // 垂直置中
+        inline: 'center'  // 水平置中
+    });
+
+    // 跳轉完成後，把這個隱形錨點清掉，保持 DOM 乾淨
+    setTimeout(() => anchor.remove(), 100);
 }
 
 function _refreshSearchResults() {
