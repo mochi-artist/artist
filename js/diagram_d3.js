@@ -162,8 +162,31 @@ function _init_ui_panels() {
 
     if (!wrapper || !toggleBtn || !panelBody) return;
     
-    // 🎯 關鍵修改：等待渲染完成後，才將 UI 顯示出來
+    // 渲染完成後顯示 UI 容器
     wrapper.style.display = 'block';
+
+    // 🎯 關鍵修改：高精度 Visual Viewport 縮放與座標補償
+    function _adjustUiViewport() {
+        const vv = window.visualViewport;
+        if (!vv) return;
+        
+        // 1. 計算反向縮放比：螢幕放大幾倍，UI 就縮小幾倍，讓視覺大小永遠不變
+        const scale = 1 / vv.scale; 
+        
+        // 2. 抓取目前手機/電腦畫面上真正的「右下角」座標
+        const x = vv.offsetLeft + vv.width;  
+        const y = vv.offsetTop + vv.height; 
+        
+        // 3. 把 UI 容器（0x0 的錨點）精準移動到該座標並進行反向縮放
+        wrapper.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    }
+
+    // 綁定動態縮放與滾動監聽（包含手機雙指捏合縮放、平移，與電腦版縮放）
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', _adjustUiViewport);
+        window.visualViewport.addEventListener('scroll', _adjustUiViewport);
+        _adjustUiViewport(); // 初始化執行一次校正
+    }
 
     if (toggleBtn.dataset.bound === 'true') return;
     toggleBtn.dataset.bound = 'true';
@@ -272,7 +295,7 @@ function draw_diagram_background(line_kind, date) {
             initDy = (parseInt(stationAxisY) + 50) - vh / 2;
         }
         
-        // 🎯 關鍵修改：交還給瀏覽器原生滾動，直接使用 window.scrollTo
+        // 交還給瀏覽器原生滾動，直接使用 window.scrollTo
         if (initDx > 0 || initDy > 0) {
             setTimeout(() => {
                 window.scrollTo(Math.max(0, initDx), Math.max(0, initDy));
