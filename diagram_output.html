@@ -6,12 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/diagram.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+    
+    <script>window._useD3Renderer = true;</script>
 </head>
 
 <body>
     <div id="popup" class="popup">
         <div class="msg">
-            <h1>讀取中，請稍後...</h1>
+            <h1>讀取中，請稍後<span id="loading-dots">.</span></h1>
         </div>
     </div>
 </body>
