@@ -32,14 +32,20 @@
 /* ==========================================================================
    2. 🎯 只新增這段：單獨把右下角 UI 面板釘死（絕不干擾 D3 畫圖與視窗）
    ========================================================================== */
+/* 🎯 最終定死版本：不干擾 D3 畫圖、不干擾點擊事件 */
 #d3-ui-wrapper {
-    position: fixed !important; /* 強制釘在瀏覽器視窗上，不跟隨網頁滾動 */
-    bottom: 24px !important;    /* 距離底部 24px */
-    right: 24px !important;     /* 距離右側 24px */
-    z-index: 9999 !important;   /* 確保層級最高，蓋在運行圖上方 */
-    pointer-events: none;       /* 讓外框透明區塊穿透，不擋住底下的地圖拖曳 */
-    transform: none !important; /* 徹底阻斷任何外部 JS 對它的位移干擾 */
+    position: fixed !important; 
+    bottom: 24px !important;    
+    right: 24px !important;     
+    z-index: 9999 !important;   
+    transform: none !important; 
+    
+    /* 新增這兩行：讓外框收縮到跟按鈕一樣大，就不會擋住地圖，也不用寫 pointer-events 了 */
+    width: max-content !important;
+    height: max-content !important;
 }
+
+/* （原本的 #d3-ui-wrapper * { pointer-events: auto; } 這整段請直接刪除！） */
 
 /* 確保 UI 面板裡面的所有按鈕、選單、輸入框都能正常點擊 */
 #d3-ui-wrapper * {
