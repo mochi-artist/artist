@@ -1,9 +1,4 @@
 // D3.js 版本的 SVG 渲染模組 (優化升級版 🚀 + 修復字體與視角Bug 🛠️)
-// 優化重點：
-// 1. 🌟 補上 paint-order 魔法：徹底解決無限放大時的文字邊框分離破圖問題 (不強制覆蓋原有CSS)。
-// 2. ⚡️ D3 現代寫法：捨棄字串拼接，改用原生的 d3.line() 產生器。
-// 3. 🎯 滾動定位優化：回歸最穩定的 scrollIntoView 隱形錨點，確保手機端縮放也能精準跳轉。
-// 4. 🗂️ 圖層 (Layer) 分離：改用 Map 儲存多條路線圖層，解決全域變數互相覆蓋導致的 Bug。
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -11,7 +6,6 @@ const _allPathEls   = new Map();
 let _selectedPathId = null;      
 let _d3Svg = null;
 let _d3G = null;
-// 🌟 修復 1：改用 Map 管理圖層，解決各路線圖層互相覆蓋的問題
 const _diagramLayers = new Map(); 
 
 // 共用 Helper：高精度小數點第二位四捨五入
@@ -100,7 +94,7 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與精準定位 (修復版：回歸最穩定的 anchor 錨點法)
+// 🌟 畫面跳轉與精準定位
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -109,7 +103,6 @@ function _panToTrain(pathId) {
     const container = document.getElementById('d3-diagram-container');
     if (!container) return;
 
-    // 🌟 修復 2：回歸你原本的隱形錨點作法，抗縮放相容性最強
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
         position: 'absolute', left: `${data.firstX}px`, top: `${data.firstY}px`,
@@ -187,7 +180,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化
+// 🌟 UI 控制中心初始化 (修復手機縮放飛走問題 🎯)
 // ==========================================
 function _init_ui_panels() {
     const toggleBtn = document.getElementById('d3-toggle-btn');
@@ -269,9 +262,10 @@ function _init_ui_panels() {
         const updateVVPos = () => {
             const vv = window.visualViewport;
             if (vv.scale > 1.01) { 
-                controlContainer.style.position = 'absolute';
-                controlContainer.style.left = `${vv.pageLeft + vv.width - 24}px`;
-                controlContainer.style.top = `${vv.pageTop + vv.height - 24}px`;
+                // 🎯 修改重點：改回 fixed，並利用 offsetLeft / offsetTop 定位，確保它緊跟手機螢幕的真實右下角
+                controlContainer.style.position = 'fixed';
+                controlContainer.style.left = `${vv.offsetLeft + vv.width - 24}px`;
+                controlContainer.style.top = `${vv.offsetTop + vv.height - 24}px`;
                 controlContainer.style.bottom = 'auto';
                 controlContainer.style.right = 'auto';
                 controlContainer.style.transformOrigin = 'bottom right';
@@ -319,7 +313,6 @@ function draw_diagram_background(line_kind, date) {
         const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
 
-        // 🌟 修復 3：按路線(key)建立獨立圖層並綁定到 Map 中
         _diagramLayers.set(key, {
             lines: g.append('g').attr('class', 'layer-train-lines'),
             hitboxes: g.append('g').attr('class', 'layer-hitboxes'),
@@ -348,7 +341,6 @@ function draw_diagram_background(line_kind, date) {
         const title = `${value['NAME']} ，日期：${date}，運行圖繪製完成時間：${draw_date}`;
         add_text(g, title, 5, 0, null);
 
-        // 背景線條渲染邏輯...
         for (let i = 0; i < DiagramHours.length; i++) {
             let x = 50 + i * 1200;
             let y = 0;
@@ -510,7 +502,6 @@ function calculate_text_position(coordinates, color) {
 
 // ⚡️ [優化] 重構 add_path：處理分層圖層與字體破圖問題
 function add_path(lk, train_id, path_string, text_position, style, pathId) {
-    // 🌟 修復 4-1：動態取得這條路線專屬的圖層
     const layers = _diagramLayers.get(lk);
     if (!layers) return;
 
@@ -550,14 +541,17 @@ function add_path(lk, train_id, path_string, text_position, style, pathId) {
         const textEl = layers.texts.append('text')
             .attr('class', style)
             .classed('d3-train-label', true)
-            // 🌟 修復 4-2：只保留 paint-order 不覆蓋字體外觀
-            .style('paint-order', 'stroke fill');
+            // 🎯 修改重點：加上明確的黑色外框當底，覆蓋住車次線條，製造字體周圍黑底的斷線感
+            .style('paint-order', 'stroke fill')
+            .style('stroke', '#000000')      // 黑色外框
+            .style('stroke-width', '4px')    // 外框粗細 (斷線空間大小)
+            .style('stroke-linejoin', 'round');
 
         textEl.append('textPath')
             .attr('href', hrefTarget)
             .attr('startOffset', offset)
             .append('tspan')
-            .attr('dy', -3) // 🌟 修復 4-3：恢復原始 dy 值
+            .attr('dy', -3) 
             .text(train_id);
     }
 }
@@ -586,7 +580,6 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
                 
-                // 取得正確圖層
                 const layers = _diagramLayers.get(lk);
                 const targetG = layers ? layers.texts : diagram_objects[lk];
                 
