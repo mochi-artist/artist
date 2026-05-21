@@ -3,7 +3,7 @@
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
-//   四、視覺絕對鎖定：VisualViewport 抗縮放技術，確保按鈕在手機縮放時「絕對固定」在畫面右下角
+//   四、無敵抗縮放鎖定：改用 Document 絕對座標系，徹底解決 iOS/Android 縮放時按鈕亂飛變大的死穴！
 //   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
 
 // ── 模組層級狀態 ──
@@ -213,30 +213,36 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心 (無敵抗縮放鎖定版)
+// 🌟 UI 控制中心 (絕對幾何反向縮放鎖定版)
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
 
+    // 🎯 核心修正：改用絕對定位 (position: absolute)，徹底避開手機瀏覽器對 fixed 的不同解釋
     const wrapper = document.createElement('div');
     wrapper.id = 'd3-ui-wrapper';
     Object.assign(wrapper.style, {
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        zIndex: '2000',
+        position: 'absolute',
+        left: '0px',
+        top: '0px',
+        width: '0px',
+        height: '0px',
+        zIndex: '9999',
         pointerEvents: 'none',
-        // 確保縮放時原點始終錨定在右下角
-        transformOrigin: 'bottom right' 
+        overflow: 'visible'
     });
 
     const container = document.createElement('div');
     container.id = 'd3-control-container';
     Object.assign(container.style, {
+        position: 'absolute',
+        right: '0px',
+        bottom: '0px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end', 
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        transformOrigin: 'bottom right' // 以右下角為縮放錨點
     });
 
     const panelBody = document.createElement('div');
@@ -366,28 +372,52 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 🎯 超強效「絕對抗縮放」鎖定核心
+    // 🎯 終極「幾何絕對錨定」反縮放控制
     if (window.visualViewport) {
         const vv = window.visualViewport;
-        const updatePos = () => {
-            // 排版視窗寬高
-            const layoutW = window.innerWidth;
-            const layoutH = window.innerHeight;
-            
-            // 計算真實可視視窗距離排版視窗右下角的偏移量
-            const shiftX = layoutW - (vv.offsetLeft + vv.width);
-            const shiftY = layoutH - (vv.offsetTop + vv.height);
-            
-            // 直接將最外層 wrapper 進行偏移補償，並反向縮放！
-            // 這樣按鈕在視覺上會永遠保持相同大小，且牢牢黏在右下角
-            wrapper.style.transform = `translate(${-shiftX}px, ${-shiftY}px) scale(${1 / vv.scale})`;
+        let basePageX = 0;
+        let basePageY = 0;
+
+        // 計算 wrapper 在當前網頁佈局下的基礎位移，排除 body margin/padding 的干擾
+        const updateBasePos = () => {
+            wrapper.style.transform = 'none';
+            const rect = wrapper.getBoundingClientRect();
+            basePageX = rect.left + window.scrollX;
+            basePageY = rect.top + window.scrollY;
         };
 
+        const updatePos = () => {
+            const scale = vv.scale;
+            const margin = 24; // 想要固定在手機螢幕上的右下角邊距 (像素)
+            
+            // 算出當前視窗右下角在整張網頁中的絕對 Document 座標
+            const targetX = vv.pageLeft + vv.width - (margin / scale);
+            const targetY = vv.pageTop + vv.height - (margin / scale);
+            
+            const dx = targetX - basePageX;
+            const dy = targetY - basePageY;
+            
+            // 透過無延遲的向量位移與反向縮放，強制鎖定在右下角且大小不變
+            wrapper.style.transform = `translate(${dx}px, ${dy}px)`;
+            container.style.transform = `scale(${1 / scale})`;
+        };
+
+        updateBasePos();
+        updatePos();
+
+        // 綁定所有視窗變動與縮放滾動事件
         vv.addEventListener('scroll', updatePos);
-        vv.addEventListener('resize', updatePos);
+        vv.addEventListener('resize', () => {
+            updateBasePos(); 
+            updatePos();
+        });
         window.addEventListener('scroll', updatePos);
         
-        setTimeout(updatePos, 100);
+        // 確保某些手機瀏覽器渲染未完成時的雙重校正
+        setTimeout(() => {
+            updateBasePos();
+            updatePos();
+        }, 300);
     }
 }
 
@@ -727,6 +757,7 @@ function interpolateArray(A, B) {
     return result;
 }
 
+// 取得當前時間的 X 軸位置
 function get_now_time_x_axis(minus_time) {
     const t = new Date();
     t.setMinutes(t.getMinutes() - minus_time);
