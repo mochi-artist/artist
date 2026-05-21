@@ -5,7 +5,8 @@
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
 //   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
 
-// ── 模組層級狀態 ──
+// ── 全域與模組層級狀態 ──
+window.diagram_objects = window.diagram_objects || {}; // 確保全域物件存在
 const _trainDataMap = new Map(); 
 const _allPathEls   = new Map(); 
 let _selectedPathId = null;      
@@ -64,7 +65,7 @@ if (!document.getElementById('d3-custom-styles')) {
 
 // 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
-    const base_no = train_no.replace(/-End$/, '');
+    const base_no = String(train_no).replace(/-End$/, ''); // 強制轉字串防呆
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
     if (/[a-zA-Z]/.test(base_no)) return 'others';
     for (let i = 1; i < _filterCategories.length - 2; i++) {
@@ -155,7 +156,7 @@ function _renderSearchResults(query, container) {
         matches.push({ pathId, data });
     }
 
-    matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
+    matches.sort((a, b) => String(a.data.train_no).localeCompare(String(b.data.train_no), undefined, {numeric: true}));
 
     const fragment = document.createDocumentFragment();
 
@@ -264,7 +265,7 @@ function _init_ui_panels() {
             const isActive = _activeFilter === cat.id;
             
             Object.assign(item.style, {
-                padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '6px 10px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderRadius: '6px',
                 transition: 'background 0.1s', userSelect: 'none', color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
             });
@@ -344,7 +345,7 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 手機視角跟隨與抗縮放邏輯
+    // 🌟 手機視角跟隨與抗縮放邏輯 (修正版)
     if (window.visualViewport) {
         const updatePos = () => {
             const vv = window.visualViewport;
@@ -364,8 +365,9 @@ function _init_ui_panels() {
                 container.style.transform = 'none';
             }
         };
-        vv.addEventListener('scroll', updatePos);
-        vv.addEventListener('resize', updatePos);
+        // 修正：使用 window.visualViewport 確保範圍正確
+        window.visualViewport.addEventListener('scroll', updatePos);
+        window.visualViewport.addEventListener('resize', updatePos);
         setTimeout(updatePos, 100);
     }
 }
@@ -405,6 +407,8 @@ function draw_diagram_background(line_kind, date) {
 
         const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
+
+        window.diagram_objects[key] = g; // 確保 diagram_objects 變數寫入
 
         svg.on('click', () => { _clearHighlight(); });
 
@@ -470,7 +474,6 @@ function draw_diagram_background(line_kind, date) {
             }
         });
 
-        diagram_objects[key] = g;
         add_line(g, now_time_x_axis, 50, now_time_x_axis, totalHeight + 50, 'now_time_line');
     });
 }
@@ -535,7 +538,7 @@ function set_path(lk, train_no, train_kind, value) {
     _trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints });
 
     const text_position = calculate_text_position(coordinates, style);
-    add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
+    add_path(window.diagram_objects[lk], lk, train_no, pathData, text_position, style);
 }
 
 function calculate_text_position(coordinates, color) {
@@ -602,7 +605,7 @@ function mark_realtime_train_position(value, line_dir, train_kind, realtime_data
             const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
-                diagram_objects[line_kind].append('circle')
+                window.diagram_objects[line_kind].append('circle')
                     .attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5)
                     .attr('class', style);
             }
