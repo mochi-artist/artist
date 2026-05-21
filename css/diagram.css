@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. 你原本舊有的樣式（原封不動保留，確保原功能正常）
+   1. 舊有保留項目（原封不動，不破壞原先排版與視窗大小）
    ========================================================================== */
 .popup {
     position: fixed;
@@ -30,24 +30,16 @@
 }
 
 /* ==========================================================================
-   2. 🎯 只新增這段：單獨把右下角 UI 面板釘死（絕不干擾 D3 畫圖與視窗）
+   2. 按鈕定死功能（利用 CSS 原生 fixed 強制掛在右下角，完全避開 JS 衝突）
    ========================================================================== */
-/* 🎯 最終定死版本：不干擾 D3 畫圖、不干擾點擊事件 */
 #d3-ui-wrapper {
-    position: fixed !important; 
-    bottom: 24px !important;    
-    right: 24px !important;     
-    z-index: 9999 !important;   
-    transform: none !important; 
+    position: fixed !important; /* 釘死在視窗上，絕不隨畫面滾動 */
+    bottom: 24px !important;    /* 距離底部 24px */
+    right: 24px !important;     /* 距離右側 24px */
+    z-index: 9999 !important;   /* 確保層級最高，永遠蓋在 D3 畫布上方 */
+    transform: none !important; /* 阻斷所有外部或舊有 JS 位移干擾 */
     
-    /* 新增這兩行：讓外框收縮到跟按鈕一樣大，就不會擋住地圖，也不用寫 pointer-events 了 */
+    /* 限制容器寬高只包裹內容物，點擊事件自然正常傳遞，不再需要 pointer-events */
     width: max-content !important;
     height: max-content !important;
-}
-
-/* （原本的 #d3-ui-wrapper * { pointer-events: auto; } 這整段請直接刪除！） */
-
-/* 確保 UI 面板裡面的所有按鈕、選單、輸入框都能正常點擊 */
-#d3-ui-wrapper * {
-    pointer-events: auto;
 }
