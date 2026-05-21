@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.05, maximum-scale=10.0, user-scalable=yes">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/diagram.css">
     
@@ -12,32 +12,25 @@
     <script>window._useD3Renderer = true;</script>
 
     <style>
-        /* 🎯 強制鎖定主網頁，防止雙重捲軸與防止 fixed 震顫 */
+        /* 🎯 關鍵修改：取消 overflow: hidden，將滾動與縮放權限交還給瀏覽器 */
         html, body { 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
             margin: 0; 
             padding: 0; 
         }
         
-        /* 獨立運行圖滾動容器 */
+        /* 讓容器自然撐開，適應 SVG 巨大尺寸 */
         #d3-diagram-container {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            position: absolute;
-            top: 0;
-            left: 0;
+            width: max-content;
+            height: max-content;
         }
 
-        /* 自訂容器捲軸樣式 */
+        /* 捲軸美化 */
         .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
         .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
         .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
         
-        /* 浮動控制中心 Pinned 外殼 */
+        /* 浮動控制中心 */
         #d3-ui-wrapper {
             position: fixed;
             right: 24px;
@@ -45,6 +38,8 @@
             z-index: 9999;
             pointer-events: none;
             overflow: visible;
+            display: none; /* 🎯 關鍵修改：讀取中預設隱藏 */
+            transform-origin: bottom right; /* 確保縮放時以右下角為基準 */
         }
         #d3-control-container {
             display: flex;
@@ -53,7 +48,6 @@
             pointer-events: none;
         }
 
-        /* 搜尋與過濾面板主體 */
         #d3-panel-body { 
             width: 420px; 
             background: rgba(15, 23, 42, 0.95); 
@@ -71,65 +65,29 @@
             overflow: hidden;
         }
         .d3-filter-section { 
-            width: 180px; 
-            flex: 0 0 auto; 
-            padding: 12px; 
+            width: 180px; flex: 0 0 auto; padding: 12px; 
             border-right: 1px solid rgba(255,255,255,0.1); 
-            max-height: 280px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 2px; 
+            max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; 
         }
-        .d3-panel-title { 
-            font-weight: bold; 
-            color: #8ab4f8; 
-            margin-bottom: 8px; 
-            padding-bottom: 4px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
-        }
-        .d3-search-section { 
-            flex: 1; 
-            min-width: 0; 
-            padding: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-        }
+        .d3-panel-title { font-weight: bold; color: #8ab4f8; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .d3-search-section { flex: 1; min-width: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
         .d3-search-input-field { 
-            width: 100%; 
-            border-radius: 6px; 
-            border: 1px solid rgba(255,255,255,0.2); 
-            background: rgba(0,0,0,0.3); 
-            color: #fff; 
-            box-sizing: border-box; 
-            outline: none; 
-            font-size: 13px; 
-            padding: 6px;
+            width: 100%; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); color: #fff; box-sizing: border-box; outline: none; 
+            font-size: 13px; padding: 6px;
         }
         .d3-search-input-field:focus { border-color: #38bdf8; }
-        #d3-search-results { 
-            max-height: 230px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            margin-top: 4px; 
-        }
+        #d3-search-results { max-height: 230px; overflow-y: auto; display: flex; flex-direction: column; margin-top: 4px; }
         
-        /* 右下角圓形切換按鈕 */
         #d3-toggle-btn {
             width: 50px; height: 50px; border-radius: 50%; border: none; background: #1a73e8; color: #fff;
-            fontSize: 22px; cursor: pointer; display: flex; justifyContent: center; alignItems: center; 
-            boxShadow: 0 4px 16px rgba(26, 115, 232, 0.4); transition: background 0.2s; pointerEvents: all; marginTop: 8px;
-            touchAction: none; userSelect: none; WebkitTapHighlightColor: 'transparent';
-            font-size: 22px; display: flex; justify-content: center; align-items: center; margin-top: 8px;
-            box-shadow: 0 4px 16px rgba(26, 115, 232, 0.4); pointer-events: all; cursor: pointer;
+            font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; 
+            margin-top: 8px; box-shadow: 0 4px 16px rgba(26, 115, 232, 0.4); pointer-events: all; transition: background 0.2s;
         }
 
         .d3-item-text { font-size: 14px; }
         .d3-item-badge { font-size: 11px; padding: 2px 8px; }
 
-        /* RWD 行動裝置優化 */
         @media (max-width: 500px) {
             #d3-panel-body { width: calc(100vw - 32px) !important; }
             .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
@@ -149,7 +107,7 @@
         </div>
     </div>
 
-    <div id="d3-diagram-container" class="d3-custom-scrollbar"></div>
+    <div id="d3-diagram-container"></div>
 
     <div id="d3-ui-wrapper">
         <div id="d3-control-container">
