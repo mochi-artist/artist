@@ -30,16 +30,16 @@
         
         /* 🎯 關鍵修改 1：將 Wrapper 變成一個純粹的畫面座標錨點（大小 0x0） */
         #d3-ui-wrapper {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 0;
-            height: 0;
-            z-index: 9999;
-            pointer-events: none;
-            display: none; /* 讀取中預設隱藏，由 JS 畫完後開啟 */
-            transform-origin: 0 0; /* 確保 JS 縮放補償以左上角為基準點 */
-        }
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    z-index: 9999;
+    pointer-events: none;
+    display: block; /* 👈 把這裡的 none 改成 block */
+    transform-origin: 0 0;
+}
 
         /* 🎯 關鍵修改 2：真正的 UI 控制中心，透過絕對定位永遠釘死在動態計算出的右下角 */
         #d3-control-container {
