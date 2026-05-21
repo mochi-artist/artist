@@ -1,8 +1,6 @@
 // D3.js 版本的 SVG 渲染模組
-// 互動功能：
-//   一、D3 畫布縮放與平移 (d3.zoom)：攔截原生縮放，UI 絕對零殘影！
-//   二、懸停提示框 (tooltip)：滑鼠移到車次線時顯示車次、車種、最近車站、時刻
-//   三、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
+// 確保全域物件存在，防止車次線繪製時當機
+window.diagram_objects = window.diagram_objects || {};
 
 // ── 模組層級狀態 ──
 const _state = {
@@ -230,7 +228,7 @@ function _renderSearchResults(query, container) {
     });
 }
 
-// ── 🌟 新版控制面板 (純 JS 生成，穩固固定右下角，高度寬度自適應) ──
+// ── 🌟 新版控制面板 (包含寬度自適應與手機防跑版引擎) ──
 function _init_ui_panels() {
     if (document.getElementById('d3-control-wrapper')) return;
 
@@ -244,10 +242,10 @@ function _init_ui_panels() {
     const panelBody = document.createElement('div');
     panelBody.id = 'd3-panel-body';
     
-    // ✅ 解法 1 核心：將寫死的寬度改為動態比例，確保不超出螢幕
+    // ✅ 寬高改用相對比例 min() 與 vw/vh，讓面板適應手機小螢幕
     Object.assign(panelBody.style, {
-        width: 'min(420px, calc(100vw - 32px))', // 適應手機寬度
-        maxHeight: 'calc(100vh - 120px)',        // 適應手機高度
+        width: 'min(420px, calc(100vw - 32px))', 
+        maxHeight: 'calc(100vh - 120px)',        
         background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
         boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
         fontFamily: 'Tahoma, Verdana, sans-serif', opacity: '0', transform: 'translateY(12px)', 
@@ -255,11 +253,11 @@ function _init_ui_panels() {
         border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', marginBottom: '8px'
     });
 
-    // [左側] 車種過濾區
+    // 左側：車種過濾區
     const filterSection = document.createElement('div');
     filterSection.className = 'd3-filter-section d3-custom-scrollbar';
     Object.assign(filterSection.style, { 
-        width: 'min(160px, 40%)', // ✅ 解法 1 核心：改為比例彈性寬度
+        width: 'min(160px, 40%)', 
         flex: '0 0 auto', padding: '10px', 
         borderRight: '1px solid rgba(255,255,255,0.1)', 
         maxHeight: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
@@ -301,7 +299,7 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(filterList);
 
-    // [右側] 搜尋區
+    // 右側：搜尋區
     const searchSection = document.createElement('div');
     searchSection.className = 'd3-search-section';
     Object.assign(searchSection.style, { 
@@ -329,7 +327,6 @@ function _init_ui_panels() {
     panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
-    // 圓形懸浮按鈕
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = '🔍';
     Object.assign(toggleBtn.style, {
@@ -367,11 +364,12 @@ function _init_ui_panels() {
     wrapper.appendChild(toggleBtn);
     document.body.appendChild(wrapper);
 
-    // 抗縮放引擎 (VisualViewport 映射)
+    // ✅ 手機抗縮放引擎 (VisualViewport 反向縮放映射)
     if (window.visualViewport) {
         const updateVVPos = () => {
             const vv = window.visualViewport;
             if (vv.scale > 1) {
+                // 利用 translate(-100%, -100%) 精準對齊真實視窗右下角
                 wrapper.style.position = 'absolute';
                 wrapper.style.left = `${vv.pageLeft + vv.width - 24}px`;
                 wrapper.style.top = `${vv.pageTop + vv.height - 24}px`;
@@ -380,6 +378,7 @@ function _init_ui_panels() {
                 wrapper.style.transformOrigin = 'bottom right';
                 wrapper.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
             } else {
+                // 恢復原狀
                 wrapper.style.position = 'fixed';
                 wrapper.style.left = 'auto';
                 wrapper.style.top = 'auto';
@@ -423,7 +422,8 @@ function draw_diagram_background(line_kind, date) {
     Object.entries(OperationLines).forEach(([key, value]) => {
         if (key !== line_kind) return;
 
-        const totalWidth  = PX_PER_HOUR * (DiagramHours.length - 1) + 2 * MARGIN;
+        // 使用 12:00 正常版的固定數值
+        const totalWidth = 1200 * (DiagramHours.length - 1) + 100;
         const totalHeight = value['MAX_X_AXIS'];
         const text_spacing_factor = 500;
         const draw_date = Date().toLocaleString();
@@ -440,9 +440,9 @@ function draw_diagram_background(line_kind, date) {
         const g = svg.append('g').attr('class', 'diagram-root');
         _state.g = g;
 
+        // ✅ 解法 2 核心：允許極小縮放 (0.02) 並且拿掉 translateExtent (拆除隱形牆壁)
         const zoom = d3.zoom()
-            .scaleExtent([0.02, 10]) // ✅ 解法 2 核心：允許縮放得非常小 (0.02)
-            // 🚫 ✅ 解法 2 核心：刪除 .translateExtent(...) 隱形牆壁，釋放視角自由！
+            .scaleExtent([0.02, 10]) 
             .on('zoom', (event) => { g.attr('transform', event.transform); });
 
         _state.zoom = zoom;
@@ -459,7 +459,7 @@ function draw_diagram_background(line_kind, date) {
             initDx = vw / (2 * initialScale) - now_time_x_axis;
         }
         if (typeof stationAxisY !== 'undefined' && stationAxisY !== null) {
-            initDy = vh / (2 * initialScale) - (parseInt(stationAxisY) + MARGIN);
+            initDy = vh / (2 * initialScale) - (parseInt(stationAxisY) + 50);
         }
         svg.call(zoom.transform, d3.zoomIdentity.scale(initialScale).translate(initDx, initDy));
 
@@ -467,9 +467,9 @@ function draw_diagram_background(line_kind, date) {
         add_text(g, title, 5, 0, null);
 
         for (let i = 0; i < DiagramHours.length; i++) {
-            let x = MARGIN + i * PX_PER_HOUR;
+            let x = 50 + i * 1200;
             let y = 0;
-            add_line(g, x, MARGIN, x, totalHeight + MARGIN, 'hour_line');
+            add_line(g, x, 50, x, totalHeight + 50, 'hour_line');
 
             while (true) {
                 const hour = DiagramHours[i];
@@ -484,10 +484,10 @@ function draw_diagram_background(line_kind, date) {
 
             if (i !== DiagramHours.length - 1) {
                 for (let j = 0; j < 5; j++) {
-                    x = MARGIN + i * PX_PER_HOUR + (j + 1) * PX_PER_10MIN;
+                    x = 50 + i * 1200 + (j + 1) * 200;
                     const lineClass = (j !== 2) ? 'min10_line' : 'min30_line';
                     const textClass = (j !== 2) ? 'min10' : 'min30';
-                    add_line(g, x, MARGIN, x, totalHeight + MARGIN, lineClass);
+                    add_line(g, x, 50, x, totalHeight + 50, lineClass);
 
                     y = 0;
                     while (true) {
@@ -501,14 +501,15 @@ function draw_diagram_background(line_kind, date) {
 
         const stations = LinesStationsForBackground[key];
         Object.entries(stations).forEach(([, stn]) => {
-            const sy = stn['SVGYAXIS'] + MARGIN;
+            const sy = stn['SVGYAXIS'] + 50;
             const isServed = stn['ID'] !== 'NA';
-            add_line(g, MARGIN, sy, totalWidth - MARGIN, sy, isServed ? 'station_line' : 'station_noserv_line');
-            for (let i = 0; i < 31; i++) { add_text(g, stn['DSC'], 5 + i * PX_PER_HOUR, sy - 20, isServed ? 'station' : 'station_noserv'); }
+            add_line(g, 50, sy, totalWidth - 50, sy, isServed ? 'station_line' : 'station_noserv_line');
+            for (let i = 0; i < 31; i++) { add_text(g, stn['DSC'], 5 + i * 1200, sy - 20, isServed ? 'station' : 'station_noserv'); }
         });
 
-        diagram_objects[key] = g;
-        add_line(g, now_time_x_axis, MARGIN, now_time_x_axis, totalHeight + MARGIN, 'now_time_line');
+        // 確保變數存在，安全寫入
+        window.diagram_objects[key] = g;
+        add_line(g, now_time_x_axis, 50, now_time_x_axis, totalHeight + 50, 'now_time_line');
     });
 }
 
@@ -527,12 +528,12 @@ function draw_train_path(all_trains_data, realtime_trains) {
             if (section_start.length > 1)
                 set_path(lk, train_no, train_kind, section_start);
             if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(section_start, line_dir, train_kind, realtime_data);
+                mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data);
 
             if (section_end.length > 3)
                 set_path(lk, train_no + '-End', train_kind, section_end);
             if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(section_end, line_dir, train_kind, realtime_data);
+                mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data);
         }
     }
 }
@@ -556,8 +557,8 @@ function _buildPathData(value, lk) {
     const diagram_need_stop = find_diagram_need_to_stop(lk);
 
     for (const [dsc, id, time, loc, stop] of value) {
-        let x = time * PX_PER_AX1 - PX_PER_HOUR * DiagramHours[0] + MARGIN;
-        let y = loc + MARGIN;
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
+        let y = loc + 50;
         x = Math.round((x + Number.EPSILON) * 100) / 100;
         y = Math.round((y + Number.EPSILON) * 100) / 100;
         if (stop !== -1 || diagram_need_stop.includes(id)) {
@@ -575,7 +576,7 @@ function set_path(lk, train_no, train_kind, value) {
     const pathId = lk + train_no;
     _state.trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints });
     const text_position = calculate_text_position(coordinates, style);
-    add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
+    add_path(window.diagram_objects[lk], lk, train_no, pathData, text_position, style);
 }
 
 function calculate_text_position(coordinates, color) {
@@ -614,8 +615,8 @@ function calculate_text_position(coordinates, color) {
     return text_position;
 }
 
-function mark_realtime_train_position(value, line_dir, train_kind, realtime_data) {
-    const diagram_need_stop = find_diagram_need_to_stop(line_kind);
+function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_data) {
+    const diagram_need_stop = find_diagram_need_to_stop(lk);
     const style = (CarKind[train_kind] || 'special') + '_mark';
     let now_time_x_axis = null;
     const coords = [];
@@ -624,8 +625,8 @@ function mark_realtime_train_position(value, line_dir, train_kind, realtime_data
         now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
 
     for (const [, id, time, loc, stop] of value) {
-        let x = time * PX_PER_AX1 - PX_PER_HOUR * DiagramHours[0] + MARGIN;
-        let y = loc + MARGIN;
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
+        let y = loc + 50;
         x = Math.round((x + Number.EPSILON) * 100) / 100;
         y = Math.round((y + Number.EPSILON) * 100) / 100;
         if (stop !== -1 || diagram_need_stop.includes(id)) coords.push([x, y]);
@@ -637,7 +638,7 @@ function mark_realtime_train_position(value, line_dir, train_kind, realtime_data
             const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
-                diagram_objects[line_kind].append('circle').attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5).attr('class', style);
+                window.diagram_objects[lk].append('circle').attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5).attr('class', style);
             }
             break;
         }
@@ -739,9 +740,9 @@ function get_now_time_x_axis(minus_time) {
     const mm = t.getMinutes().toString().padStart(2, '0');
     const ss = Math.round(t.getSeconds() / 30) * 30;
     const ssStr = ss === 60 ? '00' : ss.toString().padStart(2, '0');
-    return SVG_X_Axis[`${hh}:${mm}:${ssStr}`].ax1 * PX_PER_AX1 - PX_PER_HOUR * DiagramHours[0] + MARGIN;
+    return SVG_X_Axis[`${hh}:${mm}:${ssStr}`].ax1 * 10 - 1200 * DiagramHours[0] + 50;
 }
 
 function find_diagram_need_to_stop(lk) {
-    return LinesStationsForBackground[lk].filter(item => item['TERMINAL'] === 'Y').map(item => item['ID']);
+    return Object.values(LinesStationsForBackground[lk]).filter(item => item['TERMINAL'] === 'Y').map(item => item['ID']);
 }
