@@ -30,16 +30,20 @@
 }
 
 /* ==========================================================================
-   2. 按鈕定死功能（利用 CSS 原生 fixed 強制掛在右下角，完全避開 JS 衝突）
+   2. UI 控制面板外層 (修正：解除 JS 封印，允許縮放與絕對定位)
    ========================================================================== */
 #d3-ui-wrapper {
-    position: fixed !important; /* 釘死在視窗上，絕不隨畫面滾動 */
-    bottom: 24px !important;    /* 距離底部 24px */
-    right: 24px !important;     /* 距離右側 24px */
-    z-index: 9999 !important;   /* 確保層級最高，永遠蓋在 D3 畫布上方 */
-    transform: none !important; /* 阻斷所有外部或舊有 JS 位移干擾 */
+    /* 拿掉 !important，讓 JS 在放大時可以順利切換成 absolute */
+    position: fixed;            
+    bottom: 24px;               
+    right: 24px;                
     
-    /* 限制容器寬高只包裹內容物，點擊事件自然正常傳遞，不再需要 pointer-events */
-    width: max-content !important;
-    height: max-content !important;
+    /* 確保層級最高，永遠蓋在畫布上方，這行保留 !important 沒關係 */
+    z-index: 9999 !important;   
+    
+    /* ❌ 原本的 transform: none !important; 已刪除，讓 JS 可以控制反向縮放 */
+    
+    /* 限制容器寬高只包裹內容物，點擊事件自然正常傳遞 */
+    width: max-content;
+    height: max-content;
 }
