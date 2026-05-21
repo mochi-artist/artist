@@ -1,4 +1,4 @@
-// D3.js 版本的 SVG 渲染模組 (優化升級版 🚀 + 修復字體與視角Bug 🛠️)
+// D3.js 版本的 SVG 渲染模組 (手機縮放完美修正版 📱✨)
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -180,7 +180,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化 (修復手機縮放飛走問題 🎯)
+// 🌟 UI 控制中心初始化 (終極跨瀏覽器縮放修復 🎯)
 // ==========================================
 function _init_ui_panels() {
     const toggleBtn = document.getElementById('d3-toggle-btn');
@@ -193,6 +193,11 @@ function _init_ui_panels() {
     if (!toggleBtn || !panelBody || !controlContainer) return;
     if (toggleBtn.dataset.bound === 'true') return; 
     toggleBtn.dataset.bound = 'true';
+
+    // 🎯 核心修正 1：將控制面板直接移到 body 下，徹底擺脫局部滾動容器的干擾
+    if (controlContainer.parentNode !== document.body) {
+        document.body.appendChild(controlContainer);
+    }
 
     function _renderFilterList() {
         if (!filterList) return;
@@ -258,26 +263,18 @@ function _init_ui_panels() {
     searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) closePanel(); });
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
+    // 🎯 核心修正 2：利用絕對定位 + 數學計算，精準捕捉雙指縮放時的真實螢幕邊界
     if (window.visualViewport) {
         const updateVVPos = () => {
             const vv = window.visualViewport;
-            if (vv.scale > 1.01) { 
-                // 🎯 修改重點：改回 fixed，並利用 offsetLeft / offsetTop 定位，確保它緊跟手機螢幕的真實右下角
-                controlContainer.style.position = 'fixed';
-                controlContainer.style.left = `${vv.offsetLeft + vv.width - 24}px`;
-                controlContainer.style.top = `${vv.offsetTop + vv.height - 24}px`;
-                controlContainer.style.bottom = 'auto';
-                controlContainer.style.right = 'auto';
-                controlContainer.style.transformOrigin = 'bottom right';
-                controlContainer.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
-            } else {
-                controlContainer.style.position = 'fixed';
-                controlContainer.style.left = 'auto';
-                controlContainer.style.top = 'auto';
-                controlContainer.style.bottom = '24px';
-                controlContainer.style.right = '24px';
-                controlContainer.style.transform = 'none';
-            }
+            // 統一使用 absolute 配合 body 基底，徹底通殺 iOS 與 Android 的縮放差異
+            controlContainer.style.position = 'absolute';
+            controlContainer.style.left = `${vv.offsetLeft + vv.width - 24}px`;
+            controlContainer.style.top = `${vv.offsetTop + vv.height - 24}px`;
+            controlContainer.style.bottom = 'auto';
+            controlContainer.style.right = 'auto';
+            controlContainer.style.transformOrigin = 'right bottom';
+            controlContainer.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
         };
         window.visualViewport.addEventListener('scroll', updateVVPos);
         window.visualViewport.addEventListener('resize', updateVVPos);
@@ -500,12 +497,11 @@ function calculate_text_position(coordinates, color) {
     return text_position;
 }
 
-// ⚡️ [優化] 重構 add_path：處理分層圖層與字體破圖問題
 function add_path(lk, train_id, path_string, text_position, style, pathId) {
     const layers = _diagramLayers.get(lk);
     if (!layers) return;
 
-    // 實體有色線條 (加在下層)
+    // 實體有色線條
     const pathEl = layers.lines.append('path')
         .attr('d', path_string)
         .attr('class', style)
@@ -514,7 +510,7 @@ function add_path(lk, train_id, path_string, text_position, style, pathId) {
 
     _allPathEls.set(pathId, pathEl);
 
-    // 觸碰判定寬線 (加在中層)
+    // 觸碰判定寬線
     const hitEl = layers.hitboxes.append('path')
         .attr('d', path_string)
         .style('fill', 'none')
@@ -540,12 +536,8 @@ function add_path(lk, train_id, path_string, text_position, style, pathId) {
     for (const offset of text_position) {
         const textEl = layers.texts.append('text')
             .attr('class', style)
-            .classed('d3-train-label', true)
-            // 🎯 修改重點：加上明確的黑色外框當底，覆蓋住車次線條，製造字體周圍黑底的斷線感
-            .style('paint-order', 'stroke fill')
-            .style('stroke', '#000000')      // 黑色外框
-            .style('stroke-width', '4px')    // 外框粗細 (斷線空間大小)
-            .style('stroke-linejoin', 'round');
+            .classed('d3-train-label', true);
+            // 🎯 核心修正 3：徹底移除上一版加入的黑色外框 (Stroke) 屬性，讓字體單純繼承車次線條的 css 顏色
 
         textEl.append('textPath')
             .attr('href', hrefTarget)
