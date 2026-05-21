@@ -1,22 +1,21 @@
-// ==========================================
-// D3.js SVG 運行圖渲染模組（完整修正版）
-// ==========================================
+// D3.js 版本的 SVG 渲染模組
+// 互動功能：
+//   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
+//   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
+//   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
+//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
 
-// ── 全域 ──
-window.diagram_objects = window.diagram_objects || {};
-
-const _trainDataMap = new Map();
-const _allPathEls = new Map();
-
-let _selectedPathId = null;
+// ── 模組層級狀態 ──
+const _trainDataMap = new Map(); 
+const _allPathEls   = new Map(); 
+let _selectedPathId = null;      
 let _d3Svg = null;
-let _d3G = null;
+let _d3G = null;        
 
+// ==========================================
+// 🌟 核心狀態與分類設定
+// ==========================================
 let _activeFilter = 'all';
-
-// ==========================================
-// 車種分類
-// ==========================================
 
 const _filterCategories = [
     { id: 'all', name: '全部', styles: [] },
@@ -29,532 +28,607 @@ const _filterCategories = [
     { id: 'local', name: '區間車', styles: ['local'] },
     { id: 'local_express', name: '區間快', styles: ['local_express'] },
     { id: 'ordinary', name: '普快車', styles: ['ordinary', 'fu_hsing'] },
-    { id: 'others', name: '客迴', styles: [] },
-    { id: 'special', name: '特殊列車', styles: [] }
+    { id: 'others', name: '客迴', styles: [] }, 
+    { id: 'special', name: '特殊列車', styles: [] } 
 ];
 
-const _carKindLabel = {
-    taroko: '太魯閣',
-    puyuma: '普悠瑪',
-    tze_chiang: '自強號',
-    tze_chiang_diesel: '自強（柴）',
-    emu1200: 'EMU1200',
-    emu300: 'EMU300',
-    emu3000: 'EMU3000',
-    chu_kuang: '莒光號',
-    local: '區間車',
-    local_express: '區間快',
-    ordinary: '普快',
-    fu_hsing: '復興號',
-    others: '客迴',
-    special: '特殊'
-};
-
-// ==========================================
-// CSS
-// ==========================================
-
+// 注入美化捲軸與響應式 CSS
 if (!document.getElementById('d3-custom-styles')) {
-
     const style = document.createElement('style');
-
     style.id = 'd3-custom-styles';
-
     style.innerHTML = `
-    
-    .d3-custom-scrollbar::-webkit-scrollbar {
-        width: 5px;
-    }
+        .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        
+        #d3-panel-body { width: 420px; }
+        .d3-filter-section { width: 180px; flex: 0 0 auto; }
+        .d3-search-section { flex: 1; min-width: 0; }
+        .d3-search-input-field { font-size: 13px; }
+        .d3-item-text { font-size: 14px; }
+        .d3-item-badge { font-size: 11px; padding: 2px 8px; }
 
-    .d3-custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,0.25);
-        border-radius: 4px;
-    }
-
-    #d3-panel-body {
-        width: 420px;
-    }
-
-    .d3-filter-section {
-        width: 180px;
-        flex: 0 0 auto;
-    }
-
-    .d3-search-section {
-        flex: 1;
-        min-width: 0;
-    }
-
-    @media (max-width: 500px) {
-
-        #d3-panel-body {
-            width: calc(100vw - 32px) !important;
+        @media (max-width: 500px) {
+            #d3-panel-body { width: calc(100vw - 32px) !important; }
+            .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
+            .d3-search-section { padding: 10px 8px !important; }
+            .d3-search-input-field { font-size: 16px !important; padding: 6px !important; }
+            .d3-item-text { font-size: 12px !important; }
+            .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
+            .d3-panel-title { font-size: 12px !important; }
         }
-
-        .d3-filter-section {
-            width: 42% !important;
-        }
-    }
     `;
-
     document.head.appendChild(style);
 }
 
-// ==========================================
-// 分類判定
-// ==========================================
-
+// 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
-
-    const base_no = String(train_no).replace(/-End$/, '');
-
-    if (base_no === '1' || base_no === '2') {
-        return 'chu_kuang';
-    }
-
-    if (/[a-zA-Z]/.test(base_no)) {
-        return 'others';
-    }
-
+    const base_no = train_no.replace(/-End$/, '');
+    if (base_no === '1' || base_no === '2') return 'chu_kuang';
+    if (/[a-zA-Z]/.test(base_no)) return 'others';
     for (let i = 1; i < _filterCategories.length - 2; i++) {
-
-        if (_filterCategories[i].styles.includes(style)) {
-            return _filterCategories[i].id;
-        }
+        if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
-
     return 'special';
 }
 
 // ==========================================
-// 視覺更新
+// 🌟 統一視覺更新引擎
 // ==========================================
-
 function _updateAllPathVisuals() {
-
     _allPathEls.forEach((el, pathId) => {
-
         const baseId = pathId.replace(/-End$/, '');
+        const baseData = _trainDataMap.get(baseId);
+        if (!baseData) return;
 
-        const data = _trainDataMap.get(baseId);
+        const isSelected = (_selectedPathId === baseId);
+        const isFiltered = (_activeFilter !== 'all' && _getTrainCategoryId(baseData.style, baseData.train_no) === _activeFilter);
 
-        if (!data) return;
-
-        const selected = _selectedPathId === baseId;
-
-        const filtered =
-            _activeFilter !== 'all' &&
-            _getTrainCategoryId(data.style, data.train_no) === _activeFilter;
-
-        if (selected) {
-
-            el.style('stroke-width', '6')
-              .style('opacity', '1');
-
-        } else if (filtered) {
-
-            el.style('stroke-width', '5')
-              .style('opacity', '1');
-
+        if (isSelected) {
+            el.style('stroke-width', '6').style('opacity', '1'); 
+        } else if (isFiltered) {
+            el.style('stroke-width', '5').style('opacity', '1'); 
         } else {
-
-            el.style('stroke-width', null)
-              .style('opacity', null);
+            el.style('stroke-width', null).style('opacity', null); 
         }
     });
+
+    if (_d3G) {
+        _d3G.selectAll('text.d3-train-label').style('font-weight', null);
+    }
+}
+
+function _applyFilter() {
+    _updateAllPathVisuals();
+    _refreshSearchResults(); 
 }
 
 function _highlight(pathId) {
-
     _selectedPathId = pathId;
-
     _updateAllPathVisuals();
-
     _refreshSearchResults();
 }
 
 function _clearHighlight() {
-
     _selectedPathId = null;
-
     _updateAllPathVisuals();
-
     _refreshSearchResults();
 }
 
 // ==========================================
-// 搜尋 UI
+// 畫面跳轉與無限清單邏輯
 // ==========================================
+function _panToTrain(pathId) {
+    const data = _trainDataMap.get(pathId);
+    if (!data || data.stationPoints.length === 0) return;
+    
+    const pts = data.stationPoints;
+    window.scrollTo({
+        left: pts[0].x - window.innerWidth / 2,
+        top: pts[0].y - window.innerHeight / 2,
+        behavior: 'smooth'
+    });
+}
 
 function _refreshSearchResults() {
-
-    const inp = document.getElementById('d3-search-input');
-
+    const inp  = document.getElementById('d3-search-input');
     const cont = document.getElementById('d3-search-results');
-
     if (!inp || !cont) return;
-
     _renderSearchResults(inp.value.trim(), cont);
 }
 
 function _renderSearchResults(query, container) {
-
     container.innerHTML = '';
-
     const q = query.toLowerCase();
-
+    
     const matches = [];
-
     for (const [pathId, data] of _trainDataMap) {
-
-        if (data.train_no.endsWith('-End')) continue;
-
+        if (data.train_no.endsWith('-End')) continue; 
+        
         if (_activeFilter !== 'all') {
-
-            const cat = _getTrainCategoryId(data.style, data.train_no);
-
-            if (cat !== _activeFilter) continue;
+            const catId = _getTrainCategoryId(data.style, data.train_no);
+            if (catId !== _activeFilter) continue;
         }
 
-        if (q && !String(data.train_no).toLowerCase().includes(q)) {
-            continue;
-        }
-
+        if (q && !data.train_no.toLowerCase().includes(q)) continue;
         matches.push({ pathId, data });
     }
 
-    matches.sort((a, b) =>
-        String(a.data.train_no).localeCompare(
-            String(b.data.train_no),
-            undefined,
-            { numeric: true }
-        )
-    );
+    matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
+
+    const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
-
         const { pathId, data } = match;
-
+        const isSelected = _selectedPathId === pathId;
+        
         const item = document.createElement('div');
+        Object.assign(item.style, {
+            padding: '6px 8px', borderRadius: '4px', cursor: 'pointer',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            background: isSelected ? 'rgba(26,115,232,0.7)' : 'transparent',
+            transition: 'background 0.15s', userSelect: 'none', marginBottom: '2px'
+        });
+        
+        const kindLabel = _carKindLabel[data.style] || data.style;
+        item.innerHTML = `<b class="d3-item-text">${data.train_no}</b><span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>`;
 
-        item.style.padding = '6px 8px';
-        item.style.cursor = 'pointer';
-
-        item.innerHTML = `
-            <b>${data.train_no}</b>
-            <span style="float:right;color:#aaa">
-                ${_carKindLabel[data.style] || data.style}
-            </span>
-        `;
-
-        item.onclick = () => {
-
-            _highlight(pathId);
-
-            _panToTrain(pathId);
-        };
-
-        container.appendChild(item);
+        item.addEventListener('mouseenter', () => { if (_selectedPathId !== pathId) item.style.background = 'rgba(255,255,255,0.1)'; });
+        item.addEventListener('mouseleave', () => { if (_selectedPathId !== pathId) item.style.background = 'transparent'; });
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (_selectedPathId === pathId) {
+                _clearHighlight();
+            } else {
+                _highlight(pathId);
+                _panToTrain(pathId); 
+            }
+        });
+        fragment.appendChild(item);
     }
 
     if (matches.length === 0) {
-
-        container.innerHTML = `
-            <div style="color:#888;padding:8px;text-align:center">
-                無符合車次
-            </div>
-        `;
+        const empty = document.createElement('div');
+        Object.assign(empty.style, { color: '#888', padding: '4px 8px', textAlign: 'center', fontSize: '12px' });
+        empty.textContent = '無符合車次';
+        fragment.appendChild(empty);
     }
+
+    container.appendChild(fragment);
 }
 
 // ==========================================
-// UI 初始化
+// 🌟 UI 控制中心
 // ==========================================
-
 function _init_ui_panels() {
-
     if (document.getElementById('d3-ui-wrapper')) return;
 
     const wrapper = document.createElement('div');
-
     wrapper.id = 'd3-ui-wrapper';
-
     Object.assign(wrapper.style, {
-        position: 'fixed',
-        bottom: '24px',
-        right: '24px',
-        zIndex: '9999'
+        position: 'fixed', bottom: '24px', right: '24px',
+        width: '0px', height: '0px', zIndex: '1500', pointerEvents: 'none'
     });
 
-    const btn = document.createElement('button');
-
-    btn.innerText = '🔍';
-
-    Object.assign(btn.style, {
-        width: '52px',
-        height: '52px',
-        borderRadius: '50%',
-        border: 'none',
-        background: '#1a73e8',
-        color: '#fff',
-        fontSize: '22px'
+    const container = document.createElement('div');
+    container.id = 'd3-control-container';
+    Object.assign(container.style, {
+        position: 'absolute', bottom: '0', right: '0',
+        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', 
+        pointerEvents: 'none', transformOrigin: 'bottom right', transition: 'transform 0.05s linear' 
     });
 
-    const panel = document.createElement('div');
-
-    panel.id = 'd3-panel-body';
-
-    Object.assign(panel.style, {
-        display: 'none',
-        position: 'absolute',
-        right: '0',
-        bottom: '60px',
-        background: 'rgba(15,23,42,0.96)',
-        color: '#fff',
-        borderRadius: '12px',
-        overflow: 'hidden'
+    const panelBody = document.createElement('div');
+    panelBody.id = 'd3-panel-body';
+    Object.assign(panelBody.style, {
+        position: 'absolute', bottom: '60px', right: '0',
+        background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
+        fontFamily: 'Tahoma, Verdana, sans-serif',
+        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
+        pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
     });
 
-    panel.innerHTML = `
-        <div style="display:flex">
+    const filterSection = document.createElement('div');
+    filterSection.className = 'd3-filter-section d3-custom-scrollbar';
+    Object.assign(filterSection.style, { 
+        padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
+        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+    });
 
-            <div class="d3-filter-section d3-custom-scrollbar"
-                 style="padding:12px;max-height:280px;overflow:auto">
+    const filterTitle = document.createElement('div');
+    filterTitle.className = 'd3-panel-title';
+    filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
+    Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
 
-                <div id="d3-filter-list"></div>
-            </div>
-
-            <div class="d3-search-section"
-                 style="padding:12px">
-
-                <input
-                    id="d3-search-input"
-                    placeholder="搜尋車次"
-                    style="
-                        width:100%;
-                        padding:8px;
-                        box-sizing:border-box;
-                    "
-                >
-
-                <div
-                    id="d3-search-results"
-                    class="d3-custom-scrollbar"
-                    style="
-                        margin-top:8px;
-                        max-height:220px;
-                        overflow:auto;
-                    "
-                ></div>
-            </div>
-
-        </div>
-    `;
-
-    wrapper.appendChild(panel);
-
-    wrapper.appendChild(btn);
-
-    document.body.appendChild(wrapper);
-
-    // 搜尋
-    panel.querySelector('#d3-search-input')
-        .addEventListener('input', e => {
-
-            _renderSearchResults(
-                e.target.value.trim(),
-                panel.querySelector('#d3-search-results')
-            );
-        });
-
-    // 展開
-    let opened = false;
-
-    btn.onclick = e => {
-
-        e.stopPropagation();
-
-        opened = !opened;
-
-        panel.style.display = opened ? 'block' : 'none';
-
-        if (opened) {
-
-            _renderFilterList();
-
-            _renderSearchResults(
-                '',
-                panel.querySelector('#d3-search-results')
-            );
-        }
-    };
-
-    // 手機 viewport 修正
-    if (window.visualViewport) {
-
-        const vv = window.visualViewport;
-
-        const updatePos = () => {
-
-            if (vv.scale > 1) {
-
-                wrapper.style.position = 'absolute';
-
-                wrapper.style.left =
-                    (vv.pageLeft + vv.width - 80) + 'px';
-
-                wrapper.style.top =
-                    (vv.pageTop + vv.height - 80) + 'px';
-
-            } else {
-
-                wrapper.style.position = 'fixed';
-
-                wrapper.style.left = 'auto';
-
-                wrapper.style.top = 'auto';
-
-                wrapper.style.right = '24px';
-
-                wrapper.style.bottom = '24px';
-            }
-        };
-
-        vv.addEventListener('scroll', updatePos);
-
-        vv.addEventListener('resize', updatePos);
-
-        updatePos();
-    }
-
+    const filterList = document.createElement('div');
+    
     function _renderFilterList() {
-
-        const list = document.getElementById('d3-filter-list');
-
-        list.innerHTML = '';
+        filterList.innerHTML = '';
+        const counts = {};
+        _filterCategories.forEach(c => counts[c.id] = 0);
+        
+        let total = 0;
+        for (const [pathId, data] of _trainDataMap) {
+            if (data.train_no.endsWith('-End')) continue;
+            counts[_getTrainCategoryId(data.style, data.train_no)]++;
+            total++;
+        }
+        counts['all'] = total;
 
         _filterCategories.forEach(cat => {
+            if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
 
             const item = document.createElement('div');
-
-            item.innerText = cat.name;
-
-            item.style.padding = '6px';
-
-            item.style.cursor = 'pointer';
-
-            item.onclick = () => {
-
-                _activeFilter = cat.id;
-
-                _updateAllPathVisuals();
-
-                _refreshSearchResults();
-            };
-
-            list.appendChild(item);
+            const isActive = _activeFilter === cat.id;
+            
+            Object.assign(item.style, {
+                padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderRadius: '6px',
+                transition: 'background 0.1s', userSelect: 'none', color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
+            });
+            
+            item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
+            
+            item.addEventListener('click', () => { _activeFilter = cat.id; _renderFilterList(); _applyFilter(); });
+            filterList.appendChild(item);
         });
+    }
+    
+    filterSection.appendChild(filterTitle);
+    filterSection.appendChild(filterList);
+
+    const searchSection = document.createElement('div');
+    searchSection.className = 'd3-search-section';
+    Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
+
+    const searchInput = document.createElement('input');
+    searchInput.id = 'd3-search-input';
+    searchInput.className = 'd3-search-input-field';
+    searchInput.type = 'text';
+    searchInput.placeholder = '🔍 車次號碼...';
+    Object.assign(searchInput.style, {
+        width: '100%', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
+        background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box', outline: 'none',
+    });
+    searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#38bdf8');
+    searchInput.addEventListener('blur', () => searchInput.style.borderColor = 'rgba(255,255,255,0.2)');
+
+    const searchResults = document.createElement('div');
+    searchResults.id = 'd3-search-results';
+    searchResults.className = 'd3-custom-scrollbar';
+    Object.assign(searchResults.style, { maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
+
+    searchSection.appendChild(searchInput);
+    searchSection.appendChild(searchResults);
+
+    panelBody.appendChild(filterSection);
+    panelBody.appendChild(searchSection);
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.textContent = '🔍';
+    Object.assign(toggleBtn.style, {
+        width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
+        fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
+        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', pointerEvents: 'all', marginTop: '8px'
+    });
+
+    let isPanelOpen = false;
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isPanelOpen = !isPanelOpen;
+        if (isPanelOpen) {
+            _renderFilterList(); 
+            panelBody.style.display = 'flex';
+            requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
+            toggleBtn.textContent = '✕';
+            toggleBtn.style.background = '#c5221f';
+            _renderSearchResults('', searchResults);
+        } else {
+            panelBody.style.opacity = '0'; 
+            panelBody.style.transform = 'translateY(12px)';
+            setTimeout(() => { panelBody.style.display = 'none'; }, 200);
+            toggleBtn.textContent = '🔍';
+            toggleBtn.style.background = '#1a73e8';
+        }
+    });
+
+    searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
+
+    container.appendChild(panelBody);
+    container.appendChild(toggleBtn);
+    wrapper.appendChild(container);
+    document.body.appendChild(wrapper);
+
+    panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // 手機視角跟隨與抗縮放邏輯
+    if (window.visualViewport) {
+        const vv = window.visualViewport; // 修正點 1: 移至外層，確保事件監聽與執行皆能讀取此變數
+        const updatePos = () => {
+            if (vv.scale > 1) {
+                wrapper.style.position = 'absolute';
+                wrapper.style.left = (vv.pageLeft + vv.width - 24) + 'px';
+                wrapper.style.top = (vv.pageTop + vv.height - 24) + 'px';
+                wrapper.style.bottom = 'auto';
+                wrapper.style.right = 'auto';
+                container.style.transform = 'scale(' + (1 / vv.scale) + ')';
+            } else {
+                wrapper.style.position = 'fixed';
+                wrapper.style.left = 'auto';
+                wrapper.style.top = 'auto';
+                wrapper.style.bottom = '24px';
+                wrapper.style.right = '24px';
+                container.style.transform = 'none';
+            }
+        };
+        vv.addEventListener('scroll', updatePos);
+        vv.addEventListener('resize', updatePos);
+        setTimeout(updatePos, 100);
     }
 }
 
-// ==========================================
-// 背景繪製
-// ==========================================
+const _carKindLabel = {
+    taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
+    emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
+    zhongxing: '中興號', direct: '直快', chu_kuang: '莒光號', chushan1: '曙山（早）',
+    chushan2: '曙山（晚）', local: '區間車', local_express: '區間快', fu_hsing: '復興號',
+    ordinary: '普快', skip_stop: '跳停', alishan: '阿里山', alishan_local: '阿里山區間',
+    all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
+};
+
+// ── 公開 API ──
 
 function draw_diagram_background(line_kind, date) {
-
     Object.entries(OperationLines).forEach(([key, value]) => {
-
         if (key !== line_kind) return;
 
         const totalWidth = 1200 * (DiagramHours.length - 1) + 100;
+        const totalHeight = value['MAX_X_AXIS'];
+        const text_spacing_factor = 500;
+        const draw_date = new Date().toLocaleString(); // 修正點 2: 使用 new Date() 確保實例方法正常運作
+        const now_time_x_axis = get_now_time_x_axis(0);
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-        const totalHeight = value.MAX_X_AXIS;
-
-        _init_ui_panels();
+        _init_ui_panels(); 
 
         const svg = d3.select('body')
             .append('svg')
+            .attr('class', 'd3-diagram-svg')
             .attr('width', totalWidth)
             .attr('height', totalHeight + 125);
 
         _d3Svg = svg;
 
-        const g = svg.append('g');
-
+        const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
 
-        window.diagram_objects[key] = g;
+        svg.on('click', () => { _clearHighlight(); });
 
-        add_text(
-            g,
-            `${value.NAME} 日期:${date}`,
-            5,
-            0
-        );
+        let initDx = 0;
+        let initDy = 0;
+        if (typeof scrollToCurrentTime !== 'undefined' && scrollToCurrentTime) {
+            initDx = now_time_x_axis - vw / 2;
+        }
+        if (typeof stationAxisY !== 'undefined' && stationAxisY !== null) {
+            initDy = (parseInt(stationAxisY) + 50) - vh / 2;
+        }
+        
+        if (initDx > 0 || initDy > 0) {
+            window.scrollTo(Math.max(0, initDx), Math.max(0, initDy));
+        }
+
+        const title = `${value['NAME']} ，日期：${date}，運行圖繪製完成時間：${draw_date}`;
+        add_text(g, title, 5, 0, null);
+
+        for (let i = 0; i < DiagramHours.length; i++) {
+            let x = 50 + i * 1200;
+            let y = 0;
+            add_line(g, x, 50, x, totalHeight + 50, 'hour_line');
+
+            while (true) {
+                const hour = DiagramHours[i];
+                const hour_text = hour.toString().padStart(2, '0');
+                let after_midnight, css;
+                if (hour === 24) {
+                    after_midnight = '隔日'; css = 'hour_midnight';
+                } else {
+                    after_midnight = ''; css = 'hour';
+                }
+                if (y <= totalHeight) add_text(g, `${hour_text}00 ${after_midnight}`, x, y + 30, css);
+                else break;
+                y += text_spacing_factor;
+            }
+
+            if (i !== DiagramHours.length - 1) {
+                for (let j = 0; j < 5; j++) {
+                    x = 50 + i * 1200 + (j + 1) * 200;
+                    const lineClass = (j !== 2) ? 'min10_line' : 'min30_line';
+                    const textClass = (j !== 2) ? 'min10' : 'min30';
+                    add_line(g, x, 50, x, totalHeight + 50, lineClass);
+
+                    y = 0;
+                    while (true) {
+                        if (y <= totalHeight) add_text(g, `${j + 1}0`, x, y + 30, textClass);
+                        else break;
+                        y += text_spacing_factor;
+                    }
+                }
+            }
+        }
+
+        const stations = LinesStationsForBackground[key];
+        Object.entries(stations).forEach(([, stn]) => {
+            const sy = stn['SVGYAXIS'] + 50;
+            const isServed = stn['ID'] !== 'NA';
+            add_line(g, 50, sy, totalWidth - 50, sy, isServed ? 'station_line' : 'station_noserv_line');
+            for (let i = 0; i < 31; i++) {
+                add_text(g, stn['DSC'], 5 + i * 1200, sy - 20, isServed ? 'station' : 'station_noserv');
+            }
+        });
+
+        diagram_objects[key] = g;
+        add_line(g, now_time_x_axis, 50, now_time_x_axis, totalHeight + 50, 'now_time_line');
     });
 }
 
-// ==========================================
-// Train Path
-// ==========================================
+function draw_train_path(all_trains_data, realtime_trains) {
+    for (const train_data of all_trains_data) {
+        for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
+            if (value.length <= 2) continue;
+
+            const split = find_uncontinuous_index(value);
+            const section_start = value.slice(0, split);
+            const section_end = value.slice(split);
+
+            let realtime_data;
+            if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
+
+            if (section_start.length > 1)
+                set_path(lk, train_no, train_kind, section_start);
+            if (typeof realtime_data !== 'undefined')
+                mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); // 修正點 3: 傳入當前路線 lk
+
+            if (section_end.length > 3)
+                set_path(lk, train_no + '-End', train_kind, section_end);
+            if (typeof realtime_data !== 'undefined')
+                mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); // 修正點 3: 傳入當前路線 lk
+        }
+    }
+}
+
+// ── 內部渲染函式 ──
+
+function find_uncontinuous_index(value) {
+    let order_next = value[0][5];
+    let index = 0;
+    for (const [, , , , , order] of value) {
+        if (order === order_next) { order_next += 1; index += 1; }
+        else break;
+    }
+    return index;
+}
 
 function set_path(lk, train_no, train_kind, value) {
-
     let pathData = 'M';
-
     const coordinates = [];
-
-    const stationPoints = [];
-
+    const stationPoints = []; 
     const style = CarKind[train_kind] || 'others';
-
-    const needStop = find_diagram_need_to_stop(lk);
+    const diagram_need_stop = find_diagram_need_to_stop(lk);
 
     for (const [dsc, id, time, loc, stop] of value) {
-
-        let x =
-            time * 10 -
-            1200 * DiagramHours[0] +
-            50;
-
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
         let y = loc + 50;
-
-        if (stop !== -1 || needStop.includes(id)) {
-
+        x = Math.round((x + Number.EPSILON) * 100) / 100;
+        y = Math.round((y + Number.EPSILON) * 100) / 100;
+        if (stop !== -1 || diagram_need_stop.includes(id)) {
             pathData += `${x},${y} `;
-
             coordinates.push([x, y]);
-
-            stationPoints.push({ x, y, dsc, time });
+            stationPoints.push({ x, y, dsc, time }); 
         }
     }
 
     const pathId = lk + train_no;
+    _trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints });
 
-    _trainDataMap.set(pathId, {
-        train_no,
-        train_kind,
-        style,
-        stationPoints
-    });
-
-    add_path(
-        window.diagram_objects[lk],
-        lk,
-        train_no,
-        pathData,
-        [],
-        style
-    );
+    const text_position = calculate_text_position(coordinates, style);
+    add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
 }
 
-// ==========================================
-// Path
-// ==========================================
+function calculate_text_position(coordinates, color) {
+    const pairs = [];
+    const distances = [];
+
+    for (const pt of coordinates) {
+        if (pairs.length === 2) {
+            distances.push(calculate_distance(pairs[0], pairs[1]));
+            pairs[0] = pairs[1];
+            pairs[1] = pt;
+        } else {
+            pairs.push(pt);
+        }
+    }
+    if (pairs.length === 2) distances.push(calculate_distance(pairs[0], pairs[1]));
+
+    let text_position = [];
+    let acc = 0;
+
+    if (color === 'local') {
+        const all = [];
+        for (const d of distances) {
+            if (d > 60) all.push(acc + d / 4);
+            acc += d;
+        }
+        text_position = all.filter((_, i) => i % 2 === 0);
+    } else {
+        for (const d of distances) {
+            if (d > 60 && d < 100) {
+                text_position.push(0);
+            } else if (d >= 100 && d <= 500) {
+                text_position.push(acc + d / 2);
+            } else if (d > 500) {
+                text_position.push(acc + d / 3);
+                text_position.push(acc + 2 * d / 3);
+            }
+            acc += d;
+        }
+    }
+    return text_position;
+}
+
+function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_data) { // 修正點 3: 接收路線代碼 lk
+    const diagram_need_stop = find_diagram_need_to_stop(lk);
+    const style = (CarKind[train_kind] || 'special') + '_mark';
+    let now_time_x_axis = null;
+    const coords = [];
+
+    if (realtime_data.StationID > 0)
+        now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
+
+    for (const [, id, time, loc, stop] of value) {
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
+        let y = loc + 50;
+        x = Math.round((x + Number.EPSILON) * 100) / 100;
+        y = Math.round((y + Number.EPSILON) * 100) / 100;
+        if (stop !== -1 || diagram_need_stop.includes(id)) coords.push([x, y]);
+    }
+
+    for (let i = 1; i < coords.length; i++) {
+        if (coords[i][0] >= now_time_x_axis && coords[0][0] <= now_time_x_axis) {
+            const axis_x = [coords[i - 1][0], now_time_x_axis, coords[i][0]];
+            const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
+            if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
+                const interp = interpolateArray(axis_x, axis_y);
+                diagram_objects[lk].append('circle') // 修正點 3: 使用對應的 lk 物件
+                    .attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5)
+                    .attr('class', style);
+            }
+            break;
+        }
+    }
+}
+
+// ── D3 繪圖輔助函式 ──
+
+function add_line(g, x1, y1, x2, y2, style) {
+    const el = g.append('line')
+        .attr('x1', x1).attr('y1', y1)
+        .attr('x2', x2).attr('y2', y2);
+    if (style) el.attr('class', style);
+}
+
+function add_text(g, text_string, x, y, style) {
+    const el = g.append('text')
+        .attr('x', x).attr('y', y)
+        .attr('dominant-baseline', 'hanging')
+        .text(text_string);
+    if (style) el.attr('class', style);
+}
 
 function add_path(g, lk, train_id, path_string, text_position, style) {
-
     const pathId = lk + train_id;
 
     const pathEl = g.append('path')
@@ -570,65 +644,82 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
         .style('fill', 'none')
         .style('stroke', 'transparent')
         .style('stroke-width', '16')
-        .style('pointer-events', 'stroke');
+        .style('pointer-events', 'stroke')
+        .style('cursor', 'crosshair');
 
-    const baseId = pathId.replace(/-End$/, '');
+    const basePathId = pathId.replace(/-End$/, '');
 
-    hitEl.on('click', e => {
+    hitEl
+        .on('mouseenter', () => {
+            if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6');
+        })
+        .on('mouseleave', () => {
+            if (_selectedPathId !== basePathId) {
+                _updateAllPathVisuals();
+            }
+        });
 
-        e.stopPropagation();
-
-        _highlight(baseId);
+    hitEl.on('click', function (event) {
+        event.stopPropagation();
+        if (_selectedPathId === basePathId) {
+            _clearHighlight();
+        } else {
+            _highlight(basePathId);
+        }
     });
-}
 
-// ==========================================
-// 輔助
-// ==========================================
-
-function add_line(g, x1, y1, x2, y2, style) {
-
-    const el = g.append('line')
-        .attr('x1', x1)
-        .attr('y1', y1)
-        .attr('x2', x2)
-        .attr('y2', y2);
-
-    if (style) {
-        el.attr('class', style);
+    const hrefTarget = '#' + pathId;
+    for (const offset of text_position) {
+        const textEl = g.append('text').attr('class', style).classed('d3-train-label', true);
+        textEl.append('textPath')
+            .attr('href', hrefTarget)
+            .attr('startOffset', offset)
+            .append('tspan').attr('dy', -3)
+            .text(train_id);
     }
 }
 
-function add_text(g, text_string, x, y, style) {
-
-    const el = g.append('text')
-        .attr('x', x)
-        .attr('y', y)
-        .text(text_string);
-
-    if (style) {
-        el.attr('class', style);
-    }
+function calculate_distance(a, b) {
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    return Math.sqrt(dx * dx + dy * dy);
 }
 
-function _panToTrain(pathId) {
+function interpolateArray(A, B) {
+    const result = [];
+    for (let i = 0; i < A.length; i++) {
+        if (!isNaN(B[i])) {
+            result[i] = B[i];
+        } else {
+            let pi = i - 1, ni = i + 1;
+            while (pi >= 0 && isNaN(B[pi])) pi--;
+            while (ni < A.length && isNaN(B[ni])) ni++;
+            const pv = B[pi], nv = B[ni];
+            const pd = A[i] - A[pi], nd = A[ni] - A[i];
+            result[i] = Math.round(((pv * nd + nv * pd) / (pd + nd) + Number.EPSILON) * 100) / 100;
+        }
+    }
+    return result;
+}
 
-    const data = _trainDataMap.get(pathId);
-
-    if (!data || data.stationPoints.length === 0) return;
-
-    const pt = data.stationPoints[0];
-
-    window.scrollTo({
-        left: pt.x - window.innerWidth / 2,
-        top: pt.y - window.innerHeight / 2,
-        behavior: 'smooth'
-    });
+function get_now_time_x_axis(minus_time) {
+    const t = new Date();
+    t.setMinutes(t.getMinutes() - minus_time);
+    
+    // 修正點 5: 直接透過時效物件做 30 秒進位，讓物件內部自動調校「分與時」的連帶遞增，避免查表 KeyError
+    const seconds = t.getSeconds();
+    const roundedSeconds = Math.round(seconds / 30) * 30;
+    t.setSeconds(roundedSeconds);
+    
+    const hh = t.getHours().toString().padStart(2, '0');
+    const mm = t.getMinutes().toString().padStart(2, '0');
+    const ssStr = t.getSeconds().toString().padStart(2, '0');
+    
+    return SVG_X_Axis[`${hh}:${mm}:${ssStr}`].ax1 * 10 - 1200 * DiagramHours[0] + 50;
 }
 
 function find_diagram_need_to_stop(lk) {
-
-    return LinesStationsForBackground[lk]
-        .filter(v => v.TERMINAL === 'Y')
-        .map(v => v.ID);
+    // 修正點 4: LinesStationsForBackground 是 Object，需要轉成陣列 values 再執行 filter
+    return Object.values(LinesStationsForBackground[lk])
+        .filter(item => item['TERMINAL'] === 'Y')
+        .map(item => item['ID']);
 }
