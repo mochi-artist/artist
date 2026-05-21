@@ -185,7 +185,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化 (對接 HTML 並啟動抗縮放引擎)
+// 🌟 UI 控制中心初始化 (安全移植版：無 DOM 移轉、防斷線)
 // ==========================================
 function _init_ui_panels() {
     const toggleBtn = document.getElementById('d3-toggle-btn');
@@ -194,17 +194,112 @@ function _init_ui_panels() {
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
     
-    // 抓取最外層的一體化包裹容器
-    const controlContainer = document.getElementById('d3-ui-wrapper'); 
+    // 回歸原本最安全的原始 ID，不變動 HTML 結構
+    const controlContainer = document.getElementById('d3-control-container'); 
 
     if (!toggleBtn || !panelBody || !controlContainer) return;
     if (toggleBtn.dataset.bound === 'true') return; 
     toggleBtn.dataset.bound = 'true';
 
-    // 暴力斷後：確保 UI 容器在 body 的第一層，避免任何 CSS 排版塌陷
-    if (controlContainer.parentElement !== document.body) {
-        document.body.appendChild(controlContainer);
+    function _renderFilterList() {
+        if (!filterList) return;
+        filterList.innerHTML = '';
+        const counts = {};
+        _filterCategories.forEach(c => counts[c.id] = 0);
+        
+        let total = 0;
+        for (const [pathId, data] of _trainDataMap) {
+            if (data.train_no.endsWith('-End')) continue;
+            counts[_getTrainCategoryId(data.style, data.train_no)]++;
+            total++;
+        }
+        counts['all'] = total;
+
+        _filterCategories.forEach(cat => {
+            if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
+
+            const item = document.createElement('div');
+            const isActive = _activeFilter === cat.id;
+            
+            Object.assign(item.style, {
+                padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderRadius: '6px',
+                transition: 'background 0.1s', userSelect: 'none', color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
+            });
+            
+            item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
+            
+            item.addEventListener('click', () => { _activeFilter = cat.id; _renderFilterList(); _applyFilter(); });
+            filterList.appendChild(item);
+        });
     }
+
+    let isPanelOpen = false;
+    
+    function openPanel() {
+        isPanelOpen = true;
+        _renderFilterList(); 
+        panelBody.style.display = 'flex';
+        requestAnimationFrame(() => { 
+            panelBody.style.opacity = '1'; 
+            panelBody.style.transform = 'translateY(0)'; 
+        });
+        toggleBtn.textContent = '✕';
+        toggleBtn.style.background = '#c5221f';
+        searchInput.focus();
+        _renderSearchResults('', searchResults);
+    }
+    
+    function closePanel() {
+        isPanelOpen = false;
+        panelBody.style.opacity = '0'; 
+        panelBody.style.transform = 'translateY(12px)';
+        setTimeout(() => { panelBody.style.display = 'none'; }, 200);
+        toggleBtn.textContent = '🔍';
+        toggleBtn.style.background = '#1a73e8';
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isPanelOpen ? closePanel() : openPanel();
+    });
+
+    searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) closePanel(); });
+    panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // 🚀 數學幾何型 Fixed 鎖定引擎：不改動 DOM 節點，直接破解行動裝置雙指縮放位移
+    if (window.visualViewport) {
+        const updateVVPos = () => {
+            const vv = window.visualViewport;
+            
+            // 抓取佈局視窗的基本尺寸
+            const layoutWidth = document.documentElement.clientWidth || window.innerWidth;
+            const layoutHeight = document.documentElement.clientHeight || window.innerHeight;
+            
+            // 演算法：在 fixed 坐標系中，推算縮放時真實視覺視窗右下角的位置，並扣除等比例的 24px 邊距
+            const targetX = vv.offsetLeft + vv.width - (24 / vv.scale);
+            const targetY = vv.offsetTop + vv.height - (24 / vv.scale);
+            
+            // 計算相對於基準點 (layoutWidth, layoutHeight) 的精準偏移向量
+            const translateX = targetX - layoutWidth;
+            const translateY = targetY - layoutHeight;
+            
+            // 強制將縮放與變形基準點鎖定在右下角
+            controlContainer.style.transformOrigin = 'bottom right';
+            
+            // 同時套用「視窗位移修正」與「反向尺寸縮放」
+            controlContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${1 / vv.scale})`;
+        };
+        
+        window.visualViewport.addEventListener('scroll', updateVVPos);
+        window.visualViewport.addEventListener('resize', updateVVPos);
+        
+        // 立即啟動校正
+        updateVVPos();
+        setTimeout(updateVVPos, 100);
+    }
+}
 
     function _renderFilterList() {
         if (!filterList) return;
