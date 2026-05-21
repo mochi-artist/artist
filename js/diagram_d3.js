@@ -1,11 +1,21 @@
 // D3.js 版本的 SVG 渲染模組
+// 互動功能：
+//   一、HTML 骨架移植版：UI 元素直接靜態寫入 HTML，JS 僅負責數據控制與事件綁定
+//   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
+//   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
+//   四、純 CSS 固定選單：利用架構優勢，免去 JS 實時計算，回歸最穩定的 position: fixed
+//   五、暴力精準定位：配合滾動容器優化 scrollIntoView，縮放狀態下依然 100% 完美置中
 
+// ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
 const _allPathEls   = new Map(); 
 let _selectedPathId = null;      
 let _d3Svg = null;
 let _d3G = null;        
 
+// ==========================================
+// 🌟 核心狀態與分類設定
+// ==========================================
 let _activeFilter = 'all';
 
 const _filterCategories = [
@@ -23,6 +33,7 @@ const _filterCategories = [
     { id: 'special', name: '特殊列車', styles: [] } 
 ];
 
+// 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
     const base_no = train_no.replace(/-End$/, '');
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
@@ -33,6 +44,9 @@ function _getTrainCategoryId(style, train_no) {
     return 'special';
 }
 
+// ==========================================
+// 🌟 統一視覺更新引擎
+// ==========================================
 function _updateAllPathVisuals() {
     _allPathEls.forEach((el, pathId) => {
         const baseId = pathId.replace(/-End$/, '');
@@ -51,7 +65,9 @@ function _updateAllPathVisuals() {
         }
     });
 
-    if (_d3G) _d3G.selectAll('text.d3-train-label').style('font-weight', null);
+    if (_d3G) {
+        _d3G.selectAll('text.d3-train-label').style('font-weight', null);
+    }
 }
 
 function _applyFilter() {
@@ -71,6 +87,9 @@ function _clearHighlight() {
     _refreshSearchResults();
 }
 
+// ==========================================
+// 🌟 畫面跳轉與精準定位
+// ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
@@ -78,14 +97,28 @@ function _panToTrain(pathId) {
     const container = document.getElementById('d3-diagram-container');
     if (!container) return;
 
+    // 在獨立滾動容器架構下，直接在容器內動態建立隱形錨點
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
-        position: 'absolute', left: `${data.firstX}px`, top: `${data.firstY}px`,
-        width: '1px', height: '1px', pointerEvents: 'none', visibility: 'hidden'
+        position: 'absolute',
+        left: `${data.firstX}px`,
+        top: `${data.firstY}px`,
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none',
+        visibility: 'hidden'
     });
 
     container.appendChild(anchor);
-    anchor.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+
+    // 讓瀏覽器原生引擎去處理「該容器內在任何縮放比例下的精準置中」
+    anchor.scrollIntoView({
+        behavior: 'auto', 
+        block: 'center',  
+        inline: 'center'  
+    });
+
+    // 清除錨點
     setTimeout(() => anchor.remove(), 100);
 }
 
@@ -136,8 +169,12 @@ function _renderSearchResults(query, container) {
         item.addEventListener('mouseleave', () => { if (_selectedPathId !== pathId) item.style.background = 'transparent'; });
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (_selectedPathId === pathId) _clearHighlight();
-            else { _highlight(pathId); _panToTrain(pathId); }
+            if (_selectedPathId === pathId) {
+                _clearHighlight();
+            } else {
+                _highlight(pathId);
+                _panToTrain(pathId); 
+            }
         });
         fragment.appendChild(item);
     }
@@ -152,22 +189,18 @@ function _renderSearchResults(query, container) {
     container.appendChild(fragment);
 }
 
+// ==========================================
+// 🌟 UI 控制中心初始化 (直接對接 HTML 靜態標籤)
+// ==========================================
 function _init_ui_panels() {
-    const wrapper = document.getElementById('d3-ui-wrapper');
     const toggleBtn = document.getElementById('d3-toggle-btn');
     const panelBody = document.getElementById('d3-panel-body');
     const searchInput = document.getElementById('d3-search-input');
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
 
-    if (!wrapper || !toggleBtn || !panelBody) return;
-    
-    // 渲染完成後顯示 UI 容器
-    wrapper.style.display = 'block';
-
-    // 🎯 已移除舊有的 _adjustUiViewport 功能，改由高效能的 CSS fixed 定位接管，徹底免除位移與衝突問題。
-
-    if (toggleBtn.dataset.bound === 'true') return;
+    if (!toggleBtn || !panelBody) return;
+    if (toggleBtn.dataset.bound === 'true') return; // 防止重複綁定事件
     toggleBtn.dataset.bound = 'true';
 
     function _renderFilterList() {
@@ -252,14 +285,20 @@ function draw_diagram_background(line_kind, date) {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
+        // 初始化面版事件綁定
+        _init_ui_panels(); 
+
+        // 直接選取 HTML 中已經寫好的獨立滾動容器
         const container = d3.select('#d3-diagram-container');
-        
+
+        // 將 SVG 掛在獨立滾動容器中
         const svg = container.append('svg')
             .attr('class', 'd3-diagram-svg')
             .attr('width', totalWidth)
             .attr('height', totalHeight + 125);
 
         _d3Svg = svg;
+
         const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
 
@@ -274,10 +313,13 @@ function draw_diagram_background(line_kind, date) {
             initDy = (parseInt(stationAxisY) + 50) - vh / 2;
         }
         
+        // 使用容器自身的滾動進行精確初始定位
         if (initDx > 0 || initDy > 0) {
-            setTimeout(() => {
-                window.scrollTo(Math.max(0, initDx), Math.max(0, initDy));
-            }, 50);
+            const containerEl = document.getElementById('d3-diagram-container');
+            if (containerEl) {
+                containerEl.scrollLeft = Math.max(0, initDx);
+                containerEl.scrollTop = Math.max(0, initDy);
+            }
         }
 
         const title = `${value['NAME']} ，日期：${date}，運行圖繪製完成時間：${draw_date}`;
@@ -292,9 +334,11 @@ function draw_diagram_background(line_kind, date) {
                 const hour = DiagramHours[i];
                 const hour_text = hour.toString().padStart(2, '0');
                 let after_midnight, css;
-                if (hour === 24) { after_midnight = '隔日'; css = 'hour_midnight'; } 
-                else { after_midnight = ''; css = 'hour'; }
-                
+                if (hour === 24) {
+                    after_midnight = '隔日'; css = 'hour_midnight';
+                } else {
+                    after_midnight = ''; css = 'hour';
+                }
                 if (y <= totalHeight) add_text(g, `${hour_text}00 ${after_midnight}`, x, y + 30, css);
                 else break;
                 y += text_spacing_factor;
@@ -329,8 +373,6 @@ function draw_diagram_background(line_kind, date) {
 
         diagram_objects[key] = g;
         add_line(g, now_time_x_axis, 50, now_time_x_axis, totalHeight + 50, 'now_time_line');
-        
-        _init_ui_panels();
     });
 }
 
@@ -359,6 +401,7 @@ function draw_train_path(all_trains_data, realtime_trains) {
     }
 }
 
+// ── 內部渲染細節 ──
 function find_uncontinuous_index(value) {
     let order_next = value[0][5];
     let index = 0;
@@ -427,9 +470,14 @@ function calculate_text_position(coordinates, color) {
         text_position = all.filter((_, i) => i % 2 === 0);
     } else {
         for (const d of distances) {
-            if (d > 60 && d < 100) text_position.push(0);
-            else if (d >= 100 && d <= 500) text_position.push(acc + d / 2);
-            else if (d > 500) { text_position.push(acc + d / 3); text_position.push(acc + 2 * d / 3); }
+            if (d > 60 && d < 100) {
+                text_position.push(0);
+            } else if (d >= 100 && d <= 500) {
+                text_position.push(acc + d / 2);
+            } else if (d > 500) {
+                text_position.push(acc + d / 3);
+                text_position.push(acc + 2 * d / 3);
+            }
             acc += d;
         }
     }
@@ -442,7 +490,8 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
     let now_time_x_axis = null;
     const coords = [];
 
-    if (realtime_data.StationID > 0) now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
+    if (realtime_data.StationID > 0)
+        now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
 
     for (const [, id, time, loc, stop] of value) {
         let x = time * 10 - 1200 * DiagramHours[0] + 50;
@@ -458,7 +507,9 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
             const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
-                diagram_objects[lk].append('circle').attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5).attr('class', style);
+                diagram_objects[lk].append('circle') 
+                    .attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5)
+                    .attr('class', style);
             }
             break;
         }
@@ -478,17 +529,28 @@ function add_text(g, text_string, x, y, style) {
 function add_path(g, lk, train_id, path_string, text_position, style) {
     const pathId = lk + train_id;
 
-    const pathEl = g.append('path').attr('d', path_string).attr('class', style).attr('id', pathId).style('pointer-events', 'none');
+    const pathEl = g.append('path')
+        .attr('d', path_string)
+        .attr('class', style)
+        .attr('id', pathId)
+        .style('pointer-events', 'none');
+
     _allPathEls.set(pathId, pathEl);
 
     const hitEl = g.append('path')
-        .attr('d', path_string).style('fill', 'none').style('stroke', 'transparent')
-        .style('stroke-width', '16').style('pointer-events', 'stroke').style('cursor', 'crosshair');
+        .attr('d', path_string)
+        .style('fill', 'none')
+        .style('stroke', 'transparent')
+        .style('stroke-width', '16')
+        .style('pointer-events', 'stroke')
+        .style('cursor', 'crosshair');
 
     const basePathId = pathId.replace(/-End$/, '');
 
-    hitEl.on('mouseenter', () => { if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6'); })
-         .on('mouseleave', () => { if (_selectedPathId !== basePathId) _updateAllPathVisuals(); });
+    hitEl
+        .on('mouseenter', () => { if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6'); })
+        .on('mouseleave', () => { if (_selectedPathId !== basePathId) _updateAllPathVisuals(); });
+
     hitEl.on('click', function (event) {
         event.stopPropagation();
         if (_selectedPathId === basePathId) _clearHighlight();
@@ -498,15 +560,26 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
     const hrefTarget = '#' + pathId;
     for (const offset of text_position) {
         const textEl = g.append('text').attr('class', style).classed('d3-train-label', true);
-        textEl.append('textPath').attr('href', hrefTarget).attr('startOffset', offset).append('tspan').attr('dy', -3).text(train_id);
+        textEl.append('textPath')
+            .attr('href', hrefTarget)
+            .attr('startOffset', offset)
+            .append('tspan').attr('dy', -3)
+            .text(train_id);
     }
 }
 
-function calculate_distance(a, b) { return Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2)); }
+function calculate_distance(a, b) {
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
 function get_now_time_x_axis(minus_time) {
-    const t = new Date(); t.setMinutes(t.getMinutes() - minus_time);
-    t.setSeconds(Math.round(t.getSeconds() / 30) * 30);
+    const t = new Date();
+    t.setMinutes(t.getMinutes() - minus_time);
+    const seconds = t.getSeconds();
+    const roundedSeconds = Math.round(seconds / 30) * 30;
+    t.setSeconds(roundedSeconds);
+    
     const hh = t.getHours().toString().padStart(2, '0');
     const mm = t.getMinutes().toString().padStart(2, '0');
     const ssStr = t.getSeconds().toString().padStart(2, '0');
@@ -516,16 +589,20 @@ function get_now_time_x_axis(minus_time) {
 function interpolateArray(A, B) {
     const result = [];
     for (let i = 0; i < A.length; i++) {
-        if (!isNaN(B[i])) result[i] = B[i];
-        else {
+        if (!isNaN(B[i])) {
+            result[i] = B[i];
+        } else {
             let pi = i - 1, ni = i + 1;
             while (pi >= 0 && isNaN(B[pi])) pi--;
             while (ni < A.length && isNaN(B[ni])) ni++;
-            const pv = B[pi], nv = B[ni], pd = A[i] - A[pi], nd = A[ni] - A[i];
+            const pv = B[pi], nv = B[ni];
+            const pd = A[i] - A[pi], nd = A[ni] - A[i];
             result[i] = Math.round(((pv * nd + nv * pd) / (pd + nd) + Number.EPSILON) * 100) / 100;
         }
     }
     return result;
 }
 
-function find_diagram_need_to_stop(lk) { return Object.values(LinesStationsForBackground[lk]).filter(item => item['TERMINAL'] === 'Y').map(item => item['ID']); }
+function find_diagram_need_to_stop(lk) {
+    return Object.values(LinesStationsForBackground[lk]).filter(item => item['TERMINAL'] === 'Y').map(item => item['ID']);
+}
