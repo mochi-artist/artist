@@ -194,14 +194,14 @@ function _init_ui_panels() {
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
     
-    // 🎯 修改點 1：對齊 CSS，改抓 d3-ui-wrapper 作為變形控制容器
+    // 抓取最外層的一體化包裹容器
     const controlContainer = document.getElementById('d3-ui-wrapper'); 
 
     if (!toggleBtn || !panelBody || !controlContainer) return;
     if (toggleBtn.dataset.bound === 'true') return; 
     toggleBtn.dataset.bound = 'true';
 
-    // 🎯 修改點 2：暴力斷後，將控制容器強行移出任何具備相對定位的父層 (如 SVG 容器)
+    // 暴力斷後：確保 UI 容器在 body 的第一層，避免任何 CSS 排版塌陷
     if (controlContainer.parentElement !== document.body) {
         document.body.appendChild(controlContainer);
     }
@@ -238,6 +238,76 @@ function _init_ui_panels() {
             filterList.appendChild(item);
         });
     }
+
+    let isPanelOpen = false;
+    
+    function openPanel() {
+        isPanelOpen = true;
+        _renderFilterList(); 
+        panelBody.style.display = 'flex';
+        requestAnimationFrame(() => { 
+            panelBody.style.opacity = '1'; 
+            panelBody.style.transform = 'translateY(0)'; 
+        });
+        toggleBtn.textContent = '✕';
+        toggleBtn.style.background = '#c5221f';
+        searchInput.focus();
+        _renderSearchResults('', searchResults);
+    }
+    
+    function closePanel() {
+        isPanelOpen = false;
+        panelBody.style.opacity = '0'; 
+        panelBody.style.transform = 'translateY(12px)';
+        setTimeout(() => { panelBody.style.display = 'none'; }, 200);
+        toggleBtn.textContent = '🔍';
+        toggleBtn.style.background = '#1a73e8';
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isPanelOpen ? closePanel() : openPanel();
+    });
+
+    searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) closePanel(); });
+    panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // 🚀 全新「純 Fixed 視窗同步引擎」：完美支援雙指縮放、無視內部 Div 滾動
+    if (window.visualViewport) {
+        const updateVVPos = () => {
+            const vv = window.visualViewport;
+            
+            // 取得目前瀏覽器的佈局視窗標準寬高
+            const layoutWidth = document.documentElement.clientWidth || window.innerWidth;
+            const layoutHeight = document.documentElement.clientHeight || window.innerHeight;
+            
+            // 核心演算法：計算手機放大時，視覺視窗右下角在佈局坐標系中的真實位置，並扣除等比例的 24px 邊距
+            const targetX = vv.offsetLeft + vv.width - (24 / vv.scale);
+            const targetY = vv.offsetTop + vv.height - (24 / vv.scale);
+            
+            // 計算相對於 CSS 預設右下角 (layoutWidth, layoutHeight) 的精準位移量
+            const translateX = targetX - layoutWidth;
+            const translateY = targetY - layoutHeight;
+            
+            // 將控制中心（含按鈕與點開後的 UI 面板）的對齊原點鎖死在右下角
+            controlContainer.style.transformOrigin = 'bottom right';
+            
+            // 同時套用位移校正與反向縮放，確保放大時 UI 尺寸不會暴增，且永遠貼緊可視畫面邊緣
+            controlContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${1 / vv.scale})`;
+        };
+        
+        // 監聽網頁縮放與視覺視窗變更
+        window.visualViewport.addEventListener('scroll', updateVVPos);
+        window.visualViewport.addEventListener('resize', updateVVPos);
+        
+        // 多重初始化校正，防範行動裝置工具列動態收合造成的誤差
+        updateVVPos();
+        setTimeout(updateVVPos, 100);
+        setTimeout(updateVVPos, 300);
+    }
+}
+
 
     let isPanelOpen = false;
     
