@@ -1,10 +1,10 @@
 // D3.js 版本的 SVG 渲染模組
 // 互動功能：
-//   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
+//   一、HTML 骨架移植版：UI 元素直接靜態寫入 HTML，JS 僅負責數據控制與事件綁定
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
-//   四、無敵抗縮放鎖定：改用 Document 絕對座標系，徹底解決 iOS/Android 縮放時按鈕亂飛變大的死穴！
-//   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
+//   四、純 CSS 固定選單：利用架構優勢，免去 JS 實時計算，回歸最穩定的 position: fixed
+//   五、暴力精準定位：配合滾動容器優化 scrollIntoView，縮放狀態下依然 100% 完美置中
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -32,36 +32,6 @@ const _filterCategories = [
     { id: 'others', name: '客迴', styles: [] }, 
     { id: 'special', name: '特殊列車', styles: [] } 
 ];
-
-// 注入美化捲軸與響應式 CSS
-if (!document.getElementById('d3-custom-styles')) {
-    const style = document.createElement('style');
-    style.id = 'd3-custom-styles';
-    style.innerHTML = `
-        .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-        .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-        
-        #d3-panel-body { width: 420px; }
-        .d3-filter-section { width: 180px; flex: 0 0 auto; }
-        .d3-search-section { flex: 1; min-width: 0; }
-        .d3-search-input-field { font-size: 13px; }
-        .d3-item-text { font-size: 14px; }
-        .d3-item-badge { font-size: 11px; padding: 2px 8px; }
-
-        @media (max-width: 500px) {
-            #d3-panel-body { width: calc(100vw - 32px) !important; }
-            .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
-            .d3-search-section { padding: 10px 8px !important; }
-            .d3-search-input-field { font-size: 16px !important; padding: 6px !important; }
-            .d3-item-text { font-size: 12px !important; }
-            .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
-            .d3-panel-title { font-size: 12px !important; }
-        }
-    `;
-    document.head.appendChild(style);
-}
 
 // 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
@@ -118,47 +88,37 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯 (精準定位更新版)
+// 🌟 畫面跳轉與精準定位
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
 
-    let offsetX = 0;
-    let offsetY = 0;
-    if (_d3Svg && _d3Svg.node()) {
-        const rect = _d3Svg.node().getBoundingClientRect();
-        // 取得 SVG 容器在整張網頁中的絕對座標起點
-        offsetX = rect.left + window.scrollX;
-        offsetY = rect.top + window.scrollY;
-    }
+    const container = document.getElementById('d3-diagram-container');
+    if (!container) return;
 
-    // 算出該車次起點在整張網頁裡的絕對座標
-    const targetX = offsetX + data.firstX;
-    const targetY = offsetY + data.firstY;
-
-    // 動態建立一個 1x1 像素的隱形錨點
+    // 在獨立滾動容器架構下，直接在容器內動態建立隱形錨點
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
         position: 'absolute',
-        left: `${targetX}px`,
-        top: `${targetY}px`,
+        left: `${data.firstX}px`,
+        top: `${data.firstY}px`,
         width: '1px',
         height: '1px',
         pointerEvents: 'none',
         visibility: 'hidden'
     });
 
-    document.body.appendChild(anchor);
+    container.appendChild(anchor);
 
-    // 交給瀏覽器原生引擎處理任何縮放狀態下的精準置中
+    // 讓瀏覽器原生引擎去處理「該容器內在任何縮放比例下的精準置中」
     anchor.scrollIntoView({
-        behavior: 'auto', // 直接跳轉
-        block: 'center',  // 垂直置中
-        inline: 'center'  // 水平置中
+        behavior: 'auto', 
+        block: 'center',  
+        inline: 'center'  
     });
 
-    // 跳轉完成後，把這個隱形錨點清掉，保持 DOM 乾淨
+    // 清除錨點
     setTimeout(() => anchor.remove(), 100);
 }
 
@@ -230,63 +190,21 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心 (絕對幾何反向縮放鎖定版)
+// 🌟 UI 控制中心初始化 (直接對接 HTML 靜態標籤)
 // ==========================================
 function _init_ui_panels() {
-    if (document.getElementById('d3-ui-wrapper')) return;
+    const toggleBtn = document.getElementById('d3-toggle-btn');
+    const panelBody = document.getElementById('d3-panel-body');
+    const searchInput = document.getElementById('d3-search-input');
+    const searchResults = document.getElementById('d3-search-results');
+    const filterList = document.getElementById('d3-filter-list');
 
-    // 🎯 核心修正：改用絕對定位 (position: absolute)，徹底避開手機瀏覽器對 fixed 的不同解釋
-    const wrapper = document.createElement('div');
-    wrapper.id = 'd3-ui-wrapper';
-    Object.assign(wrapper.style, {
-        position: 'absolute',
-        left: '0px',
-        top: '0px',
-        width: '0px',
-        height: '0px',
-        zIndex: '9999',
-        pointerEvents: 'none',
-        overflow: 'visible'
-    });
+    if (!toggleBtn || !panelBody) return;
+    if (toggleBtn.dataset.bound === 'true') return; // 防止重複綁定事件
+    toggleBtn.dataset.bound = 'true';
 
-    const container = document.createElement('div');
-    container.id = 'd3-control-container';
-    Object.assign(container.style, {
-        position: 'absolute',
-        right: '0px',
-        bottom: '0px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end', 
-        pointerEvents: 'none',
-        transformOrigin: 'bottom right' // 以右下角為縮放錨點
-    });
-
-    const panelBody = document.createElement('div');
-    panelBody.id = 'd3-panel-body';
-    Object.assign(panelBody.style, {
-        background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
-        fontFamily: 'Tahoma, Verdana, sans-serif',
-        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
-        pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
-    });
-
-    const filterSection = document.createElement('div');
-    filterSection.className = 'd3-filter-section d3-custom-scrollbar';
-    Object.assign(filterSection.style, { 
-        padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
-        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
-    });
-
-    const filterTitle = document.createElement('div');
-    filterTitle.className = 'd3-panel-title';
-    filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
-    Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
-
-    const filterList = document.createElement('div');
-    
     function _renderFilterList() {
+        if (!filterList) return;
         filterList.innerHTML = '';
         const counts = {};
         _filterCategories.forEach(c => counts[c.id] = 0);
@@ -317,47 +235,6 @@ function _init_ui_panels() {
             filterList.appendChild(item);
         });
     }
-    
-    filterSection.appendChild(filterTitle);
-    filterSection.appendChild(filterList);
-
-    const searchSection = document.createElement('div');
-    searchSection.className = 'd3-search-section';
-    Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
-
-    const searchInput = document.createElement('input');
-    searchInput.id = 'd3-search-input';
-    searchInput.className = 'd3-search-input-field';
-    searchInput.type = 'text';
-    searchInput.placeholder = '🔍 車次號碼...';
-    Object.assign(searchInput.style, {
-        width: '100%', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
-        background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box', outline: 'none',
-    });
-    searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#38bdf8');
-    searchInput.addEventListener('blur', () => searchInput.style.borderColor = 'rgba(255,255,255,0.2)');
-
-    const searchResults = document.createElement('div');
-    searchResults.id = 'd3-search-results';
-    searchResults.className = 'd3-custom-scrollbar';
-    Object.assign(searchResults.style, { maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
-
-    searchSection.appendChild(searchInput);
-    searchSection.appendChild(searchResults);
-
-    panelBody.appendChild(filterSection);
-    panelBody.appendChild(searchSection);
-
-    const toggleBtn = document.createElement('button');
-    toggleBtn.textContent = '🔍';
-    Object.assign(toggleBtn.style, {
-        width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
-        fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'background 0.2s', pointerEvents: 'all', marginTop: '8px',
-        touchAction: 'none', 
-        userSelect: 'none',
-        WebkitTapHighlightColor: 'transparent'
-    });
 
     let isPanelOpen = false;
     toggleBtn.addEventListener('click', (e) => {
@@ -381,61 +258,7 @@ function _init_ui_panels() {
 
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
     searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
-
-    container.appendChild(panelBody);
-    container.appendChild(toggleBtn);
-    wrapper.appendChild(container);
-    document.body.appendChild(wrapper);
-
     panelBody.addEventListener('click', (e) => e.stopPropagation());
-
-    // 🎯 終極「幾何絕對錨定」反縮放控制
-    if (window.visualViewport) {
-        const vv = window.visualViewport;
-        let basePageX = 0;
-        let basePageY = 0;
-
-        // 計算 wrapper 在當前網頁佈局下的基礎位移，排除 body margin/padding 的干擾
-        const updateBasePos = () => {
-            wrapper.style.transform = 'none';
-            const rect = wrapper.getBoundingClientRect();
-            basePageX = rect.left + window.scrollX;
-            basePageY = rect.top + window.scrollY;
-        };
-
-        const updatePos = () => {
-            const scale = vv.scale;
-            const margin = 24; // 想要固定在手機螢幕上的右下角邊距 (像素)
-            
-            // 算出當前視窗右下角在整張網頁中的絕對 Document 座標
-            const targetX = vv.pageLeft + vv.width - (margin / scale);
-            const targetY = vv.pageTop + vv.height - (margin / scale);
-            
-            const dx = targetX - basePageX;
-            const dy = targetY - basePageY;
-            
-            // 透過無延遲的向量位移與反向縮放，強制鎖定在右下角且大小不變
-            wrapper.style.transform = `translate(${dx}px, ${dy}px)`;
-            container.style.transform = `scale(${1 / scale})`;
-        };
-
-        updateBasePos();
-        updatePos();
-
-        // 綁定所有視窗變動與縮放滾動事件
-        vv.addEventListener('scroll', updatePos);
-        vv.addEventListener('resize', () => {
-            updateBasePos(); 
-            updatePos();
-        });
-        window.addEventListener('scroll', updatePos);
-        
-        // 確保某些手機瀏覽器渲染未完成時的雙重校正
-        setTimeout(() => {
-            updateBasePos();
-            updatePos();
-        }, 300);
-    }
 }
 
 const _carKindLabel = {
@@ -447,8 +270,9 @@ const _carKindLabel = {
     all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
 };
 
+// ==========================================
 // ── 公開 API ──
-
+// ==========================================
 function draw_diagram_background(line_kind, date) {
     Object.entries(OperationLines).forEach(([key, value]) => {
         if (key !== line_kind) return;
@@ -461,10 +285,14 @@ function draw_diagram_background(line_kind, date) {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
+        // 初始化面版事件綁定
         _init_ui_panels(); 
 
-        const svg = d3.select('body')
-            .append('svg')
+        // 直接選取 HTML 中已經寫好的獨立滾動容器
+        const container = d3.select('#d3-diagram-container');
+
+        // 將 SVG 掛在獨立滾動容器中
+        const svg = container.append('svg')
             .attr('class', 'd3-diagram-svg')
             .attr('width', totalWidth)
             .attr('height', totalHeight + 125);
@@ -485,8 +313,13 @@ function draw_diagram_background(line_kind, date) {
             initDy = (parseInt(stationAxisY) + 50) - vh / 2;
         }
         
+        // 使用容器自身的滾動進行精確初始定位
         if (initDx > 0 || initDy > 0) {
-            window.scrollTo(Math.max(0, initDx), Math.max(0, initDy));
+            const containerEl = document.getElementById('d3-diagram-container');
+            if (containerEl) {
+                containerEl.scrollLeft = Math.max(0, initDx);
+                containerEl.scrollTop = Math.max(0, initDy);
+            }
         }
 
         const title = `${value['NAME']} ，日期：${date}，運行圖繪製完成時間：${draw_date}`;
@@ -568,8 +401,7 @@ function draw_train_path(all_trains_data, realtime_trains) {
     }
 }
 
-// ── 內部渲染函式 ──
-
+// ── 內部渲染細節 ──
 function find_uncontinuous_index(value) {
     let order_next = value[0][5];
     let index = 0;
@@ -684,20 +516,13 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
     }
 }
 
-// ── D3 繪圖輔助函式 ──
-
 function add_line(g, x1, y1, x2, y2, style) {
-    const el = g.append('line')
-        .attr('x1', x1).attr('y1', y1)
-        .attr('x2', x2).attr('y2', y2);
+    const el = g.append('line').attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2);
     if (style) el.attr('class', style);
 }
 
 function add_text(g, text_string, x, y, style) {
-    const el = g.append('text')
-        .attr('x', x).attr('y', y)
-        .attr('dominant-baseline', 'hanging')
-        .text(text_string);
+    const el = g.append('text').attr('x', x).attr('y', y).attr('dominant-baseline', 'hanging').text(text_string);
     if (style) el.attr('class', style);
 }
 
@@ -723,22 +548,13 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
     const basePathId = pathId.replace(/-End$/, '');
 
     hitEl
-        .on('mouseenter', () => {
-            if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6');
-        })
-        .on('mouseleave', () => {
-            if (_selectedPathId !== basePathId) {
-                _updateAllPathVisuals();
-            }
-        });
+        .on('mouseenter', () => { if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6'); })
+        .on('mouseleave', () => { if (_selectedPathId !== basePathId) _updateAllPathVisuals(); });
 
     hitEl.on('click', function (event) {
         event.stopPropagation();
-        if (_selectedPathId === basePathId) {
-            _clearHighlight();
-        } else {
-            _highlight(basePathId);
-        }
+        if (_selectedPathId === basePathId) _clearHighlight();
+        else _highlight(basePathId);
     });
 
     const hrefTarget = '#' + pathId;
@@ -755,6 +571,19 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
 function calculate_distance(a, b) {
     const dx = b[0] - a[0], dy = b[1] - a[1];
     return Math.sqrt(dx * dx + dy * dy);
+}
+
+function get_now_time_x_axis(minus_time) {
+    const t = new Date();
+    t.setMinutes(t.getMinutes() - minus_time);
+    const seconds = t.getSeconds();
+    const roundedSeconds = Math.round(seconds / 30) * 30;
+    t.setSeconds(roundedSeconds);
+    
+    const hh = t.getHours().toString().padStart(2, '0');
+    const mm = t.getMinutes().toString().padStart(2, '0');
+    const ssStr = t.getSeconds().toString().padStart(2, '0');
+    return SVG_X_Axis[`${hh}:${mm}:${ssStr}`].ax1 * 10 - 1200 * DiagramHours[0] + 50;
 }
 
 function interpolateArray(A, B) {
@@ -774,24 +603,6 @@ function interpolateArray(A, B) {
     return result;
 }
 
-// 取得當前時間的 X 軸位置
-function get_now_time_x_axis(minus_time) {
-    const t = new Date();
-    t.setMinutes(t.getMinutes() - minus_time);
-    
-    const seconds = t.getSeconds();
-    const roundedSeconds = Math.round(seconds / 30) * 30;
-    t.setSeconds(roundedSeconds);
-    
-    const hh = t.getHours().toString().padStart(2, '0');
-    const mm = t.getMinutes().toString().padStart(2, '0');
-    const ssStr = t.getSeconds().toString().padStart(2, '0');
-    
-    return SVG_X_Axis[`${hh}:${mm}:${ssStr}`].ax1 * 10 - 1200 * DiagramHours[0] + 50;
-}
-
 function find_diagram_need_to_stop(lk) {
-    return Object.values(LinesStationsForBackground[lk])
-        .filter(item => item['TERMINAL'] === 'Y')
-        .map(item => item['ID']);
+    return Object.values(LinesStationsForBackground[lk]).filter(item => item['TERMINAL'] === 'Y').map(item => item['ID']);
 }
