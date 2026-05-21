@@ -5,6 +5,7 @@
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
 //   四、純 CSS 固定選單：利用架構優勢，免去 JS 實時計算，回歸最穩定的 position: fixed
 //   五、暴力精準定位：配合滾動容器優化 scrollIntoView，縮放狀態下依然 100% 完美置中
+//   六、手機抗縮放引擎：導入 VisualViewport，確保雙指放大時 UI 釘死右下角且不變形
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -190,9 +191,11 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化 (直接對接 HTML 靜態標籤)
+// 🌟 UI 控制中心初始化 (含手機防跑版引擎)
 // ==========================================
 function _init_ui_panels() {
+    const wrapper = document.getElementById('d3-ui-wrapper');
+    const container = document.getElementById('d3-control-container');
     const toggleBtn = document.getElementById('d3-toggle-btn');
     const panelBody = document.getElementById('d3-panel-body');
     const searchInput = document.getElementById('d3-search-input');
@@ -259,6 +262,37 @@ function _init_ui_panels() {
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
     searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
     panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // 🚀 手機抗縮放引擎 (VisualViewport 映射)
+    if (window.visualViewport && wrapper && container) {
+        const updateVVPos = () => {
+            const vv = window.visualViewport;
+            if (vv.scale > 1) {
+                // 放大時，將外層 wrapper 對齊真實視覺視窗
+                wrapper.style.position = 'absolute';
+                wrapper.style.left = `${vv.pageLeft}px`;
+                wrapper.style.top = `${vv.pageTop}px`;
+                wrapper.style.width = `${vv.width}px`;
+                wrapper.style.height = `${vv.height}px`;
+
+                // 將內層 container 反向縮小，維持原尺寸
+                container.style.transformOrigin = 'bottom right';
+                container.style.transform = `scale(${1 / vv.scale})`;
+            } else {
+                // 無放大時，恢復預設 CSS 的 fixed 定位
+                wrapper.style.position = 'fixed';
+                wrapper.style.left = '0';
+                wrapper.style.top = '0';
+                wrapper.style.width = '100%';
+                wrapper.style.height = '100%';
+                container.style.transform = 'none';
+            }
+        };
+
+        window.visualViewport.addEventListener('scroll', updateVVPos);
+        window.visualViewport.addEventListener('resize', updateVVPos);
+        updateVVPos(); // 初始執行一次
+    }
 }
 
 const _carKindLabel = {
