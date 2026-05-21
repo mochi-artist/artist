@@ -3,7 +3,7 @@
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
-//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
+//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角（最新硬體加速修正版）
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -199,30 +199,37 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心
+// 🌟 UI 控制中心（手機端抗縮放極致修正版）
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
 
+    // 最外層包裹：固定在畫面，不干擾滑動
     const wrapper = document.createElement('div');
     wrapper.id = 'd3-ui-wrapper';
     Object.assign(wrapper.style, {
-        position: 'fixed', bottom: '24px', right: '24px',
-        width: '0px', height: '0px', zIndex: '1500', pointerEvents: 'none'
+        position: 'fixed',
+        bottom: '24px',
+        right: '24px',
+        zIndex: '2000',
+        pointerEvents: 'none'
     });
 
+    // 內層控制容器
     const container = document.createElement('div');
     container.id = 'd3-control-container';
     Object.assign(container.style, {
-        position: 'absolute', bottom: '0', right: '0',
-        display: 'flex', flexDirection: 'column', alignItems: 'flex-end', 
-        pointerEvents: 'none', transformOrigin: 'bottom right', transition: 'transform 0.05s linear' 
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end', 
+        pointerEvents: 'none',
+        transformOrigin: 'bottom right'
     });
 
+    // 面板本體
     const panelBody = document.createElement('div');
     panelBody.id = 'd3-panel-body';
     Object.assign(panelBody.style, {
-        position: 'absolute', bottom: '60px', right: '0',
         background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
         boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
         fontFamily: 'Tahoma, Verdana, sans-serif',
@@ -230,6 +237,7 @@ function _init_ui_panels() {
         pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
     });
 
+    // 左側車種過濾
     const filterSection = document.createElement('div');
     filterSection.className = 'd3-filter-section d3-custom-scrollbar';
     Object.assign(filterSection.style, { 
@@ -279,6 +287,7 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(filterList);
 
+    // 右側搜尋
     const searchSection = document.createElement('div');
     searchSection.className = 'd3-search-section';
     Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
@@ -306,13 +315,13 @@ function _init_ui_panels() {
     panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
+    // 圓形按鈕
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = '🔍';
-    // 🌟 修正重點：加入了 touchAction, userSelect, 解決了在啟動抗縮放邏輯後，因為微幅滑動導致按鈕點擊失效的問題
     Object.assign(toggleBtn.style, {
         width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
         fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', pointerEvents: 'all', marginTop: '8px',
+        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'background 0.2s', pointerEvents: 'all', marginTop: '8px',
         touchAction: 'none', 
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent'
@@ -348,28 +357,26 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 手機視角跟隨與抗縮放邏輯 (完整保留並修復其點擊干擾)
+    // 🌟 手機端超強效「抗縮放與視角鎖定」核心邏輯
     if (window.visualViewport) {
         const vv = window.visualViewport;
         const updatePos = () => {
-            if (vv.scale > 1) {
-                wrapper.style.position = 'absolute';
-                wrapper.style.left = (vv.pageLeft + vv.width - 24) + 'px';
-                wrapper.style.top = (vv.pageTop + vv.height - 24) + 'px';
-                wrapper.style.bottom = 'auto';
-                wrapper.style.right = 'auto';
-                container.style.transform = 'scale(' + (1 / vv.scale) + ')';
-            } else {
-                wrapper.style.position = 'fixed';
-                wrapper.style.left = 'auto';
-                wrapper.style.top = 'auto';
-                wrapper.style.bottom = '24px';
-                wrapper.style.right = '24px';
-                container.style.transform = 'none';
-            }
+            // 透過 window 的大小與 VisualViewport 的落差，精準算出手機目前的捲動量與縮放比
+            const scale = vv.scale;
+            const offsetX = (window.innerWidth - vv.width) - vv.offsetLeft;
+            const offsetY = (window.innerHeight - vv.height) - vv.offsetTop;
+
+            // 利用 CSS Translate 進行硬體加速位移，不更動 DOM 結構，確保流暢度
+            // 同時加上 scale(1/scale) 來抵消手機畫面放大的倍率，讓按鈕看起來永遠一樣大
+            container.style.transform = `translate(${-offsetX}px, ${-offsetY}px) scale(${1 / scale})`;
         };
+
+        // 綁定所有手機縮放、拖曳、調整視窗大小的事件
         vv.addEventListener('scroll', updatePos);
         vv.addEventListener('resize', updatePos);
+        window.addEventListener('scroll', updatePos);
+        
+        // 初始化時，強制執行一次定位
         setTimeout(updatePos, 100);
     }
 }
