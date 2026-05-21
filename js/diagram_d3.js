@@ -1,15 +1,17 @@
-// D3.js 版本的 SVG 渲染模組 (手機縮放完美修正版 📱✨)
+// D3.js 版本的 SVG 渲染模組
+// 互動功能：
+//   一、HTML 骨架移植版：UI 元素直接靜態寫入 HTML，JS 僅負責數據控制與事件綁定
+//   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
+//   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
+//   四、純 CSS 固定選單：利用架構優勢，免去 JS 實時計算，回歸最穩定的 position: fixed
+//   五、暴力精準定位：配合滾動容器優化 scrollIntoView，縮放狀態下依然 100% 完美置中
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
 const _allPathEls   = new Map(); 
 let _selectedPathId = null;      
 let _d3Svg = null;
-let _d3G = null;
-const _diagramLayers = new Map(); 
-
-// 共用 Helper：高精度小數點第二位四捨五入
-const round2 = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+let _d3G = null;        
 
 // ==========================================
 // 🌟 核心狀態與分類設定
@@ -31,15 +33,7 @@ const _filterCategories = [
     { id: 'special', name: '特殊列車', styles: [] } 
 ];
 
-const _carKindLabel = {
-    taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
-    emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
-    zhongxing: '中興號', direct: '直快', chu_kuang: '莒光號', chushan1: '曙山（早）',
-    chushan2: '曙山（晚）', local: '區間車', local_express: '區間快', fu_hsing: '復興號',
-    ordinary: '普快', skip_stop: '跳停', alishan: '阿里山', alishan_local: '阿里山區間',
-    all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
-};
-
+// 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
     const base_no = train_no.replace(/-End$/, '');
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
@@ -65,15 +59,15 @@ function _updateAllPathVisuals() {
         if (isSelected) {
             el.style('stroke-width', '6').style('opacity', '1'); 
         } else if (isFiltered) {
-            el.style('stroke-width', '4').style('opacity', '1'); 
+            el.style('stroke-width', '5').style('opacity', '1'); 
         } else {
             el.style('stroke-width', null).style('opacity', null); 
         }
     });
 
-    _diagramLayers.forEach(layers => {
-        layers.texts.selectAll('text.d3-train-label').style('font-weight', null);
-    });
+    if (_d3G) {
+        _d3G.selectAll('text.d3-train-label').style('font-weight', null);
+    }
 }
 
 function _applyFilter() {
@@ -103,20 +97,31 @@ function _panToTrain(pathId) {
     const container = document.getElementById('d3-diagram-container');
     if (!container) return;
 
+    // 在獨立滾動容器架構下，直接在容器內動態建立隱形錨點
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
-        position: 'absolute', left: `${data.firstX}px`, top: `${data.firstY}px`,
-        width: '1px', height: '1px', pointerEvents: 'none', visibility: 'hidden'
+        position: 'absolute',
+        left: `${data.firstX}px`,
+        top: `${data.firstY}px`,
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none',
+        visibility: 'hidden'
     });
 
     container.appendChild(anchor);
-    anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+    // 讓瀏覽器原生引擎去處理「該容器內在任何縮放比例下的精準置中」
+    anchor.scrollIntoView({
+        behavior: 'auto', 
+        block: 'center',  
+        inline: 'center'  
+    });
+
+    // 清除錨點
     setTimeout(() => anchor.remove(), 100);
 }
 
-// ==========================================
-// 🌟 搜尋結果渲染邏輯
-// ==========================================
 function _refreshSearchResults() {
     const inp  = document.getElementById('d3-search-input');
     const cont = document.getElementById('d3-search-results');
@@ -142,6 +147,7 @@ function _renderSearchResults(query, container) {
     }
 
     matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
+
     const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
@@ -163,8 +169,12 @@ function _renderSearchResults(query, container) {
         item.addEventListener('mouseleave', () => { if (_selectedPathId !== pathId) item.style.background = 'transparent'; });
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (_selectedPathId === pathId) _clearHighlight();
-            else { _highlight(pathId); _panToTrain(pathId); }
+            if (_selectedPathId === pathId) {
+                _clearHighlight();
+            } else {
+                _highlight(pathId);
+                _panToTrain(pathId); 
+            }
         });
         fragment.appendChild(item);
     }
@@ -180,7 +190,7 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心初始化 (終極跨瀏覽器縮放修復 🎯)
+// 🌟 UI 控制中心初始化 (直接對接 HTML 靜態標籤)
 // ==========================================
 function _init_ui_panels() {
     const toggleBtn = document.getElementById('d3-toggle-btn');
@@ -188,16 +198,10 @@ function _init_ui_panels() {
     const searchInput = document.getElementById('d3-search-input');
     const searchResults = document.getElementById('d3-search-results');
     const filterList = document.getElementById('d3-filter-list');
-    const controlContainer = document.getElementById('d3-control-container'); 
 
-    if (!toggleBtn || !panelBody || !controlContainer) return;
-    if (toggleBtn.dataset.bound === 'true') return; 
+    if (!toggleBtn || !panelBody) return;
+    if (toggleBtn.dataset.bound === 'true') return; // 防止重複綁定事件
     toggleBtn.dataset.bound = 'true';
-
-    // 🎯 核心修正 1：將控制面板直接移到 body 下，徹底擺脫局部滾動容器的干擾
-    if (controlContainer.parentNode !== document.body) {
-        document.body.appendChild(controlContainer);
-    }
 
     function _renderFilterList() {
         if (!filterList) return;
@@ -215,6 +219,7 @@ function _init_ui_panels() {
 
         _filterCategories.forEach(cat => {
             if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
+
             const item = document.createElement('div');
             const isActive = _activeFilter === cat.id;
             
@@ -232,58 +237,41 @@ function _init_ui_panels() {
     }
 
     let isPanelOpen = false;
-    function openPanel() {
-        isPanelOpen = true;
-        _renderFilterList(); 
-        panelBody.style.display = 'flex';
-        requestAnimationFrame(() => { 
-            panelBody.style.opacity = '1'; 
-            panelBody.style.transform = 'translateY(0)'; 
-        });
-        toggleBtn.textContent = '✕';
-        toggleBtn.style.background = '#c5221f';
-        searchInput.focus();
-        _renderSearchResults('', searchResults);
-    }
-    function closePanel() {
-        isPanelOpen = false;
-        panelBody.style.opacity = '0'; 
-        panelBody.style.transform = 'translateY(12px)';
-        setTimeout(() => { panelBody.style.display = 'none'; }, 200);
-        toggleBtn.textContent = '🔍';
-        toggleBtn.style.background = '#1a73e8';
-    }
-
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        isPanelOpen ? closePanel() : openPanel();
+        isPanelOpen = !isPanelOpen;
+        if (isPanelOpen) {
+            _renderFilterList(); 
+            panelBody.style.display = 'flex';
+            requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
+            toggleBtn.textContent = '✕';
+            toggleBtn.style.background = '#c5221f';
+            _renderSearchResults('', searchResults);
+        } else {
+            panelBody.style.opacity = '0'; 
+            panelBody.style.transform = 'translateY(12px)';
+            setTimeout(() => { panelBody.style.display = 'none'; }, 200);
+            toggleBtn.textContent = '🔍';
+            toggleBtn.style.background = '#1a73e8';
+        }
     });
 
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
-    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) closePanel(); });
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
     panelBody.addEventListener('click', (e) => e.stopPropagation());
-
-    // 🎯 核心修正 2：利用絕對定位 + 數學計算，精準捕捉雙指縮放時的真實螢幕邊界
-    if (window.visualViewport) {
-        const updateVVPos = () => {
-            const vv = window.visualViewport;
-            // 統一使用 absolute 配合 body 基底，徹底通殺 iOS 與 Android 的縮放差異
-            controlContainer.style.position = 'absolute';
-            controlContainer.style.left = `${vv.offsetLeft + vv.width - 24}px`;
-            controlContainer.style.top = `${vv.offsetTop + vv.height - 24}px`;
-            controlContainer.style.bottom = 'auto';
-            controlContainer.style.right = 'auto';
-            controlContainer.style.transformOrigin = 'right bottom';
-            controlContainer.style.transform = `translate(-100%, -100%) scale(${1 / vv.scale})`;
-        };
-        window.visualViewport.addEventListener('scroll', updateVVPos);
-        window.visualViewport.addEventListener('resize', updateVVPos);
-        setTimeout(updateVVPos, 100);
-    }
 }
 
+const _carKindLabel = {
+    taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
+    emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
+    zhongxing: '中興號', direct: '直快', chu_kuang: '莒光號', chushan1: '曙山（早）',
+    chushan2: '曙山（晚）', local: '區間車', local_express: '區間快', fu_hsing: '復興號',
+    ordinary: '普快', skip_stop: '跳停', alishan: '阿里山', alishan_local: '阿里山區間',
+    all_stop: '普通車', theme: '主題列車', special: '特殊', others: '客迴',
+};
+
 // ==========================================
-// ── 公開 API (D3 繪圖引擎) ──
+// ── 公開 API ──
 // ==========================================
 function draw_diagram_background(line_kind, date) {
     Object.entries(OperationLines).forEach(([key, value]) => {
@@ -297,24 +285,22 @@ function draw_diagram_background(line_kind, date) {
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
+        // 初始化面版事件綁定
         _init_ui_panels(); 
 
+        // 直接選取 HTML 中已經寫好的獨立滾動容器
         const container = d3.select('#d3-diagram-container');
 
+        // 將 SVG 掛在獨立滾動容器中
         const svg = container.append('svg')
             .attr('class', 'd3-diagram-svg')
             .attr('width', totalWidth)
             .attr('height', totalHeight + 125);
 
         _d3Svg = svg;
+
         const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
-
-        _diagramLayers.set(key, {
-            lines: g.append('g').attr('class', 'layer-train-lines'),
-            hitboxes: g.append('g').attr('class', 'layer-hitboxes'),
-            texts: g.append('g').attr('class', 'layer-texts')
-        });
 
         svg.on('click', () => { _clearHighlight(); });
 
@@ -327,6 +313,7 @@ function draw_diagram_background(line_kind, date) {
             initDy = (parseInt(stationAxisY) + 50) - vh / 2;
         }
         
+        // 使用容器自身的滾動進行精確初始定位
         if (initDx > 0 || initDy > 0) {
             const containerEl = document.getElementById('d3-diagram-container');
             if (containerEl) {
@@ -347,9 +334,11 @@ function draw_diagram_background(line_kind, date) {
                 const hour = DiagramHours[i];
                 const hour_text = hour.toString().padStart(2, '0');
                 let after_midnight, css;
-                if (hour === 24) { after_midnight = '隔日'; css = 'hour_midnight'; } 
-                else { after_midnight = ''; css = 'hour'; }
-                
+                if (hour === 24) {
+                    after_midnight = '隔日'; css = 'hour_midnight';
+                } else {
+                    after_midnight = ''; css = 'hour';
+                }
                 if (y <= totalHeight) add_text(g, `${hour_text}00 ${after_midnight}`, x, y + 30, css);
                 else break;
                 y += text_spacing_factor;
@@ -428,17 +417,21 @@ function set_path(lk, train_no, train_kind, value) {
 
     const first_time = value[0][2];
     const first_loc = value[0][3];
-    const firstX = round2(first_time * 10 - 1200 * DiagramHours[0] + 50);
-    const firstY = round2(first_loc + 50);
+    const firstX = Math.round((first_time * 10 - 1200 * DiagramHours[0] + 50 + Number.EPSILON) * 100) / 100;
+    const firstY = Math.round((first_loc + 50 + Number.EPSILON) * 100) / 100;
 
+    let pathData = 'M';
     const coordinates = [];
     const style = CarKind[train_kind] || 'others';
     const diagram_need_stop = find_diagram_need_to_stop(lk);
 
     for (const [, id, time, loc, stop] of value) {
-        const x = round2(time * 10 - 1200 * DiagramHours[0] + 50);
-        const y = round2(loc + 50);
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
+        let y = loc + 50;
+        x = Math.round((x + Number.EPSILON) * 100) / 100;
+        y = Math.round((y + Number.EPSILON) * 100) / 100;
         if (stop !== -1 || diagram_need_stop.includes(id)) {
+            pathData += `${x},${y} `;
             coordinates.push([x, y]);
         }
     }
@@ -446,14 +439,8 @@ function set_path(lk, train_no, train_kind, value) {
     const pathId = lk + train_no;
     _trainDataMap.set(pathId, { train_no, train_kind, style, firstX, firstY });
 
-    const lineGenerator = d3.line()
-        .x(d => d[0])
-        .y(d => d[1]);
-        
-    const pathData = lineGenerator(coordinates);
     const text_position = calculate_text_position(coordinates, style);
-    
-    add_path(lk, train_no, pathData, text_position, style, pathId);
+    add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
 }
 
 function calculate_text_position(coordinates, color) {
@@ -497,71 +484,20 @@ function calculate_text_position(coordinates, color) {
     return text_position;
 }
 
-function add_path(lk, train_id, path_string, text_position, style, pathId) {
-    const layers = _diagramLayers.get(lk);
-    if (!layers) return;
-
-    // 實體有色線條
-    const pathEl = layers.lines.append('path')
-        .attr('d', path_string)
-        .attr('class', style)
-        .attr('id', pathId)
-        .style('pointer-events', 'none');
-
-    _allPathEls.set(pathId, pathEl);
-
-    // 觸碰判定寬線
-    const hitEl = layers.hitboxes.append('path')
-        .attr('d', path_string)
-        .style('fill', 'none')
-        .style('stroke', 'transparent')
-        .style('stroke-width', '16')
-        .style('pointer-events', 'stroke')
-        .style('cursor', 'crosshair');
-
-    const basePathId = pathId.replace(/-End$/, '');
-
-    hitEl
-        .on('mouseenter', () => { if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6'); })
-        .on('mouseleave', () => { if (_selectedPathId !== basePathId) _updateAllPathVisuals(); })
-        .on('click', function (event) {
-            event.stopPropagation();
-            if (_selectedPathId === basePathId) _clearHighlight();
-            else _highlight(basePathId);
-        });
-
-    const hrefTarget = '#' + pathId;
-    
-    // 文字 (加在最上層)
-    for (const offset of text_position) {
-        const textEl = layers.texts.append('text')
-            .attr('class', style)
-            .classed('d3-train-label', true);
-            // 🎯 核心修正 3：徹底移除上一版加入的黑色外框 (Stroke) 屬性，讓字體單純繼承車次線條的 css 顏色
-
-        textEl.append('textPath')
-            .attr('href', hrefTarget)
-            .attr('startOffset', offset)
-            .append('tspan')
-            .attr('dy', -3) 
-            .text(train_id);
-    }
-}
-
-// 實時位置標記
 function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_data) {
     const diagram_need_stop = find_diagram_need_to_stop(lk);
     const style = (CarKind[train_kind] || 'special') + '_mark';
     let now_time_x_axis = null;
     const coords = [];
 
-    if (realtime_data && realtime_data.StationID > 0) {
+    if (realtime_data.StationID > 0)
         now_time_x_axis = get_now_time_x_axis(realtime_data.DelayTime);
-    }
 
     for (const [, id, time, loc, stop] of value) {
-        const x = round2(time * 10 - 1200 * DiagramHours[0] + 50);
-        const y = round2(loc + 50);
+        let x = time * 10 - 1200 * DiagramHours[0] + 50;
+        let y = loc + 50;
+        x = Math.round((x + Number.EPSILON) * 100) / 100;
+        y = Math.round((y + Number.EPSILON) * 100) / 100;
         if (stop !== -1 || diagram_need_stop.includes(id)) coords.push([x, y]);
     }
 
@@ -571,11 +507,7 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
             const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
-                
-                const layers = _diagramLayers.get(lk);
-                const targetG = layers ? layers.texts : diagram_objects[lk];
-                
-                targetG.append('circle') 
+                diagram_objects[lk].append('circle') 
                     .attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5)
                     .attr('class', style);
             }
@@ -592,6 +524,48 @@ function add_line(g, x1, y1, x2, y2, style) {
 function add_text(g, text_string, x, y, style) {
     const el = g.append('text').attr('x', x).attr('y', y).attr('dominant-baseline', 'hanging').text(text_string);
     if (style) el.attr('class', style);
+}
+
+function add_path(g, lk, train_id, path_string, text_position, style) {
+    const pathId = lk + train_id;
+
+    const pathEl = g.append('path')
+        .attr('d', path_string)
+        .attr('class', style)
+        .attr('id', pathId)
+        .style('pointer-events', 'none');
+
+    _allPathEls.set(pathId, pathEl);
+
+    const hitEl = g.append('path')
+        .attr('d', path_string)
+        .style('fill', 'none')
+        .style('stroke', 'transparent')
+        .style('stroke-width', '16')
+        .style('pointer-events', 'stroke')
+        .style('cursor', 'crosshair');
+
+    const basePathId = pathId.replace(/-End$/, '');
+
+    hitEl
+        .on('mouseenter', () => { if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6'); })
+        .on('mouseleave', () => { if (_selectedPathId !== basePathId) _updateAllPathVisuals(); });
+
+    hitEl.on('click', function (event) {
+        event.stopPropagation();
+        if (_selectedPathId === basePathId) _clearHighlight();
+        else _highlight(basePathId);
+    });
+
+    const hrefTarget = '#' + pathId;
+    for (const offset of text_position) {
+        const textEl = g.append('text').attr('class', style).classed('d3-train-label', true);
+        textEl.append('textPath')
+            .attr('href', hrefTarget)
+            .attr('startOffset', offset)
+            .append('tspan').attr('dy', -3)
+            .text(train_id);
+    }
 }
 
 function calculate_distance(a, b) {
@@ -623,7 +597,7 @@ function interpolateArray(A, B) {
             while (ni < A.length && isNaN(B[ni])) ni++;
             const pv = B[pi], nv = B[ni];
             const pd = A[i] - A[pi], nd = A[ni] - A[i];
-            result[i] = round2(((pv * nd + nv * pd) / (pd + nd)));
+            result[i] = Math.round(((pv * nd + nv * pd) / (pd + nd) + Number.EPSILON) * 100) / 100;
         }
     }
     return result;
