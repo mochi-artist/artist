@@ -2,7 +2,7 @@
 // 互動功能：
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
-//   三、嚴格分類閘門：1、2次歸類莒光，含英文字母歸類客迴，其餘未定義車種歸類特殊列車
+//   三、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠停留在螢幕右下角
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -44,31 +44,14 @@ if (!document.getElementById('d3-custom-styles')) {
     document.head.appendChild(style);
 }
 
-// ==========================================
-// 🌟 智慧判定車種分類 (4道嚴格閘門)
-// ==========================================
+// 智慧判定車種分類
 function _getTrainCategoryId(style, train_no) {
-    // 取得乾淨的車次號碼（去除跨日的 -End 標記，避免英文字母誤判）
     const base_no = train_no.replace(/-End$/, '');
-
-    // 🌟 第 1 關：特例攔截 (1次、2次環島之星強制歸類為莒光)
-    if (base_no === '1' || base_no === '2') {
-        return 'chu_kuang';
-    }
-
-    // 🌟 第 2 關：客迴攔截 (含有任何英文字母的車次歸類為客迴)
-    if (/[a-zA-Z]/.test(base_no)) {
-        return 'others';
-    }
-
-    // 🌟 第 3 關：正班車比對 (依照 final_train_diagram.json 賦予的 style 進行分類)
+    if (base_no === '1' || base_no === '2') return 'chu_kuang';
+    if (/[a-zA-Z]/.test(base_no)) return 'others';
     for (let i = 1; i < _filterCategories.length - 2; i++) {
-        if (_filterCategories[i].styles.includes(style)) {
-            return _filterCategories[i].id;
-        }
+        if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
-
-    // 🌟 第 4 關：未知捕捉 (過濾完所有正班車後，剩下的通通歸類為特殊列車)
     return 'special';
 }
 
@@ -154,10 +137,8 @@ function _renderSearchResults(query, container) {
         matches.push({ pathId, data });
     }
 
-    // 從小到大自然排序
     matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
 
-    // 使用 DocumentFragment 加速渲染，無數量限制
     const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
@@ -166,7 +147,7 @@ function _renderSearchResults(query, container) {
         const isSelected = _selectedPathId === pathId;
         const item = document.createElement('div');
         Object.assign(item.style, {
-            padding: '5px 8px', borderRadius: '4px', cursor: 'pointer',
+            padding: '6px 8px', borderRadius: '4px', cursor: 'pointer',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             background: isSelected ? 'rgba(26,115,232,0.7)' : 'transparent',
             transition: 'background 0.15s', userSelect: 'none', marginBottom: '2px'
@@ -191,7 +172,7 @@ function _renderSearchResults(query, container) {
     if (matches.length === 0) {
         const empty = document.createElement('div');
         Object.assign(empty.style, { color: '#888', padding: '4px 8px', textAlign: 'center' });
-        empty.textContent = '找不到符合的車次';
+        empty.textContent = '無符合車次';
         fragment.appendChild(empty);
     }
 
@@ -199,41 +180,63 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心：單一按鈕展開面板
+// 🌟 UI 控制中心：手機版抗縮放錨點機制
 // ==========================================
 function _init_ui_panels() {
-    if (document.getElementById('d3-control-container')) return;
+    if (document.getElementById('d3-ui-wrapper')) return;
 
+    // 1. 建立跟隨視窗的 0x0 超級錨點
+    const wrapper = document.createElement('div');
+    wrapper.id = 'd3-ui-wrapper';
+    Object.assign(wrapper.style, {
+        position: 'fixed', // 電腦版預設
+        bottom: '24px', 
+        right: '24px',
+        width: '0px', 
+        height: '0px',
+        zIndex: '1500', 
+        pointerEvents: 'none'
+    });
+
+    // 2. 建立 UI 主容器，並綁定在錨點的左上角 (向外生長)
     const container = document.createElement('div');
     container.id = 'd3-control-container';
     Object.assign(container.style, {
-        position: 'fixed', bottom: '24px', right: '24px',
-        zIndex: '1500', display: 'flex', flexDirection: 'column', 
-        alignItems: 'flex-end', pointerEvents: 'none',
+        position: 'absolute', 
+        bottom: '0', 
+        right: '0',
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'flex-end', 
+        pointerEvents: 'none',
+        transformOrigin: 'bottom right', // 縮放永遠以右下角為基準
+        transition: 'transform 0.05s linear' 
     });
 
+    // --- 面板主體 (左右雙區) ---
     const panelBody = document.createElement('div');
     Object.assign(panelBody.style, {
         position: 'absolute', bottom: '60px', right: '0',
         background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
         boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
-        fontFamily: 'Tahoma, Verdana, sans-serif', fontSize: '14px',
-        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.25s, transform 0.25s',
+        fontFamily: 'Tahoma, Verdana, sans-serif', fontSize: '13px', // 稍微縮小字體適合手機
+        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
         pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
     });
 
+    // [左側 - 車種過濾]
     const filterSection = document.createElement('div');
     Object.assign(filterSection.style, { 
-        width: '180px', padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
-        maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+        width: '140px', padding: '10px', borderRight: '1px solid rgba(255,255,255,0.1)', // 縮小寬度
+        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
     });
     filterSection.className = 'd3-custom-scrollbar';
 
     const filterTitle = document.createElement('div');
-    filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
+    filterTitle.innerHTML = '🎛️ 車種過濾';
     Object.assign(filterTitle.style, { 
-        fontWeight: 'bold', fontSize: '13px', color: '#8ab4f8', 
-        marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)'
+        fontWeight: 'bold', fontSize: '12px', color: '#8ab4f8', 
+        marginBottom: '6px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)'
     });
 
     const filterList = document.createElement('div');
@@ -258,14 +261,14 @@ function _init_ui_panels() {
             const isActive = _activeFilter === cat.id;
             
             Object.assign(item.style, {
-                padding: '6px 10px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
                 borderRadius: '6px',
                 transition: 'background 0.1s', userSelect: 'none', 
                 color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
             });
             
-            item.innerHTML = `<span>${cat.name}</span> <span style="background: rgba(0,0,0,0.3); padding:2px 8px; border-radius:12px; font-size:11px; color:#cbd5e1">${counts[cat.id]}</span>`;
+            item.innerHTML = `<span>${cat.name}</span> <span style="background: rgba(0,0,0,0.3); padding:2px 6px; border-radius:10px; font-size:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
             
             item.addEventListener('mouseenter', () => { if (!isActive) item.style.background = 'rgba(255,255,255,0.05)'; });
             item.addEventListener('mouseleave', () => { if (!isActive) item.style.background = 'transparent'; });
@@ -281,17 +284,18 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(filterList);
 
+    // [右側 - 車次搜尋]
     const searchSection = document.createElement('div');
     Object.assign(searchSection.style, { 
-        width: '220px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' 
+        width: '180px', padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' // 縮小寬度
     });
 
     const searchInput = document.createElement('input');
     searchInput.id = 'd3-search-input';
     searchInput.type = 'text';
-    searchInput.placeholder = '🔍 搜尋車次號...';
+    searchInput.placeholder = '🔍 車次號碼...';
     Object.assign(searchInput.style, {
-        width: '100%', padding: '8px 10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
+        width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
         background: 'rgba(0,0,0,0.3)', color: '#fff', fontSize: '13px', boxSizing: 'border-box', outline: 'none',
     });
     searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#38bdf8');
@@ -301,7 +305,7 @@ function _init_ui_panels() {
     searchResults.id = 'd3-search-results';
     searchResults.className = 'd3-custom-scrollbar';
     Object.assign(searchResults.style, { 
-        maxHeight: '240px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' 
+        maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' 
     });
 
     searchSection.appendChild(searchInput);
@@ -310,14 +314,15 @@ function _init_ui_panels() {
     panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
+    // --- 觸發按鈕 ---
     const toggleBtn = document.createElement('button');
     toggleBtn.id = 'd3-search-btn';
     toggleBtn.title = '搜尋車次與過濾';
     toggleBtn.textContent = '🔍';
     Object.assign(toggleBtn.style, {
-        width: '48px', height: '48px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
-        fontSize: '20px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        boxShadow: '0 4px 12px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', 
+        width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
+        fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
+        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', 
         pointerEvents: 'all', marginTop: '8px'
     });
 
@@ -340,7 +345,7 @@ function _init_ui_panels() {
         } else {
             panelBody.style.opacity = '0'; 
             panelBody.style.transform = 'translateY(12px)';
-            setTimeout(() => { panelBody.style.display = 'none'; }, 250);
+            setTimeout(() => { panelBody.style.display = 'none'; }, 200);
             toggleBtn.textContent = '🔍';
             toggleBtn.style.background = '#1a73e8';
         }
@@ -351,9 +356,53 @@ function _init_ui_panels() {
 
     container.appendChild(panelBody);
     container.appendChild(toggleBtn);
-    document.body.appendChild(container);
+    wrapper.appendChild(container);
+    document.body.appendChild(wrapper);
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // ==========================================
+    // 🌟 手機視角跟隨與抗縮放邏輯
+    // ==========================================
+    if (window.visualViewport) {
+        const adjustUIPosition = () => {
+            const vv = window.visualViewport;
+            
+            // 讓錨點變成絕對座標，跟隨使用者的真實螢幕
+            wrapper.style.position = 'absolute';
+            
+            // 計算視窗真正的右下角
+            const top = vv.pageTop + vv.height - 24;
+            const left = vv.pageLeft + vv.width - 24;
+            
+            wrapper.style.top = `${top}px`;
+            wrapper.style.left = `${left}px`;
+            wrapper.style.bottom = 'auto';
+            wrapper.style.right = 'auto';
+            
+            // 反向抵銷使用者的雙指縮放，維持 UI 正常大小
+            const scale = 1 / vv.scale;
+            container.style.transform = `scale(${scale})`;
+        };
+
+        // 使用 requestAnimationFrame 讓手機滑動時按鈕跟隨得更平滑
+        let pendingUpdate = false;
+        const onViewportChange = () => {
+            if (!pendingUpdate) {
+                pendingUpdate = true;
+                requestAnimationFrame(() => {
+                    adjustUIPosition();
+                    pendingUpdate = false;
+                });
+            }
+        };
+
+        window.visualViewport.addEventListener('scroll', onViewportChange);
+        window.visualViewport.addEventListener('resize', onViewportChange);
+        
+        // 延遲執行一次以抓取初始正確視窗大小
+        setTimeout(adjustUIPosition, 100);
+    }
 }
 
 const _carKindLabel = {
