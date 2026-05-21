@@ -12,98 +12,101 @@
     <script>window._useD3Renderer = true;</script>
 
     <style>
-    html, body { 
-        margin: 0; 
-        padding: 0; 
-    }
-    
-    #d3-diagram-container {
-        width: max-content;
-        height: max-content;
-    }
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        #d3-diagram-container {
+            width: max-content;
+            height: max-content;
+        }
 
-    .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-    .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-    .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-    .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
-    
-    /* 🌟 原生固定定位，加入 GPU 硬體加速防止殘影 */
-    #d3-ui-wrapper {
-        position: fixed;
-        right: 24px;
-        /* 避開 iPhone 底部白條 */
-        bottom: calc(24px + env(safe-area-inset-bottom, 0px)); 
-        z-index: 9999;
-        pointer-events: none;
-        overflow: visible;
-        display: none; 
-        transform: translateZ(0); /* 啟用硬體加速 */
-        -webkit-transform: translateZ(0);
-    }
+        /* 捲軸美化 */
+        .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+        .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        
+        /* 🎯 關鍵修改 1：將 Wrapper 變成一個純粹的畫面座標錨點（大小 0x0） */
+        #d3-ui-wrapper {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            z-index: 9999;
+            pointer-events: none;
+            display: none; /* 讀取中預設隱藏，由 JS 畫完後開啟 */
+            transform-origin: 0 0; /* 確保 JS 縮放補償以左上角為基準點 */
+        }
 
-    #d3-control-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end; 
-        pointer-events: none;
-        transform-origin: bottom right; 
-    }
+        /* 🎯 關鍵修改 2：真正的 UI 控制中心，透過絕對定位永遠釘死在動態計算出的右下角 */
+        #d3-control-container {
+            position: absolute;
+            right: 24px;
+            /* 避開 iPhone 底部白條，並保持固定間距 */
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px)); 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; 
+            pointer-events: auto; /* 恢復內部的點擊事件 */
+        }
 
-    #d3-panel-body { 
-        width: 420px; 
-        background: rgba(15, 23, 42, 0.95); 
-        color: #fff; 
-        border-radius: 12px; 
-        box-shadow: 0 8px 32px rgba(0,0,0,0.6); 
-        display: none; 
-        flex-direction: row; 
-        font-family: Tahoma, Verdana, sans-serif;
-        opacity: 0; 
-        transform: translateY(12px); 
-        transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-        pointer-events: all; 
-        border: 1px solid rgba(255,255,255,0.1); 
-        overflow: hidden;
-    }
+        /* 面板本體 */
+        #d3-panel-body { 
+            width: 420px; 
+            background: rgba(15, 23, 42, 0.95); 
+            color: #fff; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6); 
+            display: none; 
+            flex-direction: row; 
+            font-family: Tahoma, Verdana, sans-serif;
+            opacity: 0; 
+            transform: translateY(12px); 
+            transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+            border: 1px solid rgba(255,255,255,0.1); 
+            overflow: hidden;
+        }
 
-    .d3-filter-section { 
-        width: 180px; flex: 0 0 auto; padding: 12px; 
-        border-right: 1px solid rgba(255,255,255,0.1); 
-        max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; 
-    }
-    .d3-panel-title { font-weight: bold; color: #8ab4f8; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    
-    .d3-search-section { flex: 1; min-width: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .d3-search-input-field { 
-        width: 100%; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); 
-        background: rgba(0,0,0,0.3); color: #fff; box-sizing: border-box; outline: none; 
-        font-size: 13px; padding: 6px;
-    }
-    .d3-search-input-field:focus { border-color: #38bdf8; }
-    
-    #d3-search-results { max-height: 230px; overflow-y: auto; display: flex; flex-direction: column; margin-top: 4px; }
-    
-    #d3-toggle-btn {
-        width: 50px; height: 50px; border-radius: 50%; border: none; background: #1a73e8; color: #fff;
-        font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; 
-        margin-top: 8px; box-shadow: 0 4px 16px rgba(26, 115, 232, 0.4); pointer-events: all; transition: background 0.2s;
-    }
+        .d3-filter-section { 
+            width: 180px; flex: 0 0 auto; padding: 12px; 
+            border-right: 1px solid rgba(255,255,255,0.1); 
+            max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; 
+        }
+        .d3-panel-title { font-weight: bold; color: #8ab4f8; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        .d3-search-section { flex: 1; min-width: 0; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .d3-search-input-field { 
+            width: 100%; border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0,0,0,0.3); color: #fff; box-sizing: border-box; outline: none; 
+            font-size: 13px; padding: 6px;
+        }
+        .d3-search-input-field:focus { border-color: #38bdf8; }
+        
+        #d3-search-results { max-height: 230px; overflow-y: auto; display: flex; flex-direction: column; margin-top: 4px; }
+        
+        #d3-toggle-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: none; background: #1a73e8; color: #fff;
+            font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; 
+            margin-top: 8px; box-shadow: 0 4px 16px rgba(26, 115, 232, 0.4); transition: background 0.2s;
+        }
 
-    .d3-item-text { font-size: 14px; }
-    .d3-item-badge { font-size: 11px; padding: 2px 8px; }
+        .d3-item-text { font-size: 14px; }
+        .d3-item-badge { font-size: 11px; padding: 2px 8px; }
 
-    /* 手機版 RWD 優化 */
-    @media (max-width: 500px) {
-        #d3-panel-body { width: calc(100vw - 32px) !important; }
-        .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
-        .d3-search-section { padding: 10px 8px !important; }
-        .d3-search-input-field { font-size: 16px !important; padding: 6px !important; } /* 防 iOS 縮放 */
-        .d3-item-text { font-size: 12px !important; }
-        .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
-        .d3-panel-title { font-size: 12px !important; }
-    }
-</style>
-
+        /* 手機版 RWD 優化 */
+        @media (max-width: 500px) {
+            #d3-panel-body { width: calc(100vw - 32px) !important; }
+            .d3-filter-section { width: 42% !important; padding: 10px 8px !important; }
+            .d3-search-section { padding: 10px 8px !important; }
+            .d3-search-input-field { font-size: 16px !important; padding: 6px !important; } /* 防 iOS 放大輸入框 */
+            .d3-item-text { font-size: 12px !important; }
+            .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
+            .d3-panel-title { font-size: 12px !important; }
+        }
+    </style>
 </head>
 
 <body>
