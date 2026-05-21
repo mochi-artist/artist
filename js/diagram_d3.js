@@ -308,10 +308,14 @@ function _init_ui_panels() {
 
     const toggleBtn = document.createElement('button');
     toggleBtn.textContent = '🔍';
+    // 🌟 修正重點：加入了 touchAction, userSelect, 解決了在啟動抗縮放邏輯後，因為微幅滑動導致按鈕點擊失效的問題
     Object.assign(toggleBtn.style, {
         width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
         fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', pointerEvents: 'all', marginTop: '8px'
+        boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'all 0.2s', pointerEvents: 'all', marginTop: '8px',
+        touchAction: 'none', 
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent'
     });
 
     let isPanelOpen = false;
@@ -344,9 +348,9 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 手機視角跟隨與抗縮放邏輯
+    // 手機視角跟隨與抗縮放邏輯 (完整保留並修復其點擊干擾)
     if (window.visualViewport) {
-        const vv = window.visualViewport; // 修正點 1: 移至外層，確保事件監聽與執行皆能讀取此變數
+        const vv = window.visualViewport;
         const updatePos = () => {
             if (vv.scale > 1) {
                 wrapper.style.position = 'absolute';
@@ -388,7 +392,7 @@ function draw_diagram_background(line_kind, date) {
         const totalWidth = 1200 * (DiagramHours.length - 1) + 100;
         const totalHeight = value['MAX_X_AXIS'];
         const text_spacing_factor = 500;
-        const draw_date = new Date().toLocaleString(); // 修正點 2: 使用 new Date() 確保實例方法正常運作
+        const draw_date = new Date().toLocaleString(); 
         const now_time_x_axis = get_now_time_x_axis(0);
         const vw = window.innerWidth;
         const vh = window.innerHeight;
@@ -490,12 +494,12 @@ function draw_train_path(all_trains_data, realtime_trains) {
             if (section_start.length > 1)
                 set_path(lk, train_no, train_kind, section_start);
             if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); // 修正點 3: 傳入當前路線 lk
+                mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
 
             if (section_end.length > 3)
                 set_path(lk, train_no + '-End', train_kind, section_end);
             if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); // 修正點 3: 傳入當前路線 lk
+                mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
         }
     }
 }
@@ -579,7 +583,7 @@ function calculate_text_position(coordinates, color) {
     return text_position;
 }
 
-function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_data) { // 修正點 3: 接收路線代碼 lk
+function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_data) {
     const diagram_need_stop = find_diagram_need_to_stop(lk);
     const style = (CarKind[train_kind] || 'special') + '_mark';
     let now_time_x_axis = null;
@@ -602,7 +606,7 @@ function mark_realtime_train_position(lk, value, line_dir, train_kind, realtime_
             const axis_y = [coords[i - 1][1], NaN, coords[i][1]];
             if (axis_x[0] <= axis_x[1] && axis_x[1] <= axis_x[2]) {
                 const interp = interpolateArray(axis_x, axis_y);
-                diagram_objects[lk].append('circle') // 修正點 3: 使用對應的 lk 物件
+                diagram_objects[lk].append('circle') 
                     .attr('cx', axis_x[1]).attr('cy', interp[1]).attr('r', 5)
                     .attr('class', style);
             }
@@ -705,7 +709,6 @@ function get_now_time_x_axis(minus_time) {
     const t = new Date();
     t.setMinutes(t.getMinutes() - minus_time);
     
-    // 修正點 5: 直接透過時效物件做 30 秒進位，讓物件內部自動調校「分與時」的連帶遞增，避免查表 KeyError
     const seconds = t.getSeconds();
     const roundedSeconds = Math.round(seconds / 30) * 30;
     t.setSeconds(roundedSeconds);
@@ -718,7 +721,6 @@ function get_now_time_x_axis(minus_time) {
 }
 
 function find_diagram_need_to_stop(lk) {
-    // 修正點 4: LinesStationsForBackground 是 Object，需要轉成陣列 values 再執行 filter
     return Object.values(LinesStationsForBackground[lk])
         .filter(item => item['TERMINAL'] === 'Y')
         .map(item => item['ID']);
