@@ -3,7 +3,8 @@
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
-//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角（最新硬體加速修正版）
+//   四、手機端視覺鎖定：VisualViewport 抗縮放技術，確保按鈕永遠在右下角
+//   五、精準飛航跳轉：不論首站停靠與否，皆能精準置中第一個車站的到達時間（最新手機端修正版）
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -74,7 +75,7 @@ function _getTrainCategoryId(style, train_no) {
 }
 
 // ==========================================
-// 🌟 統一視覺更新引擎
+// 🌟 统一視覺更新引擎
 // ==========================================
 function _updateAllPathVisuals() {
     _allPathEls.forEach((el, pathId) => {
@@ -117,18 +118,30 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 畫面跳轉與無限清單邏輯
+// 🌟 畫面跳轉與無限清單邏輯（精準定位修正版）
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
-    if (!data || data.stationPoints.length === 0) return;
+    if (!data || data.firstX === undefined || data.firstY === undefined) return;
     
-    const pts = data.stationPoints;
-    window.scrollTo({
-        left: pts[0].x - window.innerWidth / 2,
-        top: pts[0].y - window.innerHeight / 2,
+    // 取得手機目前的真實可視寬高（考慮到雙指縮放時，以 visualViewport 的寬高為準）
+    const viewWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    const viewHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+
+    // 精準計算將該車次第一站置中所需要的 Scroll 頂點座標
+    const scrollTargetX = data.firstX - viewWidth / 2;
+    const scrollTargetY = data.firstY - viewHeight / 2;
+
+    const scrollOptions = {
+        left: Math.max(0, scrollTargetX),
+        top: Math.max(0, scrollTargetY),
         behavior: 'smooth'
-    });
+    };
+
+    // 進行多層級滾動覆蓋，解決不同手機瀏覽器渲染核心的相容性問題
+    window.scrollTo(scrollOptions);
+    if (document.documentElement) document.documentElement.scrollTo(scrollOptions);
+    if (document.body) document.body.scrollTo(scrollOptions);
 }
 
 function _refreshSearchResults() {
@@ -361,22 +374,16 @@ function _init_ui_panels() {
     if (window.visualViewport) {
         const vv = window.visualViewport;
         const updatePos = () => {
-            // 透過 window 的大小與 VisualViewport 的落差，精準算出手機目前的捲動量與縮放比
             const scale = vv.scale;
             const offsetX = (window.innerWidth - vv.width) - vv.offsetLeft;
             const offsetY = (window.innerHeight - vv.height) - vv.offsetTop;
-
-            // 利用 CSS Translate 進行硬體加速位移，不更動 DOM 結構，確保流暢度
-            // 同時加上 scale(1/scale) 來抵消手機畫面放大的倍率，讓按鈕看起來永遠一樣大
             container.style.transform = `translate(${-offsetX}px, ${-offsetY}px) scale(${1 / scale})`;
         };
 
-        // 綁定所有手機縮放、拖曳、調整視窗大小的事件
         vv.addEventListener('scroll', updatePos);
         vv.addEventListener('resize', updatePos);
         window.addEventListener('scroll', updatePos);
         
-        // 初始化時，強制執行一次定位
         setTimeout(updatePos, 100);
     }
 }
@@ -523,7 +530,16 @@ function find_uncontinuous_index(value) {
     return index;
 }
 
+// 🌟 車次渲染與精準端點捕獲
 function set_path(lk, train_no, train_kind, value) {
+    if (!value || value.length === 0) return;
+
+    // 🎯 核心修正：不論第一站有沒有停靠，直接精準取得該車次最初始車站的 X / Y 軸真實物理座標
+    const first_time = value[0][2];
+    const first_loc = value[0][3];
+    const firstX = Math.round((first_time * 10 - 1200 * DiagramHours[0] + 50 + Number.EPSILON) * 100) / 100;
+    const firstY = Math.round((first_loc + 50 + Number.EPSILON) * 100) / 100;
+
     let pathData = 'M';
     const coordinates = [];
     const stationPoints = []; 
@@ -543,7 +559,8 @@ function set_path(lk, train_no, train_kind, value) {
     }
 
     const pathId = lk + train_no;
-    _trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints });
+    // 注入 firstX 與 firstY 供跳轉引擎呼叫
+    _trainDataMap.set(pathId, { train_no, train_kind, style, stationPoints, firstX, firstY });
 
     const text_position = calculate_text_position(coordinates, style);
     add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
@@ -695,6 +712,7 @@ function calculate_distance(a, b) {
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+// 內插計算
 function interpolateArray(A, B) {
     const result = [];
     for (let i = 0; i < A.length; i++) {
