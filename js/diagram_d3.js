@@ -385,6 +385,164 @@ function _init_ui_panels() {
     searchSection.appendChild(searchResults);
 
     panelBody.appendChild(filterSection);
+// ==========================================
+// 🌟 UI 控制中心 (恢復 JS 絕對錨定跟隨視角版)
+// ==========================================
+function _init_ui_panels() {
+    if (document.getElementById('d3-ui-wrapper')) return;
+
+    // 🎯 恢復使用 absolute，讓它能透過 JS 精準計算在超大 SVG 中的絕對座標
+    const wrapper = document.createElement('div');
+    wrapper.id = 'd3-ui-wrapper';
+    Object.assign(wrapper.style, {
+        position: 'absolute',
+        left: '0px',
+        top: '0px',
+        width: '0px',
+        height: '0px',
+        zIndex: '9999',
+        pointerEvents: 'none',
+        overflow: 'visible'
+    });
+
+    const container = document.createElement('div');
+    container.id = 'd3-control-container';
+    Object.assign(container.style, {
+        position: 'absolute',
+        right: '0px',
+        bottom: '0px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end', 
+        pointerEvents: 'none',
+        transformOrigin: 'bottom right' // 確保縮放的基準點在右下角
+    });
+
+    const panelBody = document.createElement('div');
+    panelBody.id = 'd3-panel-body';
+    Object.assign(panelBody.style, {
+        background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
+        fontFamily: 'Tahoma, Verdana, sans-serif',
+        opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
+        pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
+    });
+
+    const filterSection = document.createElement('div');
+    filterSection.className = 'd3-filter-section d3-custom-scrollbar';
+    Object.assign(filterSection.style, { 
+        padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
+        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+    });
+
+    const filterTitle = document.createElement('div');
+    filterTitle.className = 'd3-panel-title';
+    filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
+    Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
+
+    const boldToggleContainer = document.createElement('div');
+    Object.assign(boldToggleContainer.style, {
+        display: 'flex', alignItems: 'center', marginBottom: '8px',
+        fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
+        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+    });
+    
+    const boldToggleCb = document.createElement('input');
+    boldToggleCb.type = 'checkbox';
+    boldToggleCb.id = 'd3-bold-toggle';
+    boldToggleCb.checked = _isBoldLocked;
+    Object.assign(boldToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    
+    const boldToggleLabel = document.createElement('label');
+    boldToggleLabel.htmlFor = 'd3-bold-toggle';
+    boldToggleLabel.textContent = '關閉面板保持線條加粗';
+    Object.assign(boldToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
+    
+    boldToggleCb.addEventListener('change', (e) => {
+        _isBoldLocked = e.target.checked;
+        _updateAllPathVisuals();
+    });
+    
+    boldToggleContainer.appendChild(boldToggleCb);
+    boldToggleContainer.appendChild(boldToggleLabel);
+
+    const filterList = document.createElement('div');
+    
+    function _renderFilterList() {
+        filterList.innerHTML = '';
+        const counts = {};
+        _filterCategories.forEach(c => counts[c.id] = 0);
+        
+        let total = 0;
+        for (const [pathId, data] of _trainDataMap) {
+            if (data.train_no.endsWith('-End')) continue;
+            counts[_getTrainCategoryId(data.style, data.train_no)]++;
+            total++;
+        }
+        counts['all'] = total;
+
+        _filterCategories.forEach(cat => {
+            if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
+
+            const item = document.createElement('div');
+            
+            const isAllCat = cat.id === 'all';
+            const isActive = isAllCat ? (_activeFilters.size === 0) : _activeFilters.has(cat.id);
+            
+            Object.assign(item.style, {
+                padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                background: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent', borderRadius: '6px',
+                transition: 'background 0.1s', userSelect: 'none', color: isActive ? '#38bdf8' : '#e2e8f0', fontWeight: isActive ? 'bold' : 'normal'
+            });
+            
+            item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
+            
+            item.addEventListener('click', () => { 
+                if (isAllCat) {
+                    _activeFilters.clear();
+                } else {
+                    if (_activeFilters.has(cat.id)) {
+                        _activeFilters.delete(cat.id);
+                    } else {
+                        _activeFilters.add(cat.id);
+                    }
+                }
+                _renderFilterList(); 
+                _applyFilter(); 
+            });
+            filterList.appendChild(item);
+        });
+    }
+    
+    filterSection.appendChild(filterTitle);
+    filterSection.appendChild(boldToggleContainer);
+    filterSection.appendChild(filterList);
+
+    const searchSection = document.createElement('div');
+    searchSection.className = 'd3-search-section';
+    Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
+
+    const searchInput = document.createElement('input');
+    searchInput.id = 'd3-search-input';
+    searchInput.className = 'd3-search-input-field';
+    searchInput.type = 'text';
+    searchInput.placeholder = '🔍 車次號碼...';
+    Object.assign(searchInput.style, {
+        width: '100%', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.2)', 
+        background: 'rgba(0,0,0,0.3)', color: '#fff', boxSizing: 'border-box', outline: 'none',
+    });
+    searchInput.addEventListener('focus', () => searchInput.style.borderColor = '#38bdf8');
+    searchInput.addEventListener('blur', () => searchInput.style.borderColor = 'rgba(255,255,255,0.2)');
+
+    const searchResults = document.createElement('div');
+    searchResults.id = 'd3-search-results';
+    searchResults.className = 'd3-custom-scrollbar';
+    Object.assign(searchResults.style, { maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
+
+    searchSection.appendChild(searchInput);
+    searchSection.appendChild(searchResults);
+
+    panelBody.appendChild(filterSection);
     panelBody.appendChild(searchSection);
 
     const toggleBtn = document.createElement('button');
@@ -413,7 +571,7 @@ function _init_ui_panels() {
             toggleBtn.textContent = '🔍';
             toggleBtn.style.background = '#1a73e8';
 
-            // 🎯 [新增] 如果沒勾選恆粗，關閉面板時清空多選紀錄
+            // 未勾選恆粗時，自動清空多選
             if (!_isBoldLocked) {
                 _activeFilters.clear();
             }
@@ -431,6 +589,56 @@ function _init_ui_panels() {
     document.body.appendChild(wrapper);
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
+
+    // ==========================================
+    // 🎯 恢復：終極「幾何絕對錨定」反縮放控制
+    // ==========================================
+    if (window.visualViewport) {
+        const vv = window.visualViewport;
+        let basePageX = 0;
+        let basePageY = 0;
+
+        // 計算 wrapper 在當前網頁佈局下的基礎位移，排除 body margin/padding 的干擾
+        const updateBasePos = () => {
+            wrapper.style.transform = 'none';
+            const rect = wrapper.getBoundingClientRect();
+            basePageX = rect.left + window.scrollX;
+            basePageY = rect.top + window.scrollY;
+        };
+
+        const updatePos = () => {
+            const scale = vv.scale;
+            const margin = 24; // 想要固定在手機螢幕上的右下角邊距 (像素)
+            
+            // 算出當前視窗右下角在整張網頁中的絕對 Document 座標
+            const targetX = vv.pageLeft + vv.width - (margin / scale);
+            const targetY = vv.pageTop + vv.height - (margin / scale);
+            
+            const dx = targetX - basePageX;
+            const dy = targetY - basePageY;
+            
+            // 透過無延遲的向量位移與反向縮放，強制鎖定在右下角且大小不變
+            wrapper.style.transform = `translate(${dx}px, ${dy}px) translateZ(0)`; 
+            container.style.transform = `scale(${1 / scale}) translateZ(0)`;
+        };
+
+        updateBasePos();
+        updatePos();
+
+        // 綁定所有視窗變動與縮放滾動事件
+        vv.addEventListener('scroll', updatePos);
+        vv.addEventListener('resize', () => {
+            updateBasePos(); 
+            updatePos();
+        });
+        window.addEventListener('scroll', updatePos);
+        
+        // 確保某些手機瀏覽器渲染未完成時的雙重校正
+        setTimeout(() => {
+            updateBasePos();
+            updatePos();
+        }, 300);
+    }
 }
 
 const _carKindLabel = {
