@@ -10,6 +10,13 @@
     <meta name="robots" content="index,follow" />
     <meta name="author" content="呂卓勳 Cho Husn Lu" />
     <link rel="Shortcut Icon" type="image/x-icon" href="favicon.ico" />
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="麻糬運行圖">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="css/web.css">
@@ -270,6 +277,14 @@
         <footer class="alert alert-warning" role="alert"></footer>
     </div>
 
+    <div id="ios-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 350px; background: rgba(33, 37, 41, 0.95); color: #fff; padding: 16px; border-radius: 12px; z-index: 10000; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 15px; margin-bottom: 12px;">
+            將<b>麻糬運行圖</b>加入主畫面<br>
+            請點擊下方 <b style="font-size: 18px; color: #38bdf8;">⍗</b> 分享，選擇「加入主畫面」
+        </div>
+        <button onclick="document.getElementById('ios-install-popup').style.display='none'" style="padding: 6px 20px; border: none; background: #475569; color: white; border-radius: 6px; font-weight: bold;">我知道了</button>
+    </div>
+
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -341,13 +356,55 @@
         }
     }
 
+    // ==========================================
+    // 🌟 [新增] PWA 註冊與 navbar 綁定邏輯
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW 註冊失敗', err));
+        });
+    }
+
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        showInstallNav(); // 嘗試顯示安裝選項
+    });
+
+    function showInstallNav() {
+        const navItem = document.getElementById('nav-install-pwa');
+        const installBtn = document.getElementById('btn-install-pwa');
+
+        // 確保系統允許安裝，且導覽列載入完畢
+        if (deferredPrompt && navItem && installBtn) {
+            navItem.style.display = 'block';
+
+            installBtn.onclick = async (e) => {
+                e.preventDefault();
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('使用者同意安裝！');
+                    navItem.style.display = 'none';
+                }
+                deferredPrompt = null;
+            };
+        }
+    }
+
     $(document).ready(function () {
         $('#web_name').append(web_name)
         $('#today_date').append(today_date)
         $("meta[name='description']").attr("content", description)
         $("meta[name='keywords']").attr("content", keywords)
         $('footer').append(footer)
-        $("navbar").load("navbar.html")
+        
+        // 🌟 關鍵：等 navbar 載入完，再去呼叫 showInstallNav
+        $("navbar").load("navbar.html", function() {
+            showInstallNav();
+        });
 
         $('#search-btn').on('click', function () {
             const query = $('#search-input').val().trim();
@@ -359,6 +416,14 @@
                 if (query) searchStation(query);
             }
         });
+
+        // 🌟 iOS 專屬提示框邏輯
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && window.navigator.standalone;
+
+        if (isIos() && !isInStandaloneMode() && document.getElementById('ios-install-popup')) {
+            document.getElementById('ios-install-popup').style.display = 'block';
+        }
     })
 </script>
 
