@@ -278,10 +278,20 @@
     </div>
 
     <div id="ios-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 350px; background: rgba(33, 37, 41, 0.95); color: #fff; padding: 16px; border-radius: 12px; z-index: 10000; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
-        <div style="font-size: 15px; margin-bottom: 12px;">
-            詳細ios要下載<b>麻糬運行圖至桌面</b>請至<i class="fa-solid fa-circle-info" style="display: inline-block; width: 16px; text-align: center; margin-right: 4px;">關於本站找尋<br>
+        
+        <div style="font-size: 15px; margin-bottom: 15px; line-height: 1.6;">
+            詳細 iOS 要下載麻糬運行圖至桌面<br>
+            請至 
+            <span style="display: inline-block; background: rgba(255,255,255,0.15); padding: 2px 10px; border-radius: 15px; margin: 4px;">
+                <i class="fa-solid fa-circle-info" style="margin-right: 4px;"></i>關於本站
+            </span> 
+            尋找
         </div>
-        <button onclick="document.getElementById('ios-install-popup').style.display='none'" style="padding: 6px 20px; border: none; background: #475569; color: white; border-radius: 6px; font-weight: bold;">把牛變成鱒魚，知道了</button>
+        
+        <button onclick="document.getElementById('ios-install-popup').style.display='none'" style="width: 100%; padding: 10px 20px; border: none; background: #475569; color: white; border-radius: 6px; font-weight: bold; font-size: 15px; letter-spacing: 1px;">
+            把牛變成鱒魚，知道了
+        </button>
+        
     </div>
 
 </body>
@@ -356,7 +366,7 @@
     }
 
     // ==========================================
-    // 🌟 [新增] PWA 註冊與 navbar 綁定邏輯
+    // 🌟 PWA 註冊與 navbar 綁定邏輯
     // ==========================================
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
