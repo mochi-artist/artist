@@ -5,6 +5,8 @@
 //   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
 //   四、無敵抗縮放鎖定：改用 Document 絕對座標系，徹底解決 iOS/Android 縮放時按鈕亂飛變大的死穴！
 //   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
+//   六、恆粗鎖定功能：可選擇關閉面板後，依然保持過濾車種的加粗顯示
+//   七、多選過濾模式：支援同時選取多種車型，沒鎖定恆粗時關閉面板會自動重置
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
@@ -16,7 +18,9 @@ let _d3G = null;
 // ==========================================
 // 🌟 核心狀態與分類設定
 // ==========================================
-let _activeFilter = 'all';
+let _activeFilters = new Set(); 
+let _isPanelOpen = false;  
+let _isBoldLocked = false; 
 
 const _filterCategories = [
     { id: 'all', name: '全部', styles: [] },
@@ -84,11 +88,13 @@ function _updateAllPathVisuals() {
         if (!baseData) return;
 
         const isSelected = (_selectedPathId === baseId);
-        const isFiltered = (_activeFilter !== 'all' && _getTrainCategoryId(baseData.style, baseData.train_no) === _activeFilter);
+        const catId = _getTrainCategoryId(baseData.style, baseData.train_no);
+        
+        const isFiltered = _activeFilters.size > 0 && _activeFilters.has(catId);
 
         if (isSelected) {
             el.style('stroke-width', '6').style('opacity', '1'); 
-        } else if (isFiltered) {
+        } else if (isFiltered && (_isPanelOpen || _isBoldLocked)) {
             el.style('stroke-width', '5').style('opacity', '1'); 
         } else {
             el.style('stroke-width', null).style('opacity', null); 
@@ -118,7 +124,7 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯 (精準定位更新版)
+// 🌟 畫面跳轉與無限清單邏輯
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -128,16 +134,13 @@ function _panToTrain(pathId) {
     let offsetY = 0;
     if (_d3Svg && _d3Svg.node()) {
         const rect = _d3Svg.node().getBoundingClientRect();
-        // 取得 SVG 容器在整張網頁中的絕對座標起點
         offsetX = rect.left + window.scrollX;
         offsetY = rect.top + window.scrollY;
     }
 
-    // 算出該車次起點在整張網頁裡的絕對座標
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
-    // 動態建立一個 1x1 像素的隱形錨點
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
         position: 'absolute',
@@ -151,14 +154,12 @@ function _panToTrain(pathId) {
 
     document.body.appendChild(anchor);
 
-    // 交給瀏覽器原生引擎處理任何縮放狀態下的精準置中
     anchor.scrollIntoView({
-        behavior: 'auto', // 直接跳轉
-        block: 'center',  // 垂直置中
-        inline: 'center'  // 水平置中
+        behavior: 'auto',
+        block: 'center', 
+        inline: 'center' 
     });
 
-    // 跳轉完成後，把這個隱形錨點清掉，保持 DOM 乾淨
     setTimeout(() => anchor.remove(), 100);
 }
 
@@ -177,9 +178,9 @@ function _renderSearchResults(query, container) {
     for (const [pathId, data] of _trainDataMap) {
         if (data.train_no.endsWith('-End')) continue; 
         
-        if (_activeFilter !== 'all') {
+        if (_activeFilters.size > 0) {
             const catId = _getTrainCategoryId(data.style, data.train_no);
-            if (catId !== _activeFilter) continue;
+            if (!_activeFilters.has(catId)) continue;
         }
 
         if (q && !data.train_no.toLowerCase().includes(q)) continue;
@@ -230,36 +231,32 @@ function _renderSearchResults(query, container) {
 }
 
 // ==========================================
-// 🌟 UI 控制中心 (絕對幾何反向縮放鎖定版)
+// 🌟 UI 控制中心
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
 
-    // 🎯 核心修正：改用絕對定位 (position: absolute)，徹底避開手機瀏覽器對 fixed 的不同解釋
     const wrapper = document.createElement('div');
     wrapper.id = 'd3-ui-wrapper';
     Object.assign(wrapper.style, {
-        position: 'absolute',
-        left: '0px',
-        top: '0px',
-        width: '0px',
-        height: '0px',
+        position: 'fixed',
+        right: '24px',
+        bottom: '24px',
         zIndex: '9999',
         pointerEvents: 'none',
-        overflow: 'visible'
+        overflow: 'visible',
+        transform: 'translateZ(0)',
+        willChange: 'transform'
     });
 
     const container = document.createElement('div');
     container.id = 'd3-control-container';
     Object.assign(container.style, {
-        position: 'absolute',
-        right: '0px',
-        bottom: '0px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end', 
         pointerEvents: 'none',
-        transformOrigin: 'bottom right' // 以右下角為縮放錨點
+        transformOrigin: 'bottom right' 
     });
 
     const panelBody = document.createElement('div');
@@ -281,8 +278,35 @@ function _init_ui_panels() {
 
     const filterTitle = document.createElement('div');
     filterTitle.className = 'd3-panel-title';
+    // 🎯 拿掉「(可多選)」文字
     filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
     Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
+
+    const boldToggleContainer = document.createElement('div');
+    Object.assign(boldToggleContainer.style, {
+        display: 'flex', alignItems: 'center', marginBottom: '8px',
+        fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
+        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+    });
+    
+    const boldToggleCb = document.createElement('input');
+    boldToggleCb.type = 'checkbox';
+    boldToggleCb.id = 'd3-bold-toggle';
+    boldToggleCb.checked = _isBoldLocked;
+    Object.assign(boldToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    
+    const boldToggleLabel = document.createElement('label');
+    boldToggleLabel.htmlFor = 'd3-bold-toggle';
+    boldToggleLabel.textContent = '關閉面板保持線條加粗';
+    Object.assign(boldToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
+    
+    boldToggleCb.addEventListener('change', (e) => {
+        _isBoldLocked = e.target.checked;
+        _updateAllPathVisuals();
+    });
+    
+    boldToggleContainer.appendChild(boldToggleCb);
+    boldToggleContainer.appendChild(boldToggleLabel);
 
     const filterList = document.createElement('div');
     
@@ -303,7 +327,9 @@ function _init_ui_panels() {
             if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
 
             const item = document.createElement('div');
-            const isActive = _activeFilter === cat.id;
+            
+            const isAllCat = cat.id === 'all';
+            const isActive = isAllCat ? (_activeFilters.size === 0) : _activeFilters.has(cat.id);
             
             Object.assign(item.style, {
                 padding: '6px 8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -313,12 +339,25 @@ function _init_ui_panels() {
             
             item.innerHTML = `<span class="d3-item-text">${cat.name}</span> <span class="d3-item-badge" style="background: rgba(0,0,0,0.3); border-radius:10px; color:#cbd5e1">${counts[cat.id]}</span>`;
             
-            item.addEventListener('click', () => { _activeFilter = cat.id; _renderFilterList(); _applyFilter(); });
+            item.addEventListener('click', () => { 
+                if (isAllCat) {
+                    _activeFilters.clear();
+                } else {
+                    if (_activeFilters.has(cat.id)) {
+                        _activeFilters.delete(cat.id);
+                    } else {
+                        _activeFilters.add(cat.id);
+                    }
+                }
+                _renderFilterList(); 
+                _applyFilter(); 
+            });
             filterList.appendChild(item);
         });
     }
     
     filterSection.appendChild(filterTitle);
+    filterSection.appendChild(boldToggleContainer);
     filterSection.appendChild(filterList);
 
     const searchSection = document.createElement('div');
@@ -354,16 +393,13 @@ function _init_ui_panels() {
         width: '50px', height: '50px', borderRadius: '50%', border: 'none', background: '#1a73e8', color: '#fff',
         fontSize: '22px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', 
         boxShadow: '0 4px 16px rgba(26, 115, 232, 0.4)', transition: 'background 0.2s', pointerEvents: 'all', marginTop: '8px',
-        touchAction: 'none', 
-        userSelect: 'none',
-        WebkitTapHighlightColor: 'transparent'
+        touchAction: 'none', userSelect: 'none', WebkitTapHighlightColor: 'transparent'
     });
 
-    let isPanelOpen = false;
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        isPanelOpen = !isPanelOpen;
-        if (isPanelOpen) {
+        _isPanelOpen = !_isPanelOpen; 
+        if (_isPanelOpen) {
             _renderFilterList(); 
             panelBody.style.display = 'flex';
             requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
@@ -376,11 +412,18 @@ function _init_ui_panels() {
             setTimeout(() => { panelBody.style.display = 'none'; }, 200);
             toggleBtn.textContent = '🔍';
             toggleBtn.style.background = '#1a73e8';
+
+            // 🎯 [新增] 如果沒勾選恆粗，關閉面板時清空多選紀錄
+            if (!_isBoldLocked) {
+                _activeFilters.clear();
+            }
         }
+        
+        _updateAllPathVisuals();
     });
 
     searchInput.addEventListener('input', () => _renderSearchResults(searchInput.value.trim(), searchResults));
-    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isPanelOpen) toggleBtn.click(); });
+    searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape' && _isPanelOpen) toggleBtn.click(); });
 
     container.appendChild(panelBody);
     container.appendChild(toggleBtn);
@@ -388,54 +431,6 @@ function _init_ui_panels() {
     document.body.appendChild(wrapper);
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
-
-    // 🎯 終極「幾何絕對錨定」反縮放控制
-    if (window.visualViewport) {
-        const vv = window.visualViewport;
-        let basePageX = 0;
-        let basePageY = 0;
-
-        // 計算 wrapper 在當前網頁佈局下的基礎位移，排除 body margin/padding 的干擾
-        const updateBasePos = () => {
-            wrapper.style.transform = 'none';
-            const rect = wrapper.getBoundingClientRect();
-            basePageX = rect.left + window.scrollX;
-            basePageY = rect.top + window.scrollY;
-        };
-
-        const updatePos = () => {
-            const scale = vv.scale;
-            const margin = 24; // 想要固定在手機螢幕上的右下角邊距 (像素)
-            
-            // 算出當前視窗右下角在整張網頁中的絕對 Document 座標
-            const targetX = vv.pageLeft + vv.width - (margin / scale);
-            const targetY = vv.pageTop + vv.height - (margin / scale);
-            
-            const dx = targetX - basePageX;
-            const dy = targetY - basePageY;
-            
-            // 透過無延遲的向量位移與反向縮放，強制鎖定在右下角且大小不變
-            wrapper.style.transform = `translate(${dx}px, ${dy}px)`;
-            container.style.transform = `scale(${1 / scale})`;
-        };
-
-        updateBasePos();
-        updatePos();
-
-        // 綁定所有視窗變動與縮放滾動事件
-        vv.addEventListener('scroll', updatePos);
-        vv.addEventListener('resize', () => {
-            updateBasePos(); 
-            updatePos();
-        });
-        window.addEventListener('scroll', updatePos);
-        
-        // 確保某些手機瀏覽器渲染未完成時的雙重校正
-        setTimeout(() => {
-            updateBasePos();
-            updatePos();
-        }, 300);
-    }
 }
 
 const _carKindLabel = {
