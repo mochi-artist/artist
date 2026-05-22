@@ -3,7 +3,7 @@
   "short_name": "麻糬運行圖",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#212529",
+  "background_color": "#ffffff",
   "theme_color": "#212529",
   "icons": [
     {
