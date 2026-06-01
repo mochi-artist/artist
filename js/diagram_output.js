@@ -7,6 +7,9 @@ const formattedDate = url.searchParams.get('formattedDate');
 const loadRealtimeParam = url.searchParams.get('realtime');
 const scrollToCurrentTimeParam = url.searchParams.get('scrollToCurrentTime');
 
+// 🌟 [新增] 抓取改點預覽的 JSON 檔案參數
+const revisedJsonFile = url.searchParams.get('revisedJson');
+
 // 公用變數
 let date = null;
 let circle_blink = null;
@@ -33,7 +36,7 @@ const staticSchedules = {
         // 🟢 第一個時段：1月 (舊班表)
         { 
             file: "data/林鐵_20260101~20260228.json" 
-        }, // 👈 這裡一定要加逗號！把兩段分開
+        }, 
         
         // 🔵 第二個時段：2月以後 (新班表/測試用)
         { 
@@ -41,7 +44,7 @@ const staticSchedules = {
         },
         { 
             file: "data/林鐵_20260501~20260531.json" 
-        }, // 👈 這裡一定要加逗號！把兩段分開
+        }, 
         
         // 🔵 第二個時段：2月以後 (新班表/測試用)
         { 
@@ -120,11 +123,10 @@ function parseDateRange(filename) {
     return null;
 }
 
-// 🚦 智慧路由器 (決定抓哪個檔案) - 關鍵修復在這裡！
+// 🚦 智慧路由器 (決定抓哪個檔案)
 function getTargetFile(lineKind, targetDate) {
     
     // 🌲 林鐵模式 (包含 LINE_Alishan)
-    // 👇 這裡修復了您的問題：加入了 || lineKind === "LINE_Alishan"
     if (lineKind === "林鐵" || lineKind === "lintie" || lineKind === "LINE_Alishan") {
         for (let config of staticSchedules["林鐵"]) {
             const range = parseDateRange(config.file);
@@ -167,7 +169,13 @@ async function initial_data() {
         date = formattedDate ? formattedDate : getTodayFormattedDate('nodash');
 
         // 取得目標檔案路徑
-        const targetFile = getTargetFile(line_kind, date);
+        let targetFile = getTargetFile(line_kind, date);
+
+        // 🌟 [新增] 如果網址帶有改點預覽參數，強制覆蓋目標檔案！
+        if (revisedJsonFile) {
+            targetFile = revisedJsonFile; // 直接讀取參數，不補上 'data/'
+            console.log(`🔥 進入改點預覽模式！強制載入資料: ${targetFile}`);
+        }
 
         // 讀取底圖設定
         const baseFiles = [
