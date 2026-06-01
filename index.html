@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-tw">
- 
+
 <head>
     <title id="web_name"></title>
     <meta charset="UTF-8">
@@ -22,19 +22,13 @@
     <link rel="stylesheet" href="css/web.css">
 
     <style>
-        /* ==========================================
-           🌟 首頁版面調整 (VS Code 完美樣式)
-           ========================================== */
-        
-        /* 1. 修正深藍色區塊高度，讓它俐落不佔空間 */
         .hero-section {
             background-color: #1e293b; 
             color: white;
-            padding: 60px 0; /* 完美控制上下高度 */
+            padding: 60px 0; 
             margin-bottom: 30px;
         }
 
-        /* 2. 區塊標題樣式優化 */
         .section-heading {
             color: #475569;
             border-bottom: 2px solid #e2e8f0;
@@ -45,7 +39,6 @@
             font-weight: bold;
         }
 
-        /* 3. 卡片滑鼠移入時的浮動特效 */
         .line-card {
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -53,6 +46,14 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
+        
+        /* ==========================================
+           🌟 改點模式切換專用 CSS 魔法
+           ========================================== */
+        .revised-only { display: none !important; }
+        body.revised-mode .revised-actions { display: flex !important; }
+        body.revised-mode .revised-badge { display: inline-block !important; }
+        body.revised-mode .normal-only { display: none !important; }
     </style>
 </head>
 
@@ -61,14 +62,14 @@
 
     <div class="hero-section">
         <div class="container text-center">
-            <h1 class="fw-bold mb-2">台灣鐵路/軌道運行圖</h1>
+            <h1 class="fw-bold mb-2">台灣鐵路/軌道運行圖 <span class="revised-only revised-badge text-danger ms-2" style="font-size: 0.6em; vertical-align: middle;">(改點預覽模式)</span></h1>
             <p class="text-white-50 mb-0 fs-5">今天日期：<span id="today_date"></span></p>
         </div>
     </div>
 
     <div class="container py-3 pb-5">
 
-        <div class="text-center mb-5">
+        <div class="text-center mb-5 normal-only">
             <div class="d-flex gap-3 justify-content-center text-muted small">
                 <span><span class="badge me-1" style="background-color: #fca311; color: #000000; padding: 5px 8px;">今日</span>直接開啟今天的運行圖</span>
                 <span><span class="badge me-1" style="background-color: #14213d; color: #ffffff; padding: 5px 8px;">圖庫</span>選擇日期查看歷史運行圖</span>
@@ -83,10 +84,14 @@
                         <div class="line-name">北段</div>
                         <p class="line-stations">基隆 － 竹南</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_WN&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_WN" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_WN&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_WN" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_WN&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -96,10 +101,14 @@
                         <div class="line-name">山線</div>
                         <p class="line-stations">竹南 － 彰化</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_WM&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_WM" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_WM&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_WM" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_WM&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,10 +118,14 @@
                         <div class="line-name">海線</div>
                         <p class="line-stations">竹南 － 彰化</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_WSEA&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_WSEA" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_WSEA&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_WSEA" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_WSEA&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,10 +135,14 @@
                         <div class="line-name">南段</div>
                         <p class="line-stations">彰化 － 枋寮</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_WS&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_WS" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_WS&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_WS" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_WS&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -139,10 +156,14 @@
                         <div class="line-name">宜蘭線</div>
                         <p class="line-stations">八堵 － 蘇澳</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_I&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_I" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_I&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_I" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_I&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,10 +173,14 @@
                         <div class="line-name">北迴線</div>
                         <p class="line-stations">蘇澳新 － 花蓮</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_N&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_N" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_N&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_N" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_N&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -165,10 +190,14 @@
                         <div class="line-name">台東線</div>
                         <p class="line-stations">花蓮 － 台東</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_T&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_T" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_T&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_T" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_T&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -178,10 +207,14 @@
                         <div class="line-name">南迴線</div>
                         <p class="line-stations">台東 － 枋寮</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_S&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_S" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_S&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_S" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_S&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,10 +228,14 @@
                         <div class="line-name">平溪/深澳線</div>
                         <p class="line-stations">八斗子 － 菁桐</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_PX&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_PX" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_PX&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_PX" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_PX&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -208,10 +245,14 @@
                         <div class="line-name">六家/內灣線</div>
                         <p class="line-stations">新竹 － 內灣</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_NW&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_NW" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_NW&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_NW" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_NW&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -221,10 +262,14 @@
                         <div class="line-name">集集線</div>
                         <p class="line-stations">田中 － 車埕</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_J" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_J&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_J" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_J&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -234,40 +279,44 @@
                         <div class="line-name">沙崙線</div>
                         <p class="line-stations">善化 － 沙崙</p>
                     </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_SL&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_SL" class="btn btn-archive flex-fill">圖庫</a>
+                    <div class="card-footer p-2">
+                        <div class="d-flex gap-1 w-100 normal-only">
+                            <a href="diagram_output.html?lineKind=LINE_SL&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_SL" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
+                        <div class="d-flex gap-1 w-100 revised-only revised-actions">
+                            <a href="diagram_output.html?lineKind=LINE_SL&revisedJson=final_train_diagram_1150701.json" class="btn flex-fill text-white fw-bold shadow-sm" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div class="section-heading">其他鐵道系統</div>
-        <div class="row g-2">
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="line-card card">
-                    <div class="card-body">
-                        <div class="line-name">阿里山森林鐵路</div>
-                        <p class="line-stations">嘉義 － 祝山</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=LINE_Alishan&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=LINE_Alishan" class="btn btn-archive flex-fill">圖庫</a>
+        <div id="other-railways-section" class="normal-only">
+            <div class="section-heading">其他鐵道系統</div>
+            <div class="row g-2">
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="line-card card">
+                        <div class="card-body">
+                            <div class="line-name">阿里山森林鐵路</div>
+                            <p class="line-stations">嘉義 － 祝山</p>
+                        </div>
+                        <div class="card-footer p-2 d-flex gap-1 w-100">
+                            <a href="diagram_output.html?lineKind=LINE_Alishan&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=LINE_Alishan" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="line-card card">
-                    <div class="card-body">
-                        <div class="line-name">台灣高鐵</div>
-                        <p class="line-stations">南港 － 左營</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="diagram_output.html?lineKind=thsr&scrollToCurrentTime=true"
-                            class="btn btn-today flex-fill">今日</a>
-                        <a href="lines.html?lineKind=thsr" class="btn btn-archive flex-fill">圖庫</a>
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="line-card card">
+                        <div class="card-body">
+                            <div class="line-name">台灣高鐵</div>
+                            <p class="line-stations">南港 － 左營</p>
+                        </div>
+                        <div class="card-footer p-2 d-flex gap-1 w-100">
+                            <a href="diagram_output.html?lineKind=thsr&scrollToCurrentTime=true" class="btn btn-today flex-fill">今日</a>
+                            <a href="lines.html?lineKind=thsr" class="btn btn-archive flex-fill">圖庫</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -278,7 +327,6 @@
     </div>
 
     <div id="ios-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 350px; background: rgba(33, 37, 41, 0.95); color: #fff; padding: 16px; border-radius: 12px; z-index: 10000; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
-        
         <div style="font-size: 15px; margin-bottom: 15px; line-height: 1.6;">
             詳細 iOS 要下載麻糬運行圖至桌面<br>
             請至 
@@ -287,11 +335,9 @@
             </span> 
             尋找
         </div>
-        
         <button onclick="document.getElementById('ios-install-popup').style.display='none'" style="width: 100%; padding: 10px 20px; border: none; background: #475569; color: white; border-radius: 6px; font-weight: bold; font-size: 15px; letter-spacing: 1px;">
             把牛變成鱒魚，知道了
         </button>
-        
     </div>
 
 </body>
@@ -305,6 +351,7 @@
     const diagram_data = localStorage.getItem('is_confirmed');
     const today_date = getTodayFormattedDate();
 
+    // 搜尋功能邏輯
     function searchByTrainNumber(trainNo) {
         Swal.fire({ title: `你要找的是 ${trainNo} 車次嗎？`, icon: 'question', showCancelButton: true, confirmButtonText: '是', cancelButtonText: '取消' });
     }
@@ -319,7 +366,6 @@
             const opLines = opLinesRes[0];
             const svgYAxis = svgYAxisRes[0];
             const results = stations.filter(s => s.STATIONNAME.includes(query));
-            console.log(`[Station.json] 搜尋「${query}」，找到 ${results.length} 筆：`, results);
             if (results.length === 0) {
                 Swal.fire({ title: '查無結果', text: `找不到車站「${query}」`, icon: 'info' });
                 return;
@@ -340,13 +386,8 @@
                             const line = btn.dataset.line;
                             const stationId = btn.dataset.stationid;
                             const lineStations = svgYAxis[line] || [];
-                            console.log(`[SVG_Y_Axis] LINE=${line} 共 ${lineStations.length} 站，比對 STATIONID=${stationId}`);
                             const station = lineStations.find(s => String(s.ID) === String(stationId));
-                            if (!station) {
-                                console.warn('[SVG_Y_Axis] 找不到對應站點', { line, stationId, lineStations });
-                                return;
-                            }
-                            console.log('[SVG_Y_Axis] 找到站點：', station, `→ 開啟 lineKind=${line}&stationAxisY=${station.SVGYAXIS}`);
+                            if (!station) return;
                             Swal.close();
                             window.location.href = `diagram_output.html?lineKind=${line}&scrollToCurrentTime=true&stationAxisY=${station.SVGYAXIS}`;
                         });
@@ -356,7 +397,6 @@
         });
     }
 
-    // 搜尋功能：如果輸入全為數字，則視為車次號；否則視為車站名稱
     function searchStation(query) {
         if (/^\d+$/.test(query)) {
             searchByTrainNumber(query);
@@ -365,9 +405,7 @@
         }
     }
 
-    // ==========================================
-    // 🌟 PWA 註冊與 navbar 綁定邏輯
-    // ==========================================
+    // PWA 安裝邏輯
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => console.log('SW 註冊失敗', err));
@@ -375,27 +413,22 @@
     }
 
     let deferredPrompt;
-
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        showInstallNav(); // 嘗試顯示安裝選項
+        showInstallNav();
     });
 
     function showInstallNav() {
         const navItem = document.getElementById('nav-install-pwa');
         const installBtn = document.getElementById('btn-install-pwa');
-
-        // 確保系統允許安裝，且導覽列載入完畢
         if (deferredPrompt && navItem && installBtn) {
             navItem.style.display = 'block';
-
             installBtn.onclick = async (e) => {
                 e.preventDefault();
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    console.log('使用者同意安裝！');
                     navItem.style.display = 'none';
                 }
                 deferredPrompt = null;
@@ -410,9 +443,24 @@
         $("meta[name='keywords']").attr("content", keywords)
         $('footer').append(footer)
         
-        // 🌟 關鍵：等 navbar 載入完，再去呼叫 showInstallNav
+        // 載入 Navbar 並綁定改點切換按鈕事件
         $("navbar").load("navbar.html", function() {
             showInstallNav();
+            
+            // 🌟 Navbar 改點按鈕監聽器
+            $('#nav-toggle-revised').on('click', function(e) {
+                e.preventDefault();
+                // 替 body 切換 class，觸發所有 CSS 隱藏/顯示魔法
+                $('body').toggleClass('revised-mode');
+                
+                if ($('body').hasClass('revised-mode')) {
+                    // 進入改點模式：改變 Navbar 按鈕文字與顏色
+                    $(this).html('<i class="fa-solid fa-backward"></i> 返回現行時刻').removeClass('text-danger').addClass('text-warning');
+                } else {
+                    // 返回正常模式
+                    $(this).html('<i class="fa-solid fa-calendar-plus"></i> 改點預覽模式').removeClass('text-warning').addClass('text-danger');
+                }
+            });
         });
 
         $('#search-btn').on('click', function () {
@@ -426,7 +474,7 @@
             }
         });
 
-        // 🌟 iOS 專屬提示框邏輯
+        // iOS 專屬提示框邏輯
         const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && window.navigator.standalone;
 
