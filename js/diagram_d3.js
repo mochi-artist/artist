@@ -2,24 +2,25 @@
 // 互動功能：
 //   一、原生縮放與平移：交由瀏覽器原生滑動處理，徹底解決卡頓！
 //   二、整合控制中心：單一按鈕展開「左側車種過濾、右側車次搜尋」
-//   三、嚴格分類閘門：1、2次歸類莒光，含英文字歸類客迴，其餘特殊列車
+//   三、嚴格分類閘門：1、2次歸類莒光，含英文字與 3455/3456 歸類客迴，其餘特殊列車
 //   四、無敵抗縮放鎖定：改用 Document 絕對座標系，徹底解決 iOS/Android 縮放時按鈕亂飛變大的死穴！
-//   五、暴力精準定位：加入 SVG 絕對偏移計算，移除平滑滾動，確保 100% 飛航成功
-//   六、多選與恆粗鎖定：支援同時過濾多車種，並可鎖定加粗狀態不受面板收合影響！
+//   五、加入跳轉動畫：使用 window.scrollTo 平滑捲動至車次位置
+//   六、單選/多選與恆粗鎖定：支援自由切換單多選模式，並可鎖定加粗狀態不受面板影響！
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
 const _allPathEls   = new Map(); 
-let _selectedPathId = null;      
+let _selectedPathIds = new Set(); 
 let _d3Svg = null;
 let _d3G = null;        
 
 // ==========================================
 // 🌟 核心狀態與分類設定
 // ==========================================
-let _activeFilters = new Set();  // 改為 Set 支援多選
-let _isBoldLocked = false;       // 恆粗鎖定狀態
-let _isPanelOpen = false;        // 面板開啟狀態
+let _activeFilters = new Set();  
+let _isBoldLocked = false;       
+let _isPanelOpen = false;        
+let _isMultiSelectMode = false; 
 
 const _filterCategories = [
     { id: 'all', name: '全部', styles: [] },
@@ -70,6 +71,7 @@ if (!document.getElementById('d3-custom-styles')) {
 function _getTrainCategoryId(style, train_no) {
     const base_no = train_no.replace(/-End$/, '');
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
+    if (base_no === '3455' || base_no === '3456') return 'others';
     if (/[a-zA-Z]/.test(base_no)) return 'others';
     for (let i = 1; i < _filterCategories.length - 2; i++) {
         if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
@@ -78,7 +80,7 @@ function _getTrainCategoryId(style, train_no) {
 }
 
 // ==========================================
-// 🌟 統一視覺更新引擎 (支援恆粗與多選)
+// 🌟 統一視覺更新引擎
 // ==========================================
 function _updateAllPathVisuals() {
     _allPathEls.forEach((el, pathId) => {
@@ -86,20 +88,15 @@ function _updateAllPathVisuals() {
         const baseData = _trainDataMap.get(baseId);
         if (!baseData) return;
 
-        const isSelected = (_selectedPathId === baseId);
+        const isSelected = _selectedPathIds.has(baseId);
         const catId = _getTrainCategoryId(baseData.style, baseData.train_no);
-        
-        // 判斷該車次是否在過濾名單中
         const isFiltered = _activeFilters.size > 0 && _activeFilters.has(catId);
 
         if (isSelected) {
-            // 單獨點擊選中的車次最粗
             el.style('stroke-width', '6').style('opacity', '1'); 
         } else if (isFiltered && (_isPanelOpen || _isBoldLocked)) {
-            // 如果被過濾選中，且 (面板開著 或 啟動了恆粗鎖定)，則加粗
             el.style('stroke-width', '5').style('opacity', '1'); 
         } else {
-            // 恢復預設
             el.style('stroke-width', null).style('opacity', null); 
         }
     });
@@ -114,20 +111,34 @@ function _applyFilter() {
     _refreshSearchResults(); 
 }
 
-function _highlight(pathId) {
-    _selectedPathId = pathId;
+function _toggleHighlight(pathId) {
+    if (_isMultiSelectMode) {
+        if (_selectedPathIds.has(pathId)) {
+            _selectedPathIds.delete(pathId);
+        } else {
+            _selectedPathIds.add(pathId);
+        }
+    } else {
+        if (_selectedPathIds.has(pathId)) {
+            _selectedPathIds.delete(pathId); 
+        } else {
+            _selectedPathIds.clear(); 
+            _selectedPathIds.add(pathId); 
+        }
+    }
+    
     _updateAllPathVisuals();
     _refreshSearchResults();
 }
 
 function _clearHighlight() {
-    _selectedPathId = null;
+    _selectedPathIds.clear();
     _updateAllPathVisuals();
     _refreshSearchResults();
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯
+// 🌟 畫面跳轉與無限清單邏輯 (平滑動畫版)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -144,21 +155,15 @@ function _panToTrain(pathId) {
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
-    const anchor = document.createElement('div');
-    Object.assign(anchor.style, {
-        position: 'absolute',
-        left: `${targetX}px`,
-        top: `${targetY}px`,
-        width: '1px',
-        height: '1px',
-        pointerEvents: 'none',
-        visibility: 'hidden'
+    // 🎯 改為使用 window.scrollTo 配合平滑滾動參數，直接計算置中位置
+    const scrollToX = targetX - (window.innerWidth / 2);
+    const scrollToY = targetY - (window.innerHeight / 2);
+
+    window.scrollTo({
+        left: scrollToX,
+        top: scrollToY,
+        behavior: 'smooth' // ✨ 啟動平滑動畫跳轉
     });
-
-    document.body.appendChild(anchor);
-
-    anchor.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
-    setTimeout(() => anchor.remove(), 100);
 }
 
 function _refreshSearchResults() {
@@ -176,7 +181,6 @@ function _renderSearchResults(query, container) {
     for (const [pathId, data] of _trainDataMap) {
         if (data.train_no.endsWith('-End')) continue; 
         
-        // 配合多選過濾搜尋清單
         if (_activeFilters.size > 0) {
             const catId = _getTrainCategoryId(data.style, data.train_no);
             if (!_activeFilters.has(catId)) continue;
@@ -192,7 +196,7 @@ function _renderSearchResults(query, container) {
 
     for (const match of matches) {
         const { pathId, data } = match;
-        const isSelected = _selectedPathId === pathId;
+        const isSelected = _selectedPathIds.has(pathId);
         
         const item = document.createElement('div');
         Object.assign(item.style, {
@@ -205,14 +209,12 @@ function _renderSearchResults(query, container) {
         const kindLabel = _carKindLabel[data.style] || data.style;
         item.innerHTML = `<b class="d3-item-text">${data.train_no}</b><span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>`;
 
-        item.addEventListener('mouseenter', () => { if (_selectedPathId !== pathId) item.style.background = 'rgba(255,255,255,0.1)'; });
-        item.addEventListener('mouseleave', () => { if (_selectedPathId !== pathId) item.style.background = 'transparent'; });
+        item.addEventListener('mouseenter', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'rgba(255,255,255,0.1)'; });
+        item.addEventListener('mouseleave', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'transparent'; });
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (_selectedPathId === pathId) {
-                _clearHighlight();
-            } else {
-                _highlight(pathId);
+            _toggleHighlight(pathId);
+            if (_selectedPathIds.has(pathId)) {
                 _panToTrain(pathId); 
             }
         });
@@ -264,7 +266,7 @@ function _init_ui_panels() {
     filterSection.className = 'd3-filter-section d3-custom-scrollbar';
     Object.assign(filterSection.style, { 
         padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
-        maxHeight: '280px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+        maxHeight: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
     });
 
     const filterTitle = document.createElement('div');
@@ -272,10 +274,9 @@ function _init_ui_panels() {
     filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
     Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
 
-    // 新增：恆粗鎖定 Toggle
     const boldToggleContainer = document.createElement('div');
     Object.assign(boldToggleContainer.style, {
-        display: 'flex', alignItems: 'center', marginBottom: '8px',
+        display: 'flex', alignItems: 'center', marginBottom: '4px',
         fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
         padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
@@ -298,6 +299,37 @@ function _init_ui_panels() {
     
     boldToggleContainer.appendChild(boldToggleCb);
     boldToggleContainer.appendChild(boldToggleLabel);
+
+    const multiToggleContainer = document.createElement('div');
+    Object.assign(multiToggleContainer.style, {
+        display: 'flex', alignItems: 'center', marginBottom: '8px',
+        fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
+        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+    });
+    
+    const multiToggleCb = document.createElement('input');
+    multiToggleCb.type = 'checkbox';
+    multiToggleCb.id = 'd3-multi-toggle';
+    multiToggleCb.checked = _isMultiSelectMode;
+    Object.assign(multiToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    
+    const multiToggleLabel = document.createElement('label');
+    multiToggleLabel.htmlFor = 'd3-multi-toggle';
+    multiToggleLabel.textContent = '啟用多選功能 (車種/車次)';
+    Object.assign(multiToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
+    
+    multiToggleCb.addEventListener('change', (e) => {
+        _isMultiSelectMode = e.target.checked;
+        if (!_isMultiSelectMode) {
+            if (_activeFilters.size > 1) _activeFilters.clear();
+            if (_selectedPathIds.size > 1) _selectedPathIds.clear();
+            _renderFilterList();
+            _applyFilter();
+        }
+    });
+    
+    multiToggleContainer.appendChild(multiToggleCb);
+    multiToggleContainer.appendChild(multiToggleLabel);
 
     const filterList = document.createElement('div');
     
@@ -331,12 +363,21 @@ function _init_ui_panels() {
             
             item.addEventListener('click', () => { 
                 if (isAllCat) {
-                    _activeFilters.clear(); // 點擊全部，清除所有多選
+                    _activeFilters.clear(); 
                 } else {
-                    if (_activeFilters.has(cat.id)) {
-                        _activeFilters.delete(cat.id); // 再次點擊取消選擇
+                    if (_isMultiSelectMode) {
+                        if (_activeFilters.has(cat.id)) {
+                            _activeFilters.delete(cat.id); 
+                        } else {
+                            _activeFilters.add(cat.id); 
+                        }
                     } else {
-                        _activeFilters.add(cat.id); // 點擊加入多選
+                        if (_activeFilters.has(cat.id)) {
+                            _activeFilters.delete(cat.id);
+                        } else {
+                            _activeFilters.clear();
+                            _activeFilters.add(cat.id);
+                        }
                     }
                 }
                 _renderFilterList(); 
@@ -348,6 +389,7 @@ function _init_ui_panels() {
     
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(boldToggleContainer);
+    filterSection.appendChild(multiToggleContainer); 
     filterSection.appendChild(filterList);
 
     // --- 右側：搜尋區塊 ---
@@ -355,7 +397,6 @@ function _init_ui_panels() {
     searchSection.className = 'd3-search-section';
     Object.assign(searchSection.style, { padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' });
 
-    // 新增：對齊左側比例的搜尋標題
     const searchTitle = document.createElement('div');
     searchTitle.className = 'd3-panel-title';
     searchTitle.innerHTML = '🔍 車次搜尋定位';
@@ -376,7 +417,7 @@ function _init_ui_panels() {
     const searchResults = document.createElement('div');
     searchResults.id = 'd3-search-results';
     searchResults.className = 'd3-custom-scrollbar';
-    Object.assign(searchResults.style, { maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
+    Object.assign(searchResults.style, { maxHeight: '230px', overflowY: 'auto', display: 'flex', flexDirection: 'column', marginTop: '4px' });
 
     searchSection.appendChild(searchTitle);
     searchSection.appendChild(searchInput);
@@ -412,7 +453,6 @@ function _init_ui_panels() {
             toggleBtn.textContent = '🔍';
             toggleBtn.style.background = '#1a73e8';
         }
-        // 觸發視覺更新（判斷是否因為恆粗鎖定而保留加粗）
         _updateAllPathVisuals();
     });
 
@@ -426,7 +466,6 @@ function _init_ui_panels() {
 
     panelBody.addEventListener('click', (e) => e.stopPropagation());
 
-    // 🎯 終極「幾何絕對錨定」反縮放控制
     if (window.visualViewport) {
         const vv = window.visualViewport;
         let basePageX = 0;
@@ -499,6 +538,7 @@ function draw_diagram_background(line_kind, date) {
         const g = svg.append('g').attr('class', 'diagram-root');
         _d3G = g;
 
+        // 點擊背景，一鍵清除所有多選高亮
         svg.on('click', () => { _clearHighlight(); });
 
         let initDx = 0;
@@ -608,7 +648,6 @@ function find_uncontinuous_index(value) {
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
 
-    // 🛡️ 防護 1：如果第一筆資料的時間或地點異常，直接放棄畫這條線
     if (isNaN(value[0][2]) || isNaN(value[0][3])) return;
 
     const first_time = value[0][2];
@@ -622,7 +661,6 @@ function set_path(lk, train_no, train_kind, value) {
     const diagram_need_stop = find_diagram_need_to_stop(lk);
 
     for (const [, id, time, loc, stop] of value) {
-        // 🛡️ 防護 2：過濾掉 JSON 中計算出 NaN 的損壞座標
         if (isNaN(time) || isNaN(loc)) continue;
 
         let x = time * 10 - 1200 * DiagramHours[0] + 50;
@@ -635,7 +673,6 @@ function set_path(lk, train_no, train_kind, value) {
         }
     }
 
-    // 🛡️ 防護 3：如果整條線被過濾到剩下不到 2 個點，就不要畫了
     if (coordinates.length < 2) return;
 
     const pathId = lk + train_no;
@@ -758,21 +795,17 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
 
     hitEl
         .on('mouseenter', () => {
-            if (_selectedPathId !== basePathId) pathEl.style('stroke-width', '6');
+            if (!_selectedPathIds.has(basePathId)) pathEl.style('stroke-width', '6');
         })
         .on('mouseleave', () => {
-            if (_selectedPathId !== basePathId) {
+            if (!_selectedPathIds.has(basePathId)) {
                 _updateAllPathVisuals();
             }
         });
 
     hitEl.on('click', function (event) {
         event.stopPropagation();
-        if (_selectedPathId === basePathId) {
-            _clearHighlight();
-        } else {
-            _highlight(basePathId);
-        }
+        _toggleHighlight(basePathId);
     });
 
     const hrefTarget = '#' + pathId;
