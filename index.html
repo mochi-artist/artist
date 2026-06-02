@@ -447,18 +447,39 @@
         $("navbar").load("navbar.html", function() {
             showInstallNav();
             
-            // 🌟 Navbar 改點按鈕監聽器
+            // 🌟 升級功能 1：網頁載入時，檢查網址是否帶有跳轉過來的「改點信號」
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'revised') {
+                $('body').addClass('revised-mode');
+                $('#nav-toggle-revised').html('<i class="fa-solid fa-backward"></i> 返回現行時刻')
+                                        .removeClass('text-danger')
+                                        .addClass('text-warning');
+            }
+            
+            // 🌟 升級功能 2：Navbar 改點按鈕監聽器 (攔截點擊，避免首頁重複載入閃爍)
             $('#nav-toggle-revised').on('click', function(e) {
-                e.preventDefault();
+                // 因為我們在 navbar.html 把連結寫死了，所以如果我們已經在首頁，要阻止它跳轉
+                e.preventDefault(); 
+                
                 // 替 body 切換 class，觸發所有 CSS 隱藏/顯示魔法
                 $('body').toggleClass('revised-mode');
                 
                 if ($('body').hasClass('revised-mode')) {
-                    // 進入改點模式：改變 Navbar 按鈕文字與顏色
-                    $(this).html('<i class="fa-solid fa-backward"></i> 返回現行時刻').removeClass('text-danger').addClass('text-warning');
+                    // 進入改點模式
+                    $(this).html('<i class="fa-solid fa-backward"></i> 返回現行時刻')
+                           .removeClass('text-danger')
+                           .addClass('text-warning');
+                           
+                    // 悄悄把網址加上 ?mode=revised (這樣使用者如果按 F5 重新整理，狀態才不會跑掉)
+                    window.history.replaceState(null, null, "?mode=revised");
                 } else {
                     // 返回正常模式
-                    $(this).html('<i class="fa-solid fa-calendar-plus"></i> 改點預覽模式').removeClass('text-warning').addClass('text-danger');
+                    $(this).html('<i class="fa-solid fa-calendar-plus"></i> 20260701改點(0528版)')
+                           .removeClass('text-warning')
+                           .addClass('text-danger');
+                           
+                    // 悄悄把網址上的參數擦掉，恢復乾淨的首頁網址
+                    window.history.replaceState(null, null, window.location.pathname);
                 }
             });
         });
