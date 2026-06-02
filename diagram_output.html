@@ -10,12 +10,36 @@
     <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
     
     <script>window._useD3Renderer = true;</script>
+
+    <style>
+        .loading-dots {
+            display: inline-block;
+            text-align: left;
+        }
+
+        .dot {
+            opacity: 0; /* 預設隱藏，不影響排版寬度 */
+            animation-duration: 1.5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: step-start; /* 瞬間切換，不做漸變 */
+        }
+
+        /* 分別給三個點指定不同的出場劇本 */
+        .dot:nth-child(1) { animation-name: dot1; }
+        .dot:nth-child(2) { animation-name: dot2; }
+        .dot:nth-child(3) { animation-name: dot3; }
+
+        /* 動畫劇本：利用透明度切換，這完全不佔用主執行緒，直接由 GPU 渲染 */
+        @keyframes dot1 { 0% { opacity: 0; } 25%, 100% { opacity: 1; } }
+        @keyframes dot2 { 0%, 25% { opacity: 0; } 50%, 100% { opacity: 1; } }
+        @keyframes dot3 { 0%, 50% { opacity: 0; } 75%, 100% { opacity: 1; } }
+    </style>
 </head>
 
 <body>
     <div id="popup" class="popup">
         <div class="msg">
-            <h1>讀取中，請稍後<span id="loading-dots">.</span></h1>
+            <h1>讀取中，請稍後<span class="loading-dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span></h1>
         </div>
     </div>
 </body>
