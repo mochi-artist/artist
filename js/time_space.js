@@ -78,7 +78,7 @@ function calculate_space_time(train, line_kind) {
 
 
 // ==========================================
-// 🌟 路線拓撲與車站推算模組 (AI 導航自駕版)
+// 🌟 路線拓撲與車站推算模組 (AI 導航自駕版 - 已修復環島車次)
 // ==========================================
 
 // 查詢車次會「停靠與通過」的所有車站
@@ -93,7 +93,8 @@ function find_passing_stations(timetable, line, line_dir) {
     let cheng_zhui = false;
     let roundabout_train = false;
     
-    if (end_station === '1001') {
+    // 🌟 修正 1：精準判定環島列車 (當起點等於終點，且時刻表站數大於 2 站時)
+    if (end_station === '1001' || (start_station === end_station && timetable.length > 2)) {
         end_station = start_station;
         roundabout_train = true;
     }
@@ -106,7 +107,7 @@ function find_passing_stations(timetable, line, line_dir) {
     let jiji = stations.includes('3432') || stations.includes('3431');
     let shalun = stations.includes('4272');
 
-    // 🌟 核心：智慧計算下一站的子函式 (自動 fallback 支線資料)
+    // 核心：智慧計算下一站的子函式 (自動 fallback 支線資料)
     const getNextStep = (curr, dir) => {
         let n_st = '', d_km = 0;
         // 智慧備援：如果 CW/CCW 是空的，自動抓 BRANCH 的資料填補黑洞
@@ -154,8 +155,12 @@ function find_passing_stations(timetable, line, line_dir) {
         
         _passing_stations.push([String(station), dsc, routeKm, km]);
 
-        if (station === end_station) {
-            if (roundabout_train) _passing_stations[_passing_stations.length - 1][0] = '1001';
+        // 🌟 修正 2：加入 `_passing_stations.length > 1` 判定
+        // 確保火車至少走出了起點站，之後若再次遇到終點站才算真正繞完一圈抵達！
+        if (station === end_station && _passing_stations.length > 1) {
+            if (roundabout_train && timetable[timetable.length - 1]['Station'] === '1001') {
+                _passing_stations[_passing_stations.length - 1][0] = '1001';
+            }
             break;
         }
 
