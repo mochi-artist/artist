@@ -929,3 +929,13 @@ function find_diagram_need_to_stop(lk) {
         .filter(item => item['TERMINAL'] === 'Y')
         .map(item => item['ID']);
 }
+// ── 內部渲染函式 ──
+function find_uncontinuous_index(value) {
+    let order_next = value[0][5];
+    let index = 0;
+    for (const [, , , , , order] of value) {
+        if (order === order_next) { order_next += 1; index += 1; }
+        else break;
+    }
+    return index;
+}
