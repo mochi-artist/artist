@@ -6,13 +6,15 @@
 //   四、無敵抗縮放鎖定：改用 Document 絕對座標系，徹底解決 iOS/Android 縮放時按鈕亂飛變大的死穴！
 //   五、加入跳轉動畫：使用 window.scrollTo 平滑捲動至車次位置
 //   六、單選/多選與恆粗鎖定：支援自由切換單多選模式，並可鎖定加粗狀態不受面板影響！
+//   七、運轉停車標示：支援動態讀取 OpStops.json，於水平停靠線中點標示星星，具備「重疊迴避」功能！
 
 // ── 模組層級狀態 ──
 const _trainDataMap = new Map(); 
 const _allPathEls   = new Map(); 
 let _selectedPathIds = new Set(); 
 let _d3Svg = null;
-let _d3G = null;        
+let _d3G = null;
+let _drawnStarPositions = []; // 🌟 新增：用來記錄畫過的星星位置，以利判斷重疊
 
 // ==========================================
 // 🌟 核心狀態與分類設定
@@ -608,7 +610,13 @@ function draw_diagram_background(line_kind, date) {
     });
 }
 
+// ==========================================
+// 🌟 統籌畫圖與圖層排序
+// ==========================================
 function draw_train_path(all_trains_data, realtime_trains) {
+    // 每次重新畫圖前，清空已畫星星的座標記錄
+    _drawnStarPositions = [];
+
     for (const train_data of all_trains_data) {
         for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
             if (value.length <= 2) continue;
@@ -631,20 +639,17 @@ function draw_train_path(all_trains_data, realtime_trains) {
                 mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
         }
     }
-}
 
-// ── 內部渲染函式 ──
-
-function find_uncontinuous_index(value) {
-    let order_next = value[0][5];
-    let index = 0;
-    for (const [, , , , , order] of value) {
-        if (order === order_next) { order_next += 1; index += 1; }
-        else break;
+    // 🌟 等所有的線條都畫完之後，把特定標記「提」到最上層！
+    if (_d3G) {
+        _d3G.selectAll('.op-stop-marker').raise();  
+        _d3G.selectAll('[class$="_mark"]').raise(); 
     }
-    return index;
 }
 
+// ==========================================
+// 🌟 畫線與疊加運轉停車星星模組 (具備重疊迴避)
+// ==========================================
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
 
@@ -657,19 +662,68 @@ function set_path(lk, train_no, train_kind, value) {
 
     let pathData = 'M';
     const coordinates = [];
+    
+    // 從全域變數讀取該車次的運轉停車名單
+    const baseTrainNo = train_no.replace(/-End$/, ''); 
+    const myOpStops = window._opStopsData ? (window._opStopsData[baseTrainNo] || []) : [];
+    let opStopsToDraw = []; 
+
     const style = CarKind[train_kind] || 'others';
     const diagram_need_stop = find_diagram_need_to_stop(lk);
 
-    for (const [, id, time, loc, stop] of value) {
+    for (let i = 0; i < value.length; i++) {
+        const [, id, time, loc, stop] = value[i];
         if (isNaN(time) || isNaN(loc)) continue;
 
         let x = time * 10 - 1200 * DiagramHours[0] + 50;
         let y = loc + 50;
         x = Math.round((x + Number.EPSILON) * 100) / 100;
         y = Math.round((y + Number.EPSILON) * 100) / 100;
+        
         if (stop !== -1 || diagram_need_stop.includes(id)) {
             pathData += `${x},${y} `;
             coordinates.push([x, y]);
+        }
+    }
+    
+    // 尋找水平線段 (到站與離站時間不同，且站點相同) 的「中點」
+    for (let i = 0; i < value.length - 1; i++) {
+        const [, id1, time1, loc1] = value[i];
+        const [, id2, time2, loc2] = value[i+1];
+
+        // 確認是同一個車站，且時間不同
+        if (id1 === id2 && time1 !== time2) {
+            // 檢查這個車站有沒有在名單內
+            if (myOpStops.includes(String(id1))) {
+                let arr_x = time1 * 10 - 1200 * DiagramHours[0] + 50;
+                let dep_x = time2 * 10 - 1200 * DiagramHours[0] + 50;
+                
+                let mid_x = (arr_x + dep_x) / 2;
+                let mid_y = loc1 + 50;
+                
+                // 🌟 核心：重疊檢查機制
+                let overlapCount = 0;
+                for (const pos of _drawnStarPositions) {
+                    // 如果座標差距在 1px 以內，視為重疊
+                    if (Math.abs(pos.x - mid_x) < 1 && Math.abs(pos.y - mid_y) < 1) {
+                        overlapCount++;
+                    }
+                }
+
+                // 如果發生重疊，依照重疊次數進行位移
+                if (overlapCount === 1) {
+                    mid_x -= 3; // 第一個重疊的往左偏 3px
+                } else if (overlapCount === 2) {
+                    mid_x += 3; // 第二個重疊的往右偏 3px
+                } else if (overlapCount > 2) {
+                    mid_x += (overlapCount * 2); // 更多重疊時繼續往外推
+                }
+
+                // 記錄這個（可能已經偏移過）的新座標
+                _drawnStarPositions.push({ x: mid_x, y: mid_y });
+                
+                opStopsToDraw.push([mid_x, mid_y]);
+            }
         }
     }
 
@@ -680,6 +734,19 @@ function set_path(lk, train_no, train_kind, value) {
 
     const text_position = calculate_text_position(coordinates, style);
     add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
+    
+    // 在線上疊加「空心星星」
+    const starGenerator = d3.symbol().type(d3.symbolStar).size(50)();
+
+    for (const [cx, cy] of opStopsToDraw) {
+        diagram_objects[lk].append('path')
+            .attr('d', starGenerator)
+            .attr('transform', `translate(${cx}, ${cy})`)
+            .attr('class', `${style} op-stop-marker`) 
+            .style('fill', '#ffffff')
+            .style('stroke-width', '1.5')
+            .style('pointer-events', 'none'); 
+    }
 }
 
 function calculate_text_position(coordinates, color) {
