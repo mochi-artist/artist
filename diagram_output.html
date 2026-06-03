@@ -7,9 +7,67 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/diagram.css">
     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
     
-    <script>window._useD3Renderer = true;</script>
+    <script>
+        window._useD3Renderer = true;
+
+        // ==========================================
+        // 🌟 預先讀取運轉停車資料 (版本號鎖定架構)
+        // ==========================================
+        window._opStopsData = {};
+
+        const searchString = window.location.search;
+        const urlParams = new URLSearchParams(searchString);
+        const revisedJson = urlParams.get('revisedJson');
+
+        let enableOpStops = false;
+        let opStopsFile = ""; // 🌟 用來動態決定要讀取哪個版本的檔案
+
+        if (revisedJson) {
+            // 情況 A：改點版預覽 (網址帶有 revisedJson)
+            enableOpStops = true;
+            opStopsFile = 'OpStops_1150701.json'; // 鎖定讀取 0701 版
+        } else {
+            // 情況 B：圖庫版或今日運行圖
+            let dateNum = 0;
+            const match = searchString.match(/202\d{5}/); 
+            
+            if (match) {
+                dateNum = parseInt(match[0]);
+            } else {
+                const today = new Date();
+                const yyyy = today.getFullYear();
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const dd = String(today.getDate()).padStart(2, '0');
+                dateNum = parseInt(`${yyyy}${mm}${dd}`);
+            }
+
+            // 🌟 未來若有 1201 改點，只要在這裡上面加一行 else if (dateNum >= 20261201) 即可
+            if (dateNum >= 20260701) {
+                enableOpStops = true;
+                opStopsFile = 'OpStops_1150701.json'; // 鎖定讀取 0701 版
+            }
+        }
+
+        if (enableOpStops) {
+            $.ajax({
+                url: opStopsFile, // 動態帶入檔名
+                dataType: 'json',
+                async: false,
+                success: function(data) {
+                    window._opStopsData = data;
+                    console.log(`✅ 運轉停車載入成功！(對應檔案: ${opStopsFile})`);
+                },
+                error: function() {
+                    console.warn(`⚠️ 找不到 ${opStopsFile}，將以無星星模式繪製。`);
+                }
+            });
+        } else {
+            console.log("ℹ️ 目前時間為 2026/07/01 以前，保護歷史圖庫，關閉運轉停車標示。");
+        }
+    </script>
 
     <style>
         .loading-dots {
