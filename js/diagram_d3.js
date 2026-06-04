@@ -611,109 +611,101 @@ function draw_diagram_background(line_kind, date) {
 }
 
 // ==========================================
-// 🌟 統籌畫圖與圖層排序 (整合運轉停車「全自動時空」讀取機制)
+// 🌟 統籌畫圖與圖層排序 (💯 100% 全自動時空菜單版)
 // ==========================================
 function draw_train_path(all_trains_data, realtime_trains) {
-    // 1. 自動從網址抓取目前的狀態
     const urlParams = new URLSearchParams(window.location.search);
     const revisedJson = urlParams.get('revisedJson');
     const dateParam = urlParams.get('date');
 
-    let opStopsUrl = null;
+    // 核心畫圖執行邏輯 (包裝起來等待菜單讀取)
+    const initDrawingWithEpochs = (OP_STOPS_EPOCHS) => {
+        let opStopsUrl = null;
 
-    // 📅 定義改點歷史時間軸 (前端唯一需要微調的地方)
-    // 未來有新改點，只要在這裡多加一行「西元生效日」與「民國檔名代號」即可！
-    const OP_STOPS_EPOCHS = [
-        { date: 20260101, fileId: "1150101" },
-        { date: 20260325, fileId: "1150325" },
-        { date: 20260701, fileId: "1150701" } // 🌟 這次新增的 0701 世代
-    ];
-
-    // 2. 智慧判斷要讀取哪個星星檔
-    if (revisedJson) {
-        // 情況 A：預覽模式 (直接從網址的 final_train_diagram_1150701.json 挖出數字)
-        const match = revisedJson.match(/(\d{7})/);
-        if (match) {
-            opStopsUrl = `OpStops/OpStops_${match[1]}.json`;
-        }
-    } else {
-        // 情況 B & C：圖庫模式 或 今日運行圖
-        // 決定要查詢的基準日期 (有 date 參數就用它，沒有就自動抓今天日期)
-        let qDate;
-        if (dateParam) {
-            qDate = parseInt(dateParam);
+        // 1. 判斷時空路徑
+        if (revisedJson) {
+            const match = revisedJson.match(/(\d{7})/);
+            if (match) opStopsUrl = `OpStops/OpStops_${match[1]}.json`;
         } else {
-            const d = new Date();
-            qDate = parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
-        }
-
-        // 比對時間軸，自動找出最適合的星星檔 (由最新往回找)
-        let activeFileId = null;
-        for (let i = OP_STOPS_EPOCHS.length - 1; i >= 0; i--) {
-            if (qDate >= OP_STOPS_EPOCHS[i].date) {
-                activeFileId = OP_STOPS_EPOCHS[i].fileId;
-                break;
+            let qDate;
+            if (dateParam) {
+                qDate = parseInt(dateParam);
+            } else {
+                const d = new Date();
+                qDate = parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
             }
-        }
-        if (activeFileId) {
-            opStopsUrl = `OpStops/OpStops_${activeFileId}.json`;
-        }
-    }
 
-    // 初始化全域變數
-    window._opStopsData = window._opStopsData || {};
-
-    // 3. 獨立出真正的畫圖邏輯
-    const executeDrawing = () => {
-        _drawnStarPositions = []; // 清空重疊座標記錄
-
-        for (const train_data of all_trains_data) {
-            for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
-                if (value.length <= 2) continue;
-
-                const split = find_uncontinuous_index(value);
-                const section_start = value.slice(0, split);
-                const section_end = value.slice(split);
-
-                let realtime_data;
-                if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
-
-                if (section_start.length > 1)
-                    set_path(lk, train_no, train_kind, section_start);
-                if (typeof realtime_data !== 'undefined')
-                    mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
-
-                if (section_end.length > 3)
-                    set_path(lk, train_no + '-End', train_kind, section_end);
-                if (typeof realtime_data !== 'undefined')
-                    mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
+            // 比對 Python 給的菜單，找最近的歷史世代
+            let activeFileId = null;
+            if (OP_STOPS_EPOCHS && OP_STOPS_EPOCHS.length > 0) {
+                for (let i = OP_STOPS_EPOCHS.length - 1; i >= 0; i--) {
+                    if (qDate >= OP_STOPS_EPOCHS[i].date) {
+                        activeFileId = OP_STOPS_EPOCHS[i].fileId;
+                        break;
+                    }
+                }
             }
+            if (activeFileId) opStopsUrl = `OpStops/OpStops_${activeFileId}.json`;
         }
 
-        // 把星星跟即時位置提到最上層
-        if (_d3G) {
-            _d3G.selectAll('.op-stop-marker').raise();  
-            _d3G.selectAll('[class$="_mark"]').raise(); 
+        window._opStopsData = window._opStopsData || {};
+
+        const executeDrawing = () => {
+            _drawnStarPositions = []; // 清空重疊座標記錄
+
+            for (const train_data of all_trains_data) {
+                for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
+                    if (value.length <= 2) continue;
+
+                    const split = find_uncontinuous_index(value);
+                    const section_start = value.slice(0, split);
+                    const section_end = value.slice(split);
+
+                    let realtime_data;
+                    if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
+
+                    if (section_start.length > 1) set_path(lk, train_no, train_kind, section_start);
+                    if (typeof realtime_data !== 'undefined') mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
+
+                    if (section_end.length > 3) set_path(lk, train_no + '-End', train_kind, section_end);
+                    if (typeof realtime_data !== 'undefined') mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
+                }
+            }
+            if (_d3G) {
+                _d3G.selectAll('.op-stop-marker').raise();  
+                _d3G.selectAll('[class$="_mark"]').raise(); 
+            }
+        };
+
+        // 2. 讀取星星檔並畫圖
+        if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) {
+            d3.json(opStopsUrl).then(function(opStopsData) {
+                console.log(`🌟 運轉停車載入成功！(菜單導航至: ${opStopsUrl})`);
+                window._opStopsData = opStopsData; 
+                window._currentOpStopsUrl = opStopsUrl; 
+                executeDrawing(); 
+            }).catch(function(error) {
+                console.log(`💤 尚未上傳此世代星星檔 (${opStopsUrl})，無星模式畫線。`);
+                window._opStopsData = {}; 
+                window._currentOpStopsUrl = opStopsUrl; 
+                executeDrawing(); 
+            });
+        } else {
+            executeDrawing();
         }
     };
 
-    // 4. 執行防呆讀取與畫圖
-    // 每次切換日期時，如果檔案不一樣，就重新下載
-    if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) {
-        d3.json(opStopsUrl).then(function(opStopsData) {
-            console.log(`🌟 運轉停車資料載入成功！時空路徑: ${opStopsUrl}`);
-            window._opStopsData = opStopsData; 
-            window._currentOpStopsUrl = opStopsUrl; // 記錄目前載入的檔案，避免重複下載
-            executeDrawing(); 
-        }).catch(function(error) {
-            console.log(`💤 尚未上傳此世代 (${opStopsUrl}) 的運轉停車檔，正常畫線。`);
-            window._opStopsData = {}; // 找不到就清空，避免畫出舊星星
-            window._currentOpStopsUrl = opStopsUrl; 
-            executeDrawing(); 
-        });
+    // 🌟 啟動：先確認有沒有拿到菜單
+    if (window._cachedOpStopsEpochs) {
+        initDrawingWithEpochs(window._cachedOpStopsEpochs); // 已經有了就直接用
     } else {
-        // 如果網址沒變，或者不需要讀檔，直接畫圖
-        executeDrawing();
+        d3.json("OpStops/OpStops_Epochs.json").then(epochs => {
+            window._cachedOpStopsEpochs = epochs; // 緩存起來，避免切換面板重複讀取
+            initDrawingWithEpochs(epochs);
+        }).catch(err => {
+            console.log("⚠️ 找不到 OpStops/OpStops_Epochs.json 菜單，正常畫線。");
+            initDrawingWithEpochs([]); // 沒菜單也能安全降級
+        });
     }
 }
 
