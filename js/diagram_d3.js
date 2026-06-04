@@ -164,7 +164,7 @@ function _panToTrain(pathId) {
     window.scrollTo({
         left: scrollToX,
         top: scrollToY,
-        behavior: 'smooth' // ✨ 啟動平滑動畫跳轉
+        behavior: 'smooth'
     });
 }
 
@@ -611,7 +611,7 @@ function draw_diagram_background(line_kind, date) {
 }
 
 // ==========================================
-// 🌟 統籌畫圖與圖層排序 (整合運轉停車防呆讀取)
+// 🌟 統籌畫圖與圖層排序 (整合運轉停車「全自動時空」讀取機制)
 // ==========================================
 function draw_train_path(all_trains_data, realtime_trains) {
     // 1. 自動從網址抓取目前的狀態
@@ -621,19 +621,51 @@ function draw_train_path(all_trains_data, realtime_trains) {
 
     let opStopsUrl = null;
 
-    if (revisedJson && revisedJson.includes("1150701")) {
-        opStopsUrl = "OpStops/OpStops_1150701.json";
-    } else if (dateParam && parseInt(dateParam) >= 20260701) {
-        opStopsUrl = "OpStops/OpStops_1150701.json";
+    // 📅 定義改點歷史時間軸 (前端唯一需要微調的地方)
+    // 未來有新改點，只要在這裡多加一行「西元生效日」與「民國檔名代號」即可！
+    const OP_STOPS_EPOCHS = [
+        { date: 20260101, fileId: "1150101" },
+        { date: 20260325, fileId: "1150325" },
+        { date: 20260701, fileId: "1150701" } // 🌟 這次新增的 0701 世代
+    ];
+
+    // 2. 智慧判斷要讀取哪個星星檔
+    if (revisedJson) {
+        // 情況 A：預覽模式 (直接從網址的 final_train_diagram_1150701.json 挖出數字)
+        const match = revisedJson.match(/(\d{7})/);
+        if (match) {
+            opStopsUrl = `OpStops/OpStops_${match[1]}.json`;
+        }
+    } else {
+        // 情況 B & C：圖庫模式 或 今日運行圖
+        // 決定要查詢的基準日期 (有 date 參數就用它，沒有就自動抓今天日期)
+        let qDate;
+        if (dateParam) {
+            qDate = parseInt(dateParam);
+        } else {
+            const d = new Date();
+            qDate = parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+        }
+
+        // 比對時間軸，自動找出最適合的星星檔 (由最新往回找)
+        let activeFileId = null;
+        for (let i = OP_STOPS_EPOCHS.length - 1; i >= 0; i--) {
+            if (qDate >= OP_STOPS_EPOCHS[i].date) {
+                activeFileId = OP_STOPS_EPOCHS[i].fileId;
+                break;
+            }
+        }
+        if (activeFileId) {
+            opStopsUrl = `OpStops/OpStops_${activeFileId}.json`;
+        }
     }
 
     // 初始化全域變數
     window._opStopsData = window._opStopsData || {};
 
-    // 2. 獨立出真正的畫圖邏輯 (包裝起來，等檔案讀完再呼叫)
+    // 3. 獨立出真正的畫圖邏輯
     const executeDrawing = () => {
-        // 每次重新畫圖前，清空已畫星星的座標記錄
-        _drawnStarPositions = [];
+        _drawnStarPositions = []; // 清空重疊座標記錄
 
         for (const train_data of all_trains_data) {
             for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
@@ -658,27 +690,29 @@ function draw_train_path(all_trains_data, realtime_trains) {
             }
         }
 
-        // 🌟 等所有的線條都畫完之後，把特定標記「提」到最上層！
+        // 把星星跟即時位置提到最上層
         if (_d3G) {
             _d3G.selectAll('.op-stop-marker').raise();  
             _d3G.selectAll('[class$="_mark"]').raise(); 
         }
     };
 
-    // 3. 執行防呆讀取
-    // 如果有需要讀星星檔，且還沒讀取過，就去 fetch
-    if (opStopsUrl && Object.keys(window._opStopsData).length === 0) {
+    // 4. 執行防呆讀取與畫圖
+    // 每次切換日期時，如果檔案不一樣，就重新下載
+    if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) {
         d3.json(opStopsUrl).then(function(opStopsData) {
-            console.log("🌟 運轉停車資料載入成功！路徑:", opStopsUrl);
-            window._opStopsData = opStopsData; // 存入全域變數給 set_path 使用
-            executeDrawing(); // 拿到資料後才開始畫線
+            console.log(`🌟 運轉停車資料載入成功！時空路徑: ${opStopsUrl}`);
+            window._opStopsData = opStopsData; 
+            window._currentOpStopsUrl = opStopsUrl; // 記錄目前載入的檔案，避免重複下載
+            executeDrawing(); 
         }).catch(function(error) {
-            console.log("💤 尚未上傳該世代的運轉停車檔，安靜略過。");
-            executeDrawing(); // 找不到檔案也要畫圖
+            console.log(`💤 尚未上傳此世代 (${opStopsUrl}) 的運轉停車檔，正常畫線。`);
+            window._opStopsData = {}; // 找不到就清空，避免畫出舊星星
+            window._currentOpStopsUrl = opStopsUrl; 
+            executeDrawing(); 
         });
     } else {
-        // 舊世代，或這個檔案已經讀過了，直接畫圖！
-        if (!opStopsUrl) console.log("📅 舊世代或一般模式，無需載入運轉停車檔。");
+        // 如果網址沒變，或者不需要讀檔，直接畫圖
         executeDrawing();
     }
 }
