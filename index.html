@@ -372,30 +372,43 @@
     const today_date = getTodayFormattedDate();
 
     // ==========================================
-    // 🌟 全自動改點預覽導航引擎
+    // 🌟 全自動改點預覽導航引擎 (自帶防呆保底機制)
     // ==========================================
     function setupDynamicRevisedButtons() {
-        // 抓取 OpStops_Epochs.json 菜單 (這份菜單由 Python 自動產生)
+        // 🛡️ 保底預設值：如果發生任何意外(找不到菜單等)，預設使用這個世代
+        const defaultFileId = "1150701"; 
+
+        // 負責把連結寫入按鈕的執行工具
+        const applyLinks = (fileId) => {
+            const buttons = document.querySelectorAll('.dynamic-revised-btn');
+            buttons.forEach(btn => {
+                const line = btn.getAttribute('data-line');
+                // 將 href 綁定到對應的時空大腦
+                btn.href = `diagram_output.html?lineKind=${line}&revisedJson=data all/final_train_diagram_${fileId}.json`;
+            });
+        };
+
+        // 抓取 OpStops_Epochs.json 菜單
         fetch('OpStops/OpStops_Epochs.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error("HTTP 狀態碼錯誤或檔案不存在");
+                return response.json();
+            })
             .then(epochs => {
                 if (epochs && epochs.length > 0) {
                     // 取得陣列中最後一個（也就是日期最新）的世代
                     const latestEpoch = epochs[epochs.length - 1];
-                    const latestFileId = latestEpoch.fileId;
-                    
-                    // 找到所有改點按鈕，並動態替換它們的 href
-                    const buttons = document.querySelectorAll('.dynamic-revised-btn');
-                    buttons.forEach(btn => {
-                        const line = btn.getAttribute('data-line');
-                        // 組合出指向 data all/ 裡面最新總檔的路徑
-                        btn.href = `diagram_output.html?lineKind=${line}&revisedJson=data all/final_train_diagram_${latestFileId}.json`;
-                    });
-                    console.log(`✅ 成功綁定最新改點預覽檔：data all/final_train_diagram_${latestFileId}.json`);
+                    applyLinks(latestEpoch.fileId);
+                    console.log(`✅ 成功綁定最新改點預覽檔：data all/final_train_diagram_${latestEpoch.fileId}.json`);
+                } else {
+                    // 如果菜單是空的，啟動保底
+                    applyLinks(defaultFileId);
                 }
             })
             .catch(error => {
-                console.warn('⚠️ 無法載入改點菜單 (OpStops_Epochs.json)，改點預覽按鈕可能無法運作。', error);
+                console.warn('⚠️ 無法載入改點菜單，啟動保底預設模式 (1150701)。', error);
+                // 🛡️ 就算檔案不見了、或 GitHub 還沒更新，按鈕依然能點！
+                applyLinks(defaultFileId); 
             });
     }
 
