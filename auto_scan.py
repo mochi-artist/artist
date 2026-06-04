@@ -17,7 +17,7 @@ START_DATE = 20260101               # 最早掃描日期
 
 # 🧠 大腦路徑設定
 ROOT_MASTER_FILE = "final_train_diagram.json"  # 根目錄 (現役大腦)
-FUTURE_BRAIN_DIR = "data all"                  # 未來大腦資料夾
+FUTURE_BRAIN_DIR = "data all"                  # 未來大腦與星星檔資料夾
 
 STATION_DB_FILE = "SVG_Y_Axis.json" 
 CAR_KIND_DB_FILE = "CarKind.json"
@@ -91,9 +91,9 @@ def main():
     c_map = {str(k): v for k, v in c_db.items()}
 
     # ========================================================
-    # 🧠 1. 動態大腦載入機制 (根目錄 vs data all)
+    # 🧠 1. 動態大腦與星星菜單載入機制
     # ========================================================
-    print(f"🧠 正在載入動態時空大腦...")
+    print(f"🧠 正在載入動態時空大腦與菜單...")
     
     # (A) 載入根目錄現役大腦 (預設基準)
     root_master_ids = set()
@@ -106,10 +106,13 @@ def main():
             print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
         except: print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗")
 
-    # (B) 掃描 data all 尋找未來大腦
+    # (B) 掃描 data all 尋找未來大腦與星星檔
     future_masters = {}
+    opstops_epochs = [] # 🌟 收集星星菜單
+
     if os.path.exists(FUTURE_BRAIN_DIR):
         for fname in os.listdir(FUTURE_BRAIN_DIR):
+            # 1. 找大腦總檔
             if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
                 match = re.search(r"(\d{7})", fname)
                 if match:
@@ -127,6 +130,26 @@ def main():
                         future_masters[g_date] = ids_set
                         print(f"  ✅ [未來大腦] {fname} (生效日: {g_date}) - 共 {len(ids_set)} 筆")
                     except: pass
+            
+            # 2. 找星星檔，加入菜單
+            if fname.startswith("OpStops_") and fname.endswith(".json"):
+                match = re.search(r"(\d{7})", fname)
+                if match:
+                    roc_date_str = match.group(1)
+                    g_year = int(roc_date_str[:3]) + 1911
+                    g_date = int(f"{g_year}{roc_date_str[3:]}")
+                    opstops_epochs.append({"date": g_date, "fileId": roc_date_str})
+    
+    # 🌟 輸出菜單給前端 JS 看，並存在專屬資料夾
+    if opstops_epochs:
+        opstops_epochs.sort(key=lambda x: x["date"]) # 確保日期由舊到新排序
+        if not os.path.exists("OpStops"):
+            os.makedirs("OpStops")
+        try:
+            with open("OpStops/OpStops_Epochs.json", "w", encoding="utf-8") as f:
+                json.dump(opstops_epochs, f, ensure_ascii=False, indent=2)
+            print(f"  ✅ 成功產生前端時空菜單: OpStops/OpStops_Epochs.json (共 {len(opstops_epochs)} 個世代)")
+        except: pass
 
     # ========================================================
     # 🚀 2. 雙引擎強制掃描 (破解快取，確保抓到 100% 的車)
@@ -162,7 +185,6 @@ def main():
                         files_to_process[fdate] = raw
                         with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
                             json.dump(raw, f, ensure_ascii=False)
-                        # print(f"  📥 更新: {fname}") # 怕畫面太洗版可註解
             time.sleep(0.05)
         except: continue
     print(f"  ➜ 雲端同步完成！共準備分析 {len(files_to_process)} 天的資料。")
