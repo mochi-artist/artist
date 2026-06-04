@@ -611,39 +611,75 @@ function draw_diagram_background(line_kind, date) {
 }
 
 // ==========================================
-// 🌟 統籌畫圖與圖層排序
+// 🌟 統籌畫圖與圖層排序 (整合運轉停車防呆讀取)
 // ==========================================
 function draw_train_path(all_trains_data, realtime_trains) {
-    // 每次重新畫圖前，清空已畫星星的座標記錄
-    _drawnStarPositions = [];
+    // 1. 自動從網址抓取目前的狀態
+    const urlParams = new URLSearchParams(window.location.search);
+    const revisedJson = urlParams.get('revisedJson');
+    const dateParam = urlParams.get('date');
 
-    for (const train_data of all_trains_data) {
-        for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
-            if (value.length <= 2) continue;
+    let opStopsUrl = null;
 
-            const split = find_uncontinuous_index(value);
-            const section_start = value.slice(0, split);
-            const section_end = value.slice(split);
-
-            let realtime_data;
-            if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
-
-            if (section_start.length > 1)
-                set_path(lk, train_no, train_kind, section_start);
-            if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
-
-            if (section_end.length > 3)
-                set_path(lk, train_no + '-End', train_kind, section_end);
-            if (typeof realtime_data !== 'undefined')
-                mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
-        }
+    if (revisedJson && revisedJson.includes("1150701")) {
+        opStopsUrl = "OpStops/OpStops_1150701.json";
+    } else if (dateParam && parseInt(dateParam) >= 20260701) {
+        opStopsUrl = "OpStops/OpStops_1150701.json";
     }
 
-    // 🌟 等所有的線條都畫完之後，把特定標記「提」到最上層！
-    if (_d3G) {
-        _d3G.selectAll('.op-stop-marker').raise();  
-        _d3G.selectAll('[class$="_mark"]').raise(); 
+    // 初始化全域變數
+    window._opStopsData = window._opStopsData || {};
+
+    // 2. 獨立出真正的畫圖邏輯 (包裝起來，等檔案讀完再呼叫)
+    const executeDrawing = () => {
+        // 每次重新畫圖前，清空已畫星星的座標記錄
+        _drawnStarPositions = [];
+
+        for (const train_data of all_trains_data) {
+            for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
+                if (value.length <= 2) continue;
+
+                const split = find_uncontinuous_index(value);
+                const section_start = value.slice(0, split);
+                const section_end = value.slice(split);
+
+                let realtime_data;
+                if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
+
+                if (section_start.length > 1)
+                    set_path(lk, train_no, train_kind, section_start);
+                if (typeof realtime_data !== 'undefined')
+                    mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
+
+                if (section_end.length > 3)
+                    set_path(lk, train_no + '-End', train_kind, section_end);
+                if (typeof realtime_data !== 'undefined')
+                    mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
+            }
+        }
+
+        // 🌟 等所有的線條都畫完之後，把特定標記「提」到最上層！
+        if (_d3G) {
+            _d3G.selectAll('.op-stop-marker').raise();  
+            _d3G.selectAll('[class$="_mark"]').raise(); 
+        }
+    };
+
+    // 3. 執行防呆讀取
+    // 如果有需要讀星星檔，且還沒讀取過，就去 fetch
+    if (opStopsUrl && Object.keys(window._opStopsData).length === 0) {
+        d3.json(opStopsUrl).then(function(opStopsData) {
+            console.log("🌟 運轉停車資料載入成功！路徑:", opStopsUrl);
+            window._opStopsData = opStopsData; // 存入全域變數給 set_path 使用
+            executeDrawing(); // 拿到資料後才開始畫線
+        }).catch(function(error) {
+            console.log("💤 尚未上傳該世代的運轉停車檔，安靜略過。");
+            executeDrawing(); // 找不到檔案也要畫圖
+        });
+    } else {
+        // 舊世代，或這個檔案已經讀過了，直接畫圖！
+        if (!opStopsUrl) console.log("📅 舊世代或一般模式，無需載入運轉停車檔。");
+        executeDrawing();
     }
 }
 
