@@ -24,7 +24,7 @@ CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
 # 🌟 你最完美的黃金排除名單 (拿掉 60, 61 確保 6006 等專車順利入列)
-EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
+EXCLUDE_PREFIXES = ["29", "47", "48","4008", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
