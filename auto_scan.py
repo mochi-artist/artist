@@ -139,7 +139,7 @@ def main():
     new_findings_by_date = defaultdict(list)
     new_count = 0
     today = datetime.date.today()
-    max_date_int = int((today + datetime.timedelta(days=14)).strftime("%Y%m%d"))
+    max_date_int = int((today + datetime.timedelta(days=100)).strftime("%Y%m%d"))
     
     # 3. 雙引擎掃描
     files_to_process = {}
