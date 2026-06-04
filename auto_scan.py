@@ -8,11 +8,10 @@ import re
 from collections import defaultdict
 
 # ================= 設定區 =================
-# 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，用你的 152 個檔案重新排版！
+# 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，重新排版！
 FORCE_REBUILD = True
 
-# 💡 注意：你以後再也不用在這裡設定 MASTER_FILES 了！
-# 程式會自動去掃描 "data all" 資料夾，並根據檔名（如 1150701）自動建立時間軸大腦！
+# 💡 全自動大腦載入：程式會自動掃描 "data all" 資料夾，建立時空切換點！
 # =========================================
 
 HISTORY_FILE = "scan_history.json"
@@ -23,8 +22,8 @@ STATION_DB_FILE = "SVG_Y_Axis.json"
 CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
-# 🛡️ 強化排除名單 (包含貨運/迴送/工程車)
-EXCLUDE_PREFIXES = ["29", "47", "48", "49", "7", "8", "60", "61","371A","386B","191A","196B"] 
+# 🌟 回復你最完美的排除名單！(拿掉 60, 61，確保 6006 等專車順利入列)
+EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
@@ -81,6 +80,7 @@ def main():
         
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # 1. 載入字典
     s_db = load_db(STATION_DB_FILE)
     station_map = {}
     for k, v in s_db.items():
@@ -91,21 +91,18 @@ def main():
     c_map = {str(k): v for k, v in c_db.items()}
 
     # ========================================================
-    # 🧠 1. 全自動時空大腦載入程序 (Zero-Config)
+    # 🧠 2. 全自動時空大腦載入程序
     # ========================================================
-    master_ids_dict = {0: set()} # 預設極早期大腦
+    master_ids_dict = {0: set()} 
     brain_folder = "data all"
     
     print(f"🧠 正在啟動「全自動時空大腦」載入程序...")
     if os.path.exists(brain_folder):
         for fname in os.listdir(brain_folder):
-            # 自動尋找 data all 裡面叫做 final_train_diagram_xxxxxxx.json 的檔案
             if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
-                # 擷取檔名中的 7 碼民國數字 (例如 1150701)
                 match = re.search(r"(\d{7})", fname)
                 if match:
                     roc_date_str = match.group(1)
-                    # 數學魔法：民國轉西元 (115 + 1911 = 2026) -> 20260701
                     g_year = int(roc_date_str[:3]) + 1911
                     g_date = int(f"{g_year}{roc_date_str[3:]}")
                     
@@ -116,15 +113,14 @@ def main():
                             data = extract_train_list(json.load(f))
                             for t in data:
                                 if isinstance(t, dict): ids_set.add(str(t.get("Train")))
-                        # 記錄到大腦字典中
                         master_ids_dict[g_date] = ids_set
-                        print(f"  ✅ 自動辨識大腦 [{fname}] ➡️ 生效日: {g_date}，共過濾 {len(ids_set)} 筆常態車次")
+                        print(f"  ✅ 自動辨識大腦 [{fname}] ➡️ 生效日: {g_date}，共過濾 {len(ids_set)} 筆常態車")
                     except Exception as e:
                         print(f"  ❌ 讀取大腦失敗: {fname}")
     else:
         print(f"  ⚠️ 找不到 {brain_folder} 資料夾，將以空大腦進行分析。")
 
-    # 2. 載入歷史記憶
+    # 3. 載入歷史記憶
     history_data = {"runs": [], "seen": [], "records": {}}
     if FORCE_REBUILD:
         print("\n⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行全資料夾重新分析排版！")
@@ -138,17 +134,18 @@ def main():
     seen_set = set(history_data["seen"])
     new_findings_by_date = defaultdict(list)
     new_count = 0
-    today = datetime.date.today()
-    max_date_int = int((today + datetime.timedelta(days=100)).strftime("%Y%m%d"))
     
-    # 3. 雙引擎掃描
+    # ========================================================
+    # 🚀 4. 雙引擎掃描 (解除天數限制，完全比照你的完美版！)
+    # ========================================================
     files_to_process = {}
     print(f"\n📡 [引擎 A] 正在掃描本地 data 資料夾...")
     if not os.path.exists("data"): os.makedirs("data")
     for fname in os.listdir("data"):
         if fname.endswith(".json"):
             fdate = get_filename_date(fname)
-            if START_DATE <= fdate <= max_date_int:
+            # 🌟 解除上限！只要 >= START_DATE 的未來檔案全部掃描！
+            if fdate >= START_DATE:
                 try:
                     with open(os.path.join("data", fname), 'r', encoding='utf-8') as f:
                         files_to_process[fdate] = json.load(f)
@@ -164,25 +161,24 @@ def main():
                 fname = file['name']
                 if not fname.endswith(".json"): continue
                 fdate = get_filename_date(fname)
-                if fdate < START_DATE or fdate > max_date_int: continue
-                if fdate not in files_to_process:
-                    raw = fetch_json(file['download_url'])
-                    if raw:
-                        files_to_process[fdate] = raw
-                        with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
-                            json.dump(raw, f, ensure_ascii=False)
-                        print(f"  📥 發現新資料，自動備份：{fname}")
+                
+                # 🌟 解除上限！
+                if fdate >= START_DATE:
+                    if fdate not in files_to_process:
+                        raw = fetch_json(file['download_url'])
+                        if raw:
+                            files_to_process[fdate] = raw
+                            with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
+                                json.dump(raw, f, ensure_ascii=False)
+                            print(f"  📥 發現新資料，自動備份：{fname}")
             time.sleep(0.05)
         except: continue
 
     # ========================================================
-    # 🚀 4. 時空對位分析 (最核心功能)
+    # 🔍 5. 時空對位分析 (過濾邏輯完全採用你的版本)
     # ========================================================
     print("\n🔍 正在使用各世代大腦，比對並尋找特殊車次...")
     for fdate, raw in sorted(files_to_process.items()):
-        
-        # 🎯 自動計算停損點與切換：
-        # 尋找所有大腦中，生效日小於等於目前檔案日期 (fdate) 的「最新」一個！
         applicable_date = max([d for d in master_ids_dict.keys() if d <= fdate], default=0)
         current_master_ids = master_ids_dict.get(applicable_date, set())
         
@@ -191,6 +187,7 @@ def main():
             if not isinstance(train, dict): continue
             tid = str(train.get("Train", ""))
             
+            # 🌟 精準過濾機制：只排除 29, 47, 48, 49
             if (not tid or tid in current_master_ids or 
                 any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or 
                 any(k in tid for k in EXCLUDE_KEYWORDS)): 
@@ -202,7 +199,9 @@ def main():
                 seen_set.add(uid)
                 new_count += 1
 
-    # 5. 寫入日誌與記憶
+    # ========================================================
+    # 📝 6. 寫入日誌與記憶
+    # ========================================================
     if new_count > 0 or FORCE_REBUILD:
         if new_count > 0:
             history_data["runs"].append({"time": now_str, "count": new_count})
