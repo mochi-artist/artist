@@ -8,21 +8,22 @@ import re
 from collections import defaultdict
 
 # ================= 設定區 =================
-# 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，重新排版！
+# 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，全部重新抓取！
 FORCE_REBUILD = True
-
-# 💡 全自動大腦載入：程式會自動掃描 "data all" 資料夾，建立時空切換點！
-# =========================================
 
 HISTORY_FILE = "scan_history.json"
 LOG_FILE = "scan_log.txt"
 START_DATE = 20260101               # 最早掃描日期
 
+# 🧠 大腦路徑設定
+ROOT_MASTER_FILE = "final_train_diagram.json"  # 根目錄 (現役大腦)
+FUTURE_BRAIN_DIR = "data all"                  # 未來大腦資料夾
+
 STATION_DB_FILE = "SVG_Y_Axis.json" 
 CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
-# 🌟 回復你最完美的排除名單！(拿掉 60, 61，確保 6006 等專車順利入列)
+# 🌟 你最完美的黃金排除名單 (拿掉 60, 61 確保 6006 等專車順利入列)
 EXCLUDE_PREFIXES = ["29", "47", "48", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
@@ -80,7 +81,6 @@ def main():
         
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 1. 載入字典
     s_db = load_db(STATION_DB_FILE)
     station_map = {}
     for k, v in s_db.items():
@@ -91,14 +91,25 @@ def main():
     c_map = {str(k): v for k, v in c_db.items()}
 
     # ========================================================
-    # 🧠 2. 全自動時空大腦載入程序
+    # 🧠 1. 動態大腦載入機制 (根目錄 vs data all)
     # ========================================================
-    master_ids_dict = {0: set()} 
-    brain_folder = "data all"
+    print(f"🧠 正在載入動態時空大腦...")
     
-    print(f"🧠 正在啟動「全自動時空大腦」載入程序...")
-    if os.path.exists(brain_folder):
-        for fname in os.listdir(brain_folder):
+    # (A) 載入根目錄現役大腦 (預設基準)
+    root_master_ids = set()
+    if os.path.exists(ROOT_MASTER_FILE):
+        try:
+            with open(ROOT_MASTER_FILE, 'r', encoding='utf-8') as f:
+                data = extract_train_list(json.load(f))
+                for t in data:
+                    if isinstance(t, dict): root_master_ids.add(str(t.get("Train", "")))
+            print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
+        except: print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗")
+
+    # (B) 掃描 data all 尋找未來大腦
+    future_masters = {}
+    if os.path.exists(FUTURE_BRAIN_DIR):
+        for fname in os.listdir(FUTURE_BRAIN_DIR):
             if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
                 match = re.search(r"(\d{7})", fname)
                 if match:
@@ -106,24 +117,62 @@ def main():
                     g_year = int(roc_date_str[:3]) + 1911
                     g_date = int(f"{g_year}{roc_date_str[3:]}")
                     
-                    filepath = os.path.join(brain_folder, fname)
+                    filepath = os.path.join(FUTURE_BRAIN_DIR, fname)
                     try:
                         ids_set = set()
                         with open(filepath, 'r', encoding='utf-8') as f:
                             data = extract_train_list(json.load(f))
                             for t in data:
-                                if isinstance(t, dict): ids_set.add(str(t.get("Train")))
-                        master_ids_dict[g_date] = ids_set
-                        print(f"  ✅ 自動辨識大腦 [{fname}] ➡️ 生效日: {g_date}，共過濾 {len(ids_set)} 筆常態車")
-                    except Exception as e:
-                        print(f"  ❌ 讀取大腦失敗: {fname}")
-    else:
-        print(f"  ⚠️ 找不到 {brain_folder} 資料夾，將以空大腦進行分析。")
+                                if isinstance(t, dict): ids_set.add(str(t.get("Train", "")))
+                        future_masters[g_date] = ids_set
+                        print(f"  ✅ [未來大腦] {fname} (生效日: {g_date}) - 共 {len(ids_set)} 筆")
+                    except: pass
 
-    # 3. 載入歷史記憶
+    # ========================================================
+    # 🚀 2. 雙引擎強制掃描 (破解快取，確保抓到 100% 的車)
+    # ========================================================
+    files_to_process = {}
+    if not os.path.exists("data"): os.makedirs("data")
+
+    # 引擎 A：先抓本地當底
+    for fname in os.listdir("data"):
+        if fname.endswith(".json"):
+            fdate = get_filename_date(fname)
+            if fdate >= START_DATE:
+                try:
+                    with open(os.path.join("data", fname), 'r', encoding='utf-8') as f:
+                        files_to_process[fdate] = json.load(f)
+                except: pass
+
+    # 引擎 B：強制從 GitHub 覆蓋最新資料 (防止漏車)
+    print(f"\n📡 正在從 GitHub 同步最新資料 (破解快取陷阱)...")
+    for user, repo, path in TARGETS:
+        try:
+            res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
+            github_files = res.json() if res.status_code == 200 else []
+            for file in github_files:
+                fname = file['name']
+                if not fname.endswith(".json"): continue
+                fdate = get_filename_date(fname)
+                
+                if fdate >= START_DATE:
+                    # 🌟 無視本地，只要雲端有，就強迫拉下來覆蓋！
+                    raw = fetch_json(file['download_url'])
+                    if raw:
+                        files_to_process[fdate] = raw
+                        with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
+                            json.dump(raw, f, ensure_ascii=False)
+                        # print(f"  📥 更新: {fname}") # 怕畫面太洗版可註解
+            time.sleep(0.05)
+        except: continue
+    print(f"  ➜ 雲端同步完成！共準備分析 {len(files_to_process)} 天的資料。")
+
+    # ========================================================
+    # 🔍 3. 智慧時空對位與過濾
+    # ========================================================
     history_data = {"runs": [], "seen": [], "records": {}}
     if FORCE_REBUILD:
-        print("\n⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行全資料夾重新分析排版！")
+        print("\n⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行全資料夾重新分析！")
     elif os.path.exists(HISTORY_FILE):
         try:
             with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
@@ -134,60 +183,26 @@ def main():
     seen_set = set(history_data["seen"])
     new_findings_by_date = defaultdict(list)
     new_count = 0
-    
-    # ========================================================
-    # 🚀 4. 雙引擎掃描 (解除天數限制，完全比照你的完美版！)
-    # ========================================================
-    files_to_process = {}
-    print(f"\n📡 [引擎 A] 正在掃描本地 data 資料夾...")
-    if not os.path.exists("data"): os.makedirs("data")
-    for fname in os.listdir("data"):
-        if fname.endswith(".json"):
-            fdate = get_filename_date(fname)
-            # 🌟 解除上限！只要 >= START_DATE 的未來檔案全部掃描！
-            if fdate >= START_DATE:
-                try:
-                    with open(os.path.join("data", fname), 'r', encoding='utf-8') as f:
-                        files_to_process[fdate] = json.load(f)
-                except: pass
-    print(f"  ➜ 本地共抓取到 {len(files_to_process)} 天的資料！")
 
-    print(f"📡 [引擎 B] 正在掃描 Billy 的 GitHub 尋找新檔案...")
-    for user, repo, path in TARGETS:
-        try:
-            res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
-            github_files = res.json() if res.status_code == 200 else []
-            for file in github_files:
-                fname = file['name']
-                if not fname.endswith(".json"): continue
-                fdate = get_filename_date(fname)
-                
-                # 🌟 解除上限！
-                if fdate >= START_DATE:
-                    if fdate not in files_to_process:
-                        raw = fetch_json(file['download_url'])
-                        if raw:
-                            files_to_process[fdate] = raw
-                            with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
-                                json.dump(raw, f, ensure_ascii=False)
-                            print(f"  📥 發現新資料，自動備份：{fname}")
-            time.sleep(0.05)
-        except: continue
-
-    # ========================================================
-    # 🔍 5. 時空對位分析 (過濾邏輯完全採用你的版本)
-    # ========================================================
-    print("\n🔍 正在使用各世代大腦，比對並尋找特殊車次...")
+    print("\n🔍 正在使用動態大腦尋找特殊車次...")
     for fdate, raw in sorted(files_to_process.items()):
-        applicable_date = max([d for d in master_ids_dict.keys() if d <= fdate], default=0)
-        current_master_ids = master_ids_dict.get(applicable_date, set())
         
+        # 🎯 動態大腦切換邏輯：
+        # 尋找 data all 裡面，生效日 <= 檔案日期的「最新未來大腦」
+        applicable_dates = [d for d in future_masters.keys() if d <= fdate]
+        if applicable_dates:
+            best_date = max(applicable_dates)
+            current_master_ids = future_masters[best_date]
+        else:
+            # 如果沒有任何未來大腦適用，就乖乖用根目錄的基準大腦
+            current_master_ids = root_master_ids
+
         daily_data = extract_train_list(raw)
         for train in daily_data:
             if not isinstance(train, dict): continue
             tid = str(train.get("Train", ""))
             
-            # 🌟 精準過濾機制：只排除 29, 47, 48, 49
+            # 🌟 你的完美過濾名單！
             if (not tid or tid in current_master_ids or 
                 any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or 
                 any(k in tid for k in EXCLUDE_KEYWORDS)): 
@@ -200,7 +215,7 @@ def main():
                 new_count += 1
 
     # ========================================================
-    # 📝 6. 寫入日誌與記憶
+    # 📝 4. 寫入 scan_log.txt 與歷史記憶
     # ========================================================
     if new_count > 0 or FORCE_REBUILD:
         if new_count > 0:
@@ -231,7 +246,7 @@ def main():
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(history_data, f, ensure_ascii=False, indent=2)
 
-        log_lines = ["========================================", "🕒 掃描歷史摘要:"]
+        log_lines = ["========================================", "🕒 掃描歷史摘要 (動態大腦模式):"]
         run_map = {}
         for idx, r in enumerate(history_data["runs"], 1):
             log_lines.append(f"  [{idx}] {r['time']} (發現 {r['count']} 筆新車次)")
@@ -249,7 +264,7 @@ def main():
         with open(LOG_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
             
-        print(f"\n✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE} (重新排版完成)")
+        print(f"\n✅ 成功！已將 {new_count} 筆新資料寫入 {LOG_FILE} (重新排版完成)")
     else:
         print("\n💤 本次無新發現。")
 
