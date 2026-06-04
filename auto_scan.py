@@ -9,15 +9,11 @@ from collections import defaultdict
 
 # ================= 設定區 =================
 # 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，用你的 152 個檔案重新排版！
-# (注意：成功排版一次後，請記得把它改回 False，不然每次都會全部重跑)
 FORCE_REBUILD = True
 
-# 🧠 多重大腦設定 (改點應對機制)
-MASTER_FILES = {
-    0: "final_train_diagram.json", 
-    # 🌟 預留位置：拿到未來的改點檔案時，取消#註解並修改日期與檔名！
-    20260701: "final_train_diagram_1150701.json",
-}
+# 💡 注意：你以後再也不用在這裡設定 MASTER_FILES 了！
+# 程式會自動去掃描 "data all" 資料夾，並根據檔名（如 1150701）自動建立時間軸大腦！
+# =========================================
 
 HISTORY_FILE = "scan_history.json"
 LOG_FILE = "scan_log.txt"
@@ -27,7 +23,7 @@ STATION_DB_FILE = "SVG_Y_Axis.json"
 CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
-# 🛡️ 強化排除名單 (包含 7, 8, 60, 61 等貨運/迴送/工程車)
+# 🛡️ 強化排除名單 (包含貨運/迴送/工程車)
 EXCLUDE_PREFIXES = ["29", "47", "48", "49", "7", "8", "60", "61","371A","386B","191A","196B"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
@@ -42,7 +38,6 @@ CHINESE_NAME_MAP = {
     "all_stop": "站站停", "local_express": "區快", "fu_hsing": "復興",
     "ordinary": "普快", "theme": "主題", "special": "專車", "others": "其他"
 }
-# =========================================
 
 def get_filename_date(filename):
     try: return int(filename.replace(".json", ""))
@@ -86,7 +81,6 @@ def main():
         
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # 1. 載入字典
     s_db = load_db(STATION_DB_FILE)
     station_map = {}
     for k, v in s_db.items():
@@ -96,27 +90,44 @@ def main():
     c_db = load_db(CAR_KIND_DB_FILE)
     c_map = {str(k): v for k, v in c_db.items()}
 
-    # 2. 載入大腦 (防呆版)
-    master_ids_dict = {}
-    print("🧠 正在載入車次過濾大腦...")
-    for apply_date, filepath in MASTER_FILES.items():
-        if os.path.exists(filepath):
-            try:
-                ids_set = set()
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    data = extract_train_list(json.load(f))
-                    for t in data:
-                        if isinstance(t, dict): ids_set.add(str(t.get("Train")))
-                master_ids_dict[apply_date] = ids_set
-                print(f"  ✅ 載入 [{filepath}] (生效日: {apply_date}) - 共 {len(ids_set)} 筆基準車次")
-            except Exception as e:
-                pass
-    if 0 not in master_ids_dict: master_ids_dict[0] = set()
+    # ========================================================
+    # 🧠 1. 全自動時空大腦載入程序 (Zero-Config)
+    # ========================================================
+    master_ids_dict = {0: set()} # 預設極早期大腦
+    brain_folder = "data all"
+    
+    print(f"🧠 正在啟動「全自動時空大腦」載入程序...")
+    if os.path.exists(brain_folder):
+        for fname in os.listdir(brain_folder):
+            # 自動尋找 data all 裡面叫做 final_train_diagram_xxxxxxx.json 的檔案
+            if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
+                # 擷取檔名中的 7 碼民國數字 (例如 1150701)
+                match = re.search(r"(\d{7})", fname)
+                if match:
+                    roc_date_str = match.group(1)
+                    # 數學魔法：民國轉西元 (115 + 1911 = 2026) -> 20260701
+                    g_year = int(roc_date_str[:3]) + 1911
+                    g_date = int(f"{g_year}{roc_date_str[3:]}")
+                    
+                    filepath = os.path.join(brain_folder, fname)
+                    try:
+                        ids_set = set()
+                        with open(filepath, 'r', encoding='utf-8') as f:
+                            data = extract_train_list(json.load(f))
+                            for t in data:
+                                if isinstance(t, dict): ids_set.add(str(t.get("Train")))
+                        # 記錄到大腦字典中
+                        master_ids_dict[g_date] = ids_set
+                        print(f"  ✅ 自動辨識大腦 [{fname}] ➡️ 生效日: {g_date}，共過濾 {len(ids_set)} 筆常態車次")
+                    except Exception as e:
+                        print(f"  ❌ 讀取大腦失敗: {fname}")
+    else:
+        print(f"  ⚠️ 找不到 {brain_folder} 資料夾，將以空大腦進行分析。")
 
-    # 3. 載入歷史記憶 (結合 FORCE_REBUILD 洗腦機制)
+    # 2. 載入歷史記憶
     history_data = {"runs": [], "seen": [], "records": {}}
     if FORCE_REBUILD:
-        print("⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行全資料夾重新分析排版！")
+        print("\n⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行全資料夾重新分析排版！")
     elif os.path.exists(HISTORY_FILE):
         try:
             with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
@@ -130,15 +141,10 @@ def main():
     today = datetime.date.today()
     max_date_int = int((today + datetime.timedelta(days=14)).strftime("%Y%m%d"))
     
-    # ========================================================
-    # 🚀 4. 雙引擎掃描 (本地寶庫 + 雲端備份)
-    # ========================================================
+    # 3. 雙引擎掃描
     files_to_process = {}
-
-    # 引擎 A：掃描你電腦裡的 data 資料夾 (那 152 個檔案會在這裡被抓進來！)
-    print(f"📡 [引擎 A] 正在掃描本地 data 資料夾...")
-    if not os.path.exists("data"): 
-        os.makedirs("data")
+    print(f"\n📡 [引擎 A] 正在掃描本地 data 資料夾...")
+    if not os.path.exists("data"): os.makedirs("data")
     for fname in os.listdir("data"):
         if fname.endswith(".json"):
             fdate = get_filename_date(fname)
@@ -149,25 +155,20 @@ def main():
                 except: pass
     print(f"  ➜ 本地共抓取到 {len(files_to_process)} 天的資料！")
 
-    # 引擎 B：掃描 Billy 的雲端，抓取你電腦裡還沒有的最新檔案
     print(f"📡 [引擎 B] 正在掃描 Billy 的 GitHub 尋找新檔案...")
     for user, repo, path in TARGETS:
         try:
             res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
             github_files = res.json() if res.status_code == 200 else []
-            
             for file in github_files:
                 fname = file['name']
                 if not fname.endswith(".json"): continue
                 fdate = get_filename_date(fname)
                 if fdate < START_DATE or fdate > max_date_int: continue
-                
-                # 💡 如果本地沒有這個日期，才去雲端下載並備份！
                 if fdate not in files_to_process:
                     raw = fetch_json(file['download_url'])
                     if raw:
                         files_to_process[fdate] = raw
-                        # 自動備份到你的 data 資料夾
                         with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
                             json.dump(raw, f, ensure_ascii=False)
                         print(f"  📥 發現新資料，自動備份：{fname}")
@@ -175,11 +176,13 @@ def main():
         except: continue
 
     # ========================================================
-    # 5. 開始分析所有收集到的資料
+    # 🚀 4. 時空對位分析 (最核心功能)
     # ========================================================
-    print("🔍 正在比對並尋找特殊車次...")
+    print("\n🔍 正在使用各世代大腦，比對並尋找特殊車次...")
     for fdate, raw in sorted(files_to_process.items()):
-        # 動態決定今天要用哪個大腦
+        
+        # 🎯 自動計算停損點與切換：
+        # 尋找所有大腦中，生效日小於等於目前檔案日期 (fdate) 的「最新」一個！
         applicable_date = max([d for d in master_ids_dict.keys() if d <= fdate], default=0)
         current_master_ids = master_ids_dict.get(applicable_date, set())
         
@@ -199,9 +202,7 @@ def main():
                 seen_set.add(uid)
                 new_count += 1
 
-    # ========================================================
-    # 6. 寫入日誌與記憶
-    # ========================================================
+    # 5. 寫入日誌與記憶
     if new_count > 0 or FORCE_REBUILD:
         if new_count > 0:
             history_data["runs"].append({"time": now_str, "count": new_count})
@@ -228,11 +229,9 @@ def main():
                     end = station_map.get(str(tts[-1].get("Station")), str(tts[-1].get("Station")))
                 history_data["records"][date_str][now_str].append(f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})")
 
-        # 儲存 json 記憶體
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(history_data, f, ensure_ascii=False, indent=2)
 
-        # 產生漂漂亮亮的 TXT
         log_lines = ["========================================", "🕒 掃描歷史摘要:"]
         run_map = {}
         for idx, r in enumerate(history_data["runs"], 1):
@@ -251,9 +250,9 @@ def main():
         with open(LOG_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
             
-        print(f"✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE} (重新排版完成)")
+        print(f"\n✅ 已將 {new_count} 筆新資料寫入 {LOG_FILE} (重新排版完成)")
     else:
-        print("💤 本次無新發現。")
+        print("\n💤 本次無新發現。")
 
 if __name__ == "__main__":
     main()
