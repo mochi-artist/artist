@@ -23,8 +23,8 @@ STATION_DB_FILE = "SVG_Y_Axis.json"
 CAR_KIND_DB_FILE = "CarKind.json"
 BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
 
-# 🌟 你最完美的黃金排除名單 (拿掉 60, 61 確保 6006 等專車順利入列)
-EXCLUDE_PREFIXES = ["29", "47", "48","4008", "49"] 
+# 🌟 你最完美的黃金排除名單 (保留了你新增的 4008)
+EXCLUDE_PREFIXES = ["29", "47", "48", "4008", "49"] 
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]          
 TARGETS = [("billy1125", "billy1125.github.io", "data")]
 
@@ -91,7 +91,7 @@ def main():
     c_map = {str(k): v for k, v in c_db.items()}
 
     # ========================================================
-    # 🧠 1. 動態大腦與星星菜單載入機制 (雙資料夾分工版)
+    # 🧠 1. 動態大腦與時空菜單載入機制 (嚴格結界版)
     # ========================================================
     print(f"🧠 正在載入動態時空大腦與菜單...")
     
@@ -106,8 +106,10 @@ def main():
             print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
         except: print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗")
 
-    # (B) 專心掃描 data all 尋找未來大腦
+    # (B) 掃描 data all 尋找未來大腦，並建立「時空結界菜單」
     future_masters = {}
+    revised_epochs = [] # 🌟 菜單改由「總檔」決定
+
     if os.path.exists(FUTURE_BRAIN_DIR):
         for fname in os.listdir(FUTURE_BRAIN_DIR):
             if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
@@ -125,28 +127,18 @@ def main():
                             for t in data:
                                 if isinstance(t, dict): ids_set.add(str(t.get("Train", "")))
                         future_masters[g_date] = ids_set
+                        revised_epochs.append({"date": g_date, "fileId": roc_date_str}) # 寫入菜單
                         print(f"  ✅ [未來大腦] {fname} (生效日: {g_date}) - 共 {len(ids_set)} 筆")
                     except: pass
             
-    # (C) 專心掃描 OpStops 尋找星星檔，並收集菜單
-    opstops_epochs = [] 
-    if os.path.exists("OpStops"):
-        for fname in os.listdir("OpStops"):
-            if fname.startswith("OpStops_") and fname.endswith(".json") and "Epochs" not in fname:
-                match = re.search(r"(\d{7})", fname)
-                if match:
-                    roc_date_str = match.group(1)
-                    g_year = int(roc_date_str[:3]) + 1911
-                    g_date = int(f"{g_year}{roc_date_str[3:]}")
-                    opstops_epochs.append({"date": g_date, "fileId": roc_date_str})
-    
-    # 🌟 輸出菜單給前端 JS 看，並存在專屬資料夾
-    if opstops_epochs:
-        opstops_epochs.sort(key=lambda x: x["date"]) # 確保日期由舊到新排序
+    # 🌟 輸出菜單給前端 JS 看，存入 data all 資料夾
+    if revised_epochs:
+        revised_epochs.sort(key=lambda x: x["date"]) 
+        if not os.path.exists("data all"): os.makedirs("data all")
         try:
-            with open("OpStops/OpStops_Epochs.json", "w", encoding="utf-8") as f:
-                json.dump(opstops_epochs, f, ensure_ascii=False, indent=2)
-            print(f"  ✅ 成功產生前端時空菜單: OpStops/OpStops_Epochs.json (共 {len(opstops_epochs)} 個世代)")
+            with open("data all/Revised_Epochs.json", "w", encoding="utf-8") as f:
+                json.dump(revised_epochs, f, ensure_ascii=False, indent=2)
+            print(f"  ✅ 成功產生時空菜單: data all/Revised_Epochs.json (共 {len(revised_epochs)} 個結界)")
         except: pass
 
     # ========================================================
