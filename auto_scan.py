@@ -8,8 +8,8 @@ import re
 from collections import defaultdict
 
 # ================= 設定區 =================
-# 💥 洗腦重建開關：設為 True 會強制忘記舊的錯誤車次，全部重新抓取！
-FORCE_REBUILD = True
+# 💥 洗腦重建開關：請設為 False！這樣機器人才會記住歷史，並算出「新增」了幾筆車次！
+FORCE_REBUILD = False
 
 HISTORY_FILE = "scan_history.json"
 LOG_FILE = "scan_log.txt"
@@ -95,7 +95,6 @@ def main():
     # ========================================================
     print(f"🧠 正在載入動態時空大腦與菜單...")
     
-    # (A) 載入根目錄現役大腦 (預設基準)
     root_master_ids = set()
     if os.path.exists(ROOT_MASTER_FILE):
         try:
@@ -106,9 +105,8 @@ def main():
             print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
         except: print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗")
 
-    # (B) 掃描 data all 尋找未來大腦，並建立「時空結界菜單」
     future_masters = {}
-    revised_epochs = [] # 🌟 菜單改由「總檔」決定
+    revised_epochs = [] 
 
     if os.path.exists(FUTURE_BRAIN_DIR):
         for fname in os.listdir(FUTURE_BRAIN_DIR):
@@ -127,11 +125,10 @@ def main():
                             for t in data:
                                 if isinstance(t, dict): ids_set.add(str(t.get("Train", "")))
                         future_masters[g_date] = ids_set
-                        revised_epochs.append({"date": g_date, "fileId": roc_date_str}) # 寫入菜單
+                        revised_epochs.append({"date": g_date, "fileId": roc_date_str}) 
                         print(f"  ✅ [未來大腦] {fname} (生效日: {g_date}) - 共 {len(ids_set)} 筆")
                     except: pass
             
-    # 🌟 輸出菜單給前端 JS 看，存入 data all 資料夾
     if revised_epochs:
         revised_epochs.sort(key=lambda x: x["date"]) 
         if not os.path.exists("data all"): os.makedirs("data all")
@@ -142,12 +139,12 @@ def main():
         except: pass
 
     # ========================================================
-    # 🚀 2. 雙引擎強制掃描 (破解快取，確保抓到 100% 的車)
+    # 🚀 2. 雙引擎掃描 (僅供比對，絕對不寫入硬碟覆蓋資料！)
     # ========================================================
     files_to_process = {}
     if not os.path.exists("data"): os.makedirs("data")
 
-    # 引擎 A：先抓本地當底
+    # 引擎 A：抓本地當底
     for fname in os.listdir("data"):
         if fname.endswith(".json"):
             fdate = get_filename_date(fname)
@@ -157,8 +154,8 @@ def main():
                         files_to_process[fdate] = json.load(f)
                 except: pass
 
-    # 引擎 B：強制從 GitHub 覆蓋最新資料 (防止漏車)
-    print(f"\n📡 正在從 GitHub 同步最新資料 (破解快取陷阱)...")
+    # 引擎 B：從 GitHub 讀取最新資料「放進記憶體比對」
+    print(f"\n📡 正在從 GitHub 同步最新資料 (🔒 安全模式：絕不覆蓋本地 data 檔案)...")
     for user, repo, path in TARGETS:
         try:
             res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
@@ -169,12 +166,10 @@ def main():
                 fdate = get_filename_date(fname)
                 
                 if fdate >= START_DATE:
-                    # 🌟 無視本地，只要雲端有，就強迫拉下來覆蓋！
+                    # 🌟 唯讀模式：抓下來存進記憶體比對，不再執行寫入動作！
                     raw = fetch_json(file['download_url'])
                     if raw:
                         files_to_process[fdate] = raw
-                        with open(os.path.join("data", fname), 'w', encoding='utf-8') as f:
-                            json.dump(raw, f, ensure_ascii=False)
             time.sleep(0.05)
         except: continue
     print(f"  ➜ 雲端同步完成！共準備分析 {len(files_to_process)} 天的資料。")
@@ -199,14 +194,11 @@ def main():
     print("\n🔍 正在使用動態大腦尋找特殊車次...")
     for fdate, raw in sorted(files_to_process.items()):
         
-        # 🎯 動態大腦切換邏輯：
-        # 尋找 data all 裡面，生效日 <= 檔案日期的「最新未來大腦」
         applicable_dates = [d for d in future_masters.keys() if d <= fdate]
         if applicable_dates:
             best_date = max(applicable_dates)
             current_master_ids = future_masters[best_date]
         else:
-            # 如果沒有任何未來大腦適用，就乖乖用根目錄的基準大腦
             current_master_ids = root_master_ids
 
         daily_data = extract_train_list(raw)
@@ -214,7 +206,6 @@ def main():
             if not isinstance(train, dict): continue
             tid = str(train.get("Train", ""))
             
-            # 🌟 你的完美過濾名單！
             if (not tid or tid in current_master_ids or 
                 any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or 
                 any(k in tid for k in EXCLUDE_KEYWORDS)): 
@@ -227,11 +218,16 @@ def main():
                 new_count += 1
 
     # ========================================================
-    # 📝 4. 寫入 scan_log.txt 與歷史記憶
+    # 📝 4. 寫入 scan_log.txt 與歷史記憶 (✨ 全新排版格式)
     # ========================================================
     if new_count > 0 or FORCE_REBUILD:
         if new_count > 0:
-            history_data["runs"].append({"time": now_str, "count": new_count})
+            # 紀錄每次執行的：時間、累計總發現數、本次新增數量
+            history_data["runs"].append({
+                "time": now_str, 
+                "total_seen": len(seen_set), 
+                "new_added": new_count
+            })
             history_data["seen"] = list(seen_set)
         
         for date_key in sorted(new_findings_by_date.keys()):
@@ -258,18 +254,33 @@ def main():
         with open(HISTORY_FILE, "w", encoding="utf-8") as f:
             json.dump(history_data, f, ensure_ascii=False, indent=2)
 
+        # 🌟 產生全新格式的 txt 報表
         log_lines = ["========================================", "🕒 掃描歷史摘要 (動態大腦模式):"]
         run_map = {}
         for idx, r in enumerate(history_data["runs"], 1):
-            log_lines.append(f"  [{idx}] {r['time']} (發現 {r['count']} 筆新車次)")
+            total_seen = r.get('total_seen', 0)
+            new_added = r.get('new_added', 0)
+            if idx == 1 or new_added == total_seen:
+                log_lines.append(f"  [{idx}] {r['time']} (共發現 {total_seen} 筆特殊車次)")
+            else:
+                log_lines.append(f"  [{idx}] {r['time']} (共發現 {total_seen} 筆特殊車次) (新增 {new_added} 筆)")
             run_map[r['time']] = idx
         log_lines.append("========================================\n")
         
         for date_str in sorted(history_data["records"].keys(), key=lambda x: int(x)):
+            # 計算該日期的總車次，與本次掃描新增的車次
+            total_for_date = sum(len(history_data["records"][date_str][rt]) for rt in history_data["records"][date_str])
+            new_for_date = len(new_findings_by_date.get(int(date_str), []))
+            
             log_lines.append(f"📅 日期: {date_str}")
+            if new_for_date > 0 and not FORCE_REBUILD:
+                log_lines.append(f"   📊 總計: {total_for_date} 筆特殊車次 (本次掃描新增 {new_for_date} 筆)")
+            else:
+                log_lines.append(f"   📊 總計: {total_for_date} 筆特殊車次")
+                
             for run_time in sorted(history_data["records"][date_str].keys()):
                 run_idx = run_map.get(run_time, "?")
-                log_lines.append(f"  --- [第 {run_idx} 次讀取] {run_time} ---")
+                log_lines.append(f"  --- [第 {run_idx} 次紀錄] {run_time} ---")
                 log_lines.extend(history_data["records"][date_str][run_time])
             log_lines.append("") 
             
