@@ -7,10 +7,44 @@
     <title>目前所有可讀取的台鐵時刻資料 TRA JSON Parser</title>
     <link rel="stylesheet" href="css/trains.css" />
     
-    <!-- ==========================================
-         📱 終極手機版響應式補丁 (上 4 : 下 6 比例版)
-         ========================================== -->
     <style>
+        /* 讓車次清單面板支援彈性排版以容納搜尋框 */
+        .panel-trains {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        /* 搜尋框區塊樣式 */
+        .panel-search {
+            padding: 6px;
+            background-color: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            flex-shrink: 0; /* 防止輸入框被擠壓變形 */
+        }
+        
+        .panel-search input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: #f8fafc;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .panel-search input:focus {
+            border-color: #38bdf8;
+        }
+
+        /* 讓清單本體自動接管剩餘高度 */
+        .panel-trains .panel-body {
+            flex: 1 !important;
+            height: auto !important;
+        }
+
         @media screen and (max-width: 768px) {
             html, body {
                 overflow: hidden !important;
@@ -24,9 +58,7 @@
                 overflow: hidden !important;
             }
 
-            /* ==========================================
-               🌟 上半部：三個選單區塊 (比例 4)
-               ========================================== */
+            /* 上半部選單區塊 (比例 4) */
             .panel-group {
                 flex: 4 !important; 
                 min-height: 0 !important; 
@@ -36,6 +68,7 @@
                 width: 100% !important;
                 gap: 0 !important;
             }
+            
             .panel {
                 width: 33.33% !important; 
                 height: 100% !important;
@@ -49,20 +82,28 @@
                 justify-content: center !important;
                 letter-spacing: -0.5px !important;
                 white-space: nowrap !important;
+                flex-shrink: 0;
             }
+            
             .panel-head svg {
                 display: none !important; 
             }
-            .panel-body {
+            
+            .panel-files .panel-body,
+            .panel-filter .panel-body {
                 height: calc(100% - 35px) !important;
                 overflow-x: hidden !important;
                 overflow-y: auto !important;
                 padding: 2px !important; 
             }
+            
+            .panel-trains .panel-body {
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                padding: 2px !important; 
+            }
 
-            /* ==========================================
-               🌟 下半部：詳細資料區塊 (比例 6)
-               ========================================== */
+            /* 下半部詳細資料區塊 (比例 6) */
             .panel-detail {
                 flex: 6 !important; 
                 min-height: 0 !important; 
@@ -72,18 +113,17 @@
                 overflow-y: auto !important; 
             }
 
-            /* ==========================================
-               🌟 時刻表縮放防護
-               ========================================== */
             .time-table-wrap {
                 overflow-x: hidden !important;
                 width: 100% !important;
             }
+            
             .time-table {
                 width: 100% !important;
                 table-layout: fixed !important; 
                 font-size: 0.75rem !important;   
             }
+            
             .time-table th, .time-table td {
                 padding: 6px 1px !important; 
                 text-align: center;
@@ -91,6 +131,7 @@
                 white-space: normal !important; 
                 letter-spacing: -0.5px !important;         
             }
+            
             .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 10%; } 
             .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 24%; } 
             .time-table th:nth-child(3), .time-table td:nth-child(3) { width: 26%; } 
@@ -102,6 +143,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -122,6 +164,9 @@
             </div>
             <div class="panel panel-trains">
                 <div class="panel-head">車次清單</div>
+                <div class="panel-search">
+                    <input type="text" id="train-search-input" placeholder="🔍 輸入車次(支援大小寫英文)..." autocomplete="off" />
+                </div>
                 <div class="panel-body" id="train-list"><div class="panel-empty">請先選擇日期</div></div>
             </div>
         </div>
@@ -136,7 +181,6 @@
         </div>
     </div>
 
-    <!-- ── Templates ── -->
     <template id="tpl-filter-item"><div class="filter-item"><span class="f-name"></span><span class="f-count"></span></div></template>
     <template id="tpl-train-item"><div class="train-item"><span class="t-num"></span><span class="t-meta"></span></div></template>
     <template id="tpl-detail-card">
@@ -163,5 +207,72 @@
     <template id="tpl-time-row"><tr><td class="order"></td><td class="station"></td><td class="time arr"></td><td class="time dep"></td><td class="route"></td></tr></template>
 
     <script src="js/trains.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('train-search-input');
+            const trainListContainer = document.getElementById('train-list');
+
+            if (!searchInput || !trainListContainer) return;
+
+            // 監聽鍵盤輸入事件進行即時篩選
+            searchInput.addEventListener('input', function(e) {
+                const keyword = e.target.value.trim().toLowerCase();
+                const trainItems = trainListContainer.querySelectorAll('.train-item');
+                let visibleCount = 0;
+
+                trainItems.forEach(item => {
+                    // 🌟 關鍵升級：不再只抓數字！改抓「整行文字 (包含號碼與車種)」
+                    // 這樣一來，搜 "111"、"區間"、"emu" 都能完美命中！
+                    const itemText = item.textContent.trim().toLowerCase();
+                    
+                    if (itemText.includes(keyword)) {
+                        item.style.display = ''; 
+                        visibleCount++;          
+                    } else {
+                        item.style.display = 'none'; 
+                    }
+                });
+
+                // 移除舊的「查無結果」提示
+                const oldNoResult = trainListContainer.querySelector('.no-search-result');
+                if (oldNoResult) oldNoResult.remove();
+
+                // 🌟 完美復刻圖2：若過濾後無任何匹配車次，顯示「無符合車次」
+                if (visibleCount === 0 && keyword !== '' && trainItems.length > 0) {
+                    const noResultDiv = document.createElement('div');
+                    noResultDiv.className = 'no-search-result'; 
+                    
+                    // 完全比照 D3 運行圖的低調灰色樣式
+                    Object.assign(noResultDiv.style, {
+                        color: '#888', 
+                        padding: '12px 8px', 
+                        textAlign: 'center', 
+                        fontSize: '12px',
+                        width: '100%',
+                        letterSpacing: '1px'
+                    });
+                    
+                    noResultDiv.textContent = '無符合車次';
+                    trainListContainer.appendChild(noResultDiv);
+                }
+            });
+
+            // 🟢 點擊左側「日期」或「車種過濾」時，自動清空搜尋框並恢復清單
+            const fileList = document.getElementById('file-list');
+            const typeFilter = document.getElementById('type-filter');
+
+            const clearSearch = () => {
+                if (searchInput.value !== '') {
+                    searchInput.value = '';
+                    // 模擬觸發一次輸入事件，讓被隱藏的火車重新顯示出來
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            };
+
+            if (fileList) fileList.addEventListener('click', clearSearch);
+            if (typeFilter) typeFilter.addEventListener('click', clearSearch);
+        });
+    </script>
 </body>
 </html>
