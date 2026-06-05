@@ -707,6 +707,7 @@ function draw_train_path(all_trains_data, realtime_trains) {
             initDrawingWithEpochs([]); // 沒菜單也能安全降級
         });
     }
+}
 
 // ==========================================
 // 🌟 畫線與疊加運轉停車星星模組 (具備重疊迴避)
