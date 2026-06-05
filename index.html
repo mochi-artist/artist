@@ -54,15 +54,6 @@
         body.revised-mode .revised-actions { display: flex !important; }
         body.revised-mode .revised-badge { display: inline-block !important; }
         body.revised-mode .normal-only { display: none !important; }
-
-        /* ==========================================
-           💻 電腦版專屬：90% 滿版排版 (手機版保持不變)
-           ========================================== */
-        @media screen and (min-width: 992px) {
-            .desktop-90-container {
-                max-width: 90% !important;
-            }
-        }
     </style>
 </head>
 
@@ -76,8 +67,7 @@
         </div>
     </div>
 
-    <!-- 這裡加入了 desktop-90-container 來達成電腦版 90% 寬度 -->
-    <div class="container desktop-90-container py-3 pb-5">
+    <div class="container py-3 pb-5">
 
         <div class="text-center mb-5 normal-only">
             <div class="d-flex gap-3 justify-content-center text-muted small">
@@ -100,7 +90,6 @@
                             <a href="lines.html?lineKind=LINE_WN" class="btn btn-archive flex-fill">圖庫</a>
                         </div>
                         <div class="d-flex gap-1 w-100 revised-only revised-actions">
-                            <!-- 修改卡片上的改點預覽文字在這裡 👇 -->
                             <a href="#" data-line="LINE_WN" class="btn flex-fill text-white fw-bold shadow-sm dynamic-revised-btn" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
                         </div>
                     </div>
@@ -118,7 +107,6 @@
                             <a href="lines.html?lineKind=LINE_WM" class="btn btn-archive flex-fill">圖庫</a>
                         </div>
                         <div class="d-flex gap-1 w-100 revised-only revised-actions">
-                            <!-- 修改卡片上的改點預覽文字在這裡 👇 -->
                             <a href="#" data-line="LINE_WM" class="btn flex-fill text-white fw-bold shadow-sm dynamic-revised-btn" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
                         </div>
                     </div>
@@ -136,7 +124,6 @@
                             <a href="lines.html?lineKind=LINE_WSEA" class="btn btn-archive flex-fill">圖庫</a>
                         </div>
                         <div class="d-flex gap-1 w-100 revised-only revised-actions">
-                            <!-- 修改卡片上的改點預覽文字在這裡 👇 -->
                             <a href="#" data-line="LINE_WSEA" class="btn flex-fill text-white fw-bold shadow-sm dynamic-revised-btn" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
                         </div>
                     </div>
@@ -154,7 +141,6 @@
                             <a href="lines.html?lineKind=LINE_WS" class="btn btn-archive flex-fill">圖庫</a>
                         </div>
                         <div class="d-flex gap-1 w-100 revised-only revised-actions">
-                            <!-- 修改卡片上的改點預覽文字在這裡 👇 -->
                             <a href="#" data-line="LINE_WS" class="btn flex-fill text-white fw-bold shadow-sm dynamic-revised-btn" style="background-color: #ef4444; padding: 8px;">進入改點預覽</a>
                         </div>
                     </div>
@@ -522,44 +508,47 @@
         setupDynamicRevisedButtons();
 
         // 載入 Navbar 並綁定改點切換按鈕事件
+        // 載入 Navbar 並綁定改點切換按鈕事件
+        // 載入 Navbar 並綁定改點切換按鈕事件
         $("navbar").load("navbar.html", function() {
             showInstallNav();
+            
+            // 🌟 核心升級：自動記憶 navbar.html 裡面設定的預設文字
+            const defaultNavHtml = $('#nav-toggle-revised').html();
+            $('#nav-toggle-revised').attr('data-default-html', defaultNavHtml);
             
             // 🌟 升級功能 1：網頁載入時，檢查網址是否帶有跳轉過來的「改點信號」
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('mode') === 'revised') {
                 $('body').addClass('revised-mode');
-                // 👉 Navbar 點選進入改點後，「返回」的文字在這裡改
+                // 👉 網頁一載入就是改點模式時，把字改成「返回現行時刻」
                 $('#nav-toggle-revised').html('<i class="fa-solid fa-backward"></i> 返回現行時刻')
                                         .removeClass('text-danger')
                                         .addClass('text-warning');
             }
             
-            // 🌟 升級功能 2：Navbar 改點按鈕監聽器 (攔截點擊，避免首頁重複載入閃爍)
+            // 🌟 升級功能 2：Navbar 改點按鈕監聽器
             $('#nav-toggle-revised').on('click', function(e) {
-                // 因為我們在 navbar.html 把連結寫死了，所以如果我們已經在首頁，要阻止它跳轉
+                // 阻止預設的連結跳轉行為
                 e.preventDefault(); 
                 
-                // 替 body 切換 class，觸發所有 CSS 隱藏/顯示魔法
+                // 替 body 切換 class，觸發卡片紅按鈕的隱藏/顯示魔法
                 $('body').toggleClass('revised-mode');
                 
                 if ($('body').hasClass('revised-mode')) {
-                    // 進入改點模式
-                    // 👉 Navbar 進入改點後，「返回」的文字也可以在這裡同步修改
+                    // 👉 進入改點模式：文字固定變成「返回現行時刻」 (圖一)
                     $(this).html('<i class="fa-solid fa-backward"></i> 返回現行時刻')
                            .removeClass('text-danger')
                            .addClass('text-warning');
                            
-                    // 悄悄把網址加上 ?mode=revised (這樣使用者如果按 F5 重新整理，狀態才不會跑掉)
                     window.history.replaceState(null, null, "?mode=revised");
                 } else {
-                    // 返回正常模式
-                    // 👉 Navbar 從改點切回來後，按鈕的「預設文字」在這裡改 👇
-                    $(this).html('<i class="fa-solid fa-calendar-plus"></i> 進入最新改點預覽')
+                    // 👉 返回正常模式：直接把剛才「記憶」的 navbar.html 內容貼回來！ (圖二)
+                    const originalHtml = $(this).attr('data-default-html');
+                    $(this).html(originalHtml)
                            .removeClass('text-warning')
                            .addClass('text-danger');
                            
-                    // 悄悄把網址上的參數擦掉，恢復乾淨的首頁網址
                     window.history.replaceState(null, null, window.location.pathname);
                 }
             });
