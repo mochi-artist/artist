@@ -34,8 +34,9 @@ jobs:
           git config --global user.name "Scout Bot"
           git config --global user.email "bot@github.com"
           
-          # ⚠️⚠️⚠️ 關鍵修正：改用 git add . 將所有變更(含 Revised_Epochs.json)加入 ⚠️⚠️⚠️
-          git add .
+          # 🛡️ 絕對防禦修正：不使用 git add . 
+          # 嚴格規定機器人每次只能上傳這三個指定的檔案，杜絕一切意外！
+          git add scan_log.txt scan_history.json "data all/Revised_Epochs.json"
           
           # 提交變更 (如果沒新車、菜單也沒變，就不做任何事)
           git commit -m "📝 更新偵察日記、記憶與時空菜單 [skip ci]" || exit 0
