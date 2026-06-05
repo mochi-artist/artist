@@ -9,7 +9,7 @@ from collections import defaultdict
 
 # ================= 設定區 =================
 # 💥 洗腦重建開關：請設為 False！這樣機器人才會記住歷史，並算出「新增」了幾筆車次！
-FORCE_REBUILD = False
+FORCE_REBUILD = True
 
 HISTORY_FILE = "scan_history.json"
 LOG_FILE = "scan_log.txt"
