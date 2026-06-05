@@ -696,18 +696,17 @@ function draw_train_path(all_trains_data, realtime_trains) {
     };
 
     // 🌟 啟動：先確認有沒有拿到菜單
-    if (window._cachedOpStopsEpochs) {
-        initDrawingWithEpochs(window._cachedOpStopsEpochs); // 已經有了就直接用
+    if (window._cachedRevisedEpochs) {
+        initDrawingWithEpochs(window._cachedRevisedEpochs); // 已經有了就直接用
     } else {
-        d3.json("OpStops/OpStops_Epochs.json").then(epochs => {
-            window._cachedOpStopsEpochs = epochs; // 緩存起來，避免切換面板重複讀取
+        d3.json("data all/Revised_Epochs.json").then(epochs => {
+            window._cachedRevisedEpochs = epochs; // 緩存起來，避免切換面板重複讀取
             initDrawingWithEpochs(epochs);
         }).catch(err => {
-            console.log("⚠️ 找不到 OpStops/OpStops_Epochs.json 菜單，正常畫線。");
+            console.log("⚠️ 找不到 data all/Revised_Epochs.json 菜單，正常畫線。");
             initDrawingWithEpochs([]); // 沒菜單也能安全降級
         });
     }
-}
 
 // ==========================================
 // 🌟 畫線與疊加運轉停車星星模組 (具備重疊迴避)
