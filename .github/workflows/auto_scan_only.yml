@@ -26,18 +26,17 @@ jobs:
         run: pip install requests
 
       - name: 執行偵查 (Scan Only)
-        # 這支程式會自動去雲端抓字典，並讀寫 scan_history.json
+        # 這支程式會自動去雲端抓字典，並讀寫 scan_history.json 以及產出菜單
         run: python auto_scan.py
 
-      - name: 上傳偵察日記與記憶
+      - name: 上傳偵察日記、記憶與時空菜單
         run: |
           git config --global user.name "Scout Bot"
           git config --global user.email "bot@github.com"
           
-          # ⚠️⚠️⚠️ 關鍵修正：必須同時加入 log 和 history ⚠️⚠️⚠️
-          # 如果不加 history，機器人下次會忘記自己看過什麼
-          git add -f scan_log.txt scan_history.json
+          # ⚠️⚠️⚠️ 關鍵修正：改用 git add . 將所有變更(含 Revised_Epochs.json)加入 ⚠️⚠️⚠️
+          git add .
           
-          # 提交變更 (如果沒新車就不做任何事)
-          git commit -m "📝 更新偵察日記與記憶 [skip ci]" || exit 0
+          # 提交變更 (如果沒新車、菜單也沒變，就不做任何事)
+          git commit -m "📝 更新偵察日記、記憶與時空菜單 [skip ci]" || exit 0
           git push
