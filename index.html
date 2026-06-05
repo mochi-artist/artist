@@ -389,7 +389,7 @@
         };
 
         // 抓取 OpStops_Epochs.json 菜單
-        fetch('OpStops/OpStops_Epochs.json')
+        fetch('data all/Revised_Epochs.json')
             .then(response => {
                 if (!response.ok) throw new Error("HTTP 狀態碼錯誤或檔案不存在");
                 return response.json();
