@@ -653,22 +653,103 @@ function draw_train_path(all_trains_data, realtime_trains) {
         const executeDrawing = () => {
             _drawnStarPositions = []; // 清空重疊座標記錄
 
+            // 🌟 自動模式判定：透過網址參數決定
+            // 如果網址有 revisedJson，代表是從「進入改點預覽」進來的總車次檔 (data all)
+            // 如果沒有，代表是從「今日運行圖」或「日期圖庫」進來的日期檔 (data)
+            const is_master_mode = !!revisedJson; 
+
+            // 🌟 空間跳躍引擎參數
+            const shift_amount = 2880; // 24小時的 time 單位 (24 * 60 * 2)
+            const start_time = DiagramHours[0] * 120; // 網頁左邊界時間，通常為 04:00 (480)
+
             for (const train_data of all_trains_data) {
                 for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
                     if (value.length <= 2) continue;
 
-                    const split = find_uncontinuous_index(value);
-                    const section_start = value.slice(0, split);
-                    const section_end = value.slice(split);
+                    let realtime_data = realtime_trains != null ? realtime_trains.get(train_no) : undefined;
 
-                    let realtime_data;
-                    if (realtime_trains != null) realtime_data = realtime_trains.get(train_no);
+                    let sections = [];
+                    let current_section = [];
+                    let order_next = value[0][5];
 
-                    if (section_start.length > 1) set_path(lk, train_no, train_kind, section_start);
-                    if (typeof realtime_data !== 'undefined') mark_realtime_train_position(lk, section_start, line_dir, train_kind, realtime_data); 
+                    for (let i = 0; i < value.length; i++) {
+                        let pt = [...value[i]];
+                        let orig_time = value[i][2];
+                        let order = pt[5];
 
-                    if (section_end.length > 3) set_path(lk, train_no + '-End', train_kind, section_end);
-                    if (typeof realtime_data !== 'undefined') mark_realtime_train_position(lk, section_end, line_dir, train_kind, realtime_data); 
+                        let is_disconnect = false;
+                        if (order !== order_next) is_disconnect = true;
+
+                        if (orig_time !== null && !isNaN(orig_time)) {
+                            if (current_section.length > 0) {
+                                let orig_prev_time = value[i-1][2];
+
+                                // 異常髒資料：時間嚴重倒退，強制切斷
+                                if (orig_time < orig_prev_time - 1440) {
+                                    is_disconnect = true;
+                                } else if (!is_disconnect) {
+                                    // 🌟 跨越 04:00 邊界判定
+                                    let prev_cycles = Math.floor((orig_prev_time - start_time) / shift_amount);
+                                    let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
+
+                                    // 當偵測到跨越右邊界時 (例如 03:55 -> 04:01)
+                                    if (curr_cycles > prev_cycles) {
+                                        // A. 將當前點「降維」，把線畫到右邊界 04:00 出圖
+                                        let pt_old = [...pt];
+                                        pt_old[2] -= prev_cycles * shift_amount;
+                                        current_section.push(pt_old);
+                                        sections.push(current_section);
+
+                                        // B. 根據模式決定後續動作！
+                                        if (is_master_mode) {
+                                            // 🔮 全車次版 (data all)：莫比烏斯環，無縫接回左邊 04:00！
+                                            let prev_new = [...value[i-1]];
+                                            prev_new[2] -= curr_cycles * shift_amount;
+                                            pt[2] -= curr_cycles * shift_amount;
+                                            current_section = [prev_new, pt];
+                                            order_next = order + 1;
+                                            continue;
+                                        } else {
+                                            // 🚫 日期檔 (data)：超過明早 4:00 的部分屬於明天，當天直接隱藏！
+                                            current_section = []; 
+                                            break; // 直接跳出這個車次的內部站點迴圈
+                                        }
+                                    }
+                                    
+                                    // 同週期的正常點，僅做基礎位移
+                                    pt[2] -= curr_cycles * shift_amount;
+                                }
+                            }
+                            
+                            // 新線段的起點基礎位移
+                            if (current_section.length === 0 || is_disconnect) {
+                                let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
+                                pt[2] -= curr_cycles * shift_amount;
+                            }
+                        }
+
+                        if (is_disconnect) {
+                            if (current_section.length > 1) sections.push(current_section);
+                            current_section = [pt];
+                            order_next = order + 1;
+                            continue;
+                        }
+
+                        current_section.push(pt);
+                        order_next = order + 1;
+                    }
+
+                    if (current_section.length > 1) sections.push(current_section);
+
+                    // 將拆分後的每一段畫出
+                    for (let j = 0; j < sections.length; j++) {
+                        let suffix = j === 0 ? '' : (j === 1 ? '-End' : `-End${j}`);
+                        set_path(lk, train_no + suffix, train_kind, sections[j]);
+                        
+                        if (typeof realtime_data !== 'undefined') {
+                            mark_realtime_train_position(lk, sections[j], line_dir, train_kind, realtime_data);
+                        }
+                    }
                 }
             }
             if (_d3G) {
