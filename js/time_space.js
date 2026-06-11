@@ -102,10 +102,10 @@ function find_passing_stations(timetable, line, line_dir) {
     let stations = timetable.map(item => item['Station']);
 
     if (line === "3" || (stations.includes('2260') && stations.includes('3350'))) cheng_zhui = true;
-    let neiwan = stations.includes('1194') || stations.includes('1203');
-    let pingxi = stations.includes('7332');
-    let jiji = stations.includes('3432') || stations.includes('3431');
-    let shalun = stations.includes('4272');
+    let neiwan = stations.includes('1191') || stations.includes('1192') || stations.includes('1193') || stations.includes('1194')|| stations.includes('1201')|| stations.includes('1202')|| stations.includes('1203')|| stations.includes('1204')|| stations.includes('1205')|| stations.includes('1206')|| stations.includes('1207')|| stations.includes('1208');
+    let pingxi = stations.includes('7362') || stations.includes('7361') || stations.includes('7331') || stations.includes('7332') || stations.includes('7333') || stations.includes('7334') || stations.includes('7335') || stations.includes('7336');
+    let jiji = stations.includes('3431') || stations.includes('3432') || stations.includes('3433') || stations.includes('3434') || stations.includes('3435') || stations.includes('3436');
+    let shalun = stations.includes('4271') || stations.includes('4272');
 
     // 核心：智慧計算下一站的子函式 (自動 fallback 支線資料)
     const getNextStep = (curr, dir) => {
