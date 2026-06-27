@@ -17,6 +17,19 @@ let _d3G = null;
 let _drawnStarPositions = []; // 🌟 新增：用來記錄畫過的星星位置，以利判斷重疊
 
 // ==========================================
+// 🎨 視覺顯示濾網：清理系統標籤，保留完整車次備註
+// ==========================================
+function cleanTrainNoForDisplay(trainNo) {
+    if (!trainNo) return "";
+    let cleaned = String(trainNo);
+    // 1. 消除跨日產生的標籤 (支援消除 -End, -End2 等後綴)
+    cleaned = cleaned.replace(/-End\d*/g, ''); 
+    // 2. 精準隱藏系統專屬標籤：只刪除 (高) 與 (林)
+    cleaned = cleaned.replace(/[(（][高林][)）]/g, '');
+    return cleaned;
+}
+
+// ==========================================
 // 🌟 核心狀態與分類設定
 // ==========================================
 let _activeFilters = new Set();  
@@ -188,16 +201,21 @@ function _renderSearchResults(query, container) {
             if (!_activeFilters.has(catId)) continue;
         }
 
-        if (q && !data.train_no.toLowerCase().includes(q)) continue;
-        matches.push({ pathId, data });
+        // 🌟 1. 取得過濾後的乾淨車次
+        const display_train_no = cleanTrainNoForDisplay(data.train_no);
+
+        // 🌟 2. 搜尋比對改用乾淨車次
+        if (q && !display_train_no.toLowerCase().includes(q)) continue;
+        matches.push({ pathId, data, display_train_no });
     }
 
-    matches.sort((a, b) => a.data.train_no.localeCompare(b.data.train_no, undefined, {numeric: true}));
+    // 🌟 3. 排序改用乾淨車次 (確保 1, 2, 8 等數字排列正確)
+    matches.sort((a, b) => a.display_train_no.localeCompare(b.display_train_no, undefined, {numeric: true}));
 
     const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
-        const { pathId, data } = match;
+        const { pathId, data, display_train_no } = match;
         const isSelected = _selectedPathIds.has(pathId);
         
         const item = document.createElement('div');
@@ -209,7 +227,8 @@ function _renderSearchResults(query, container) {
         });
         
         const kindLabel = _carKindLabel[data.style] || data.style;
-        item.innerHTML = `<b class="d3-item-text">${data.train_no}</b><span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>`;
+        // 🌟 4. 畫面顯示套用乾淨車次
+        item.innerHTML = `<b class="d3-item-text">${display_train_no}</b><span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>`;
 
         item.addEventListener('mouseenter', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'rgba(255,255,255,0.1)'; });
         item.addEventListener('mouseleave', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'transparent'; });
@@ -1019,13 +1038,18 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
     });
 
     const hrefTarget = '#' + pathId;
+    
+    // 🌟 取得乾淨的車次名稱 (過濾掉 -End, (林), (高))
+    const display_train_id = cleanTrainNoForDisplay(train_id);
+
     for (const offset of text_position) {
+        // 放棄自訂置中邏輯，完全回歸系統預設對齊，保留原始設定
         const textEl = g.append('text').attr('class', style).classed('d3-train-label', true);
         textEl.append('textPath')
             .attr('href', hrefTarget)
             .attr('startOffset', offset)
             .append('tspan').attr('dy', -3)
-            .text(train_id);
+            .text(display_train_id); // 印出乾淨的字串
     }
 }
 
