@@ -49,6 +49,10 @@ const staticSchedules = {
         // 🔵 第二個時段：2月以後 (新班表/測試用)
         { 
             file: "data/林鐵_20260601~20260630.json" 
+        },
+
+        { 
+            file: "data/林鐵_20260701~20260930.json" 
         }
     ],
     
