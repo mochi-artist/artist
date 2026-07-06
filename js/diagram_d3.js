@@ -810,7 +810,7 @@ function draw_train_path(all_trains_data, realtime_trains) {
 }
 
 // ==========================================
-// 🌟 畫線與疊加運轉停車星星模組 (具備重疊迴避)
+// 🌟 畫線與疊加運轉停車星星模組 (在地修復終極版)
 // ==========================================
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
@@ -831,7 +831,8 @@ function set_path(lk, train_no, train_kind, value) {
     let opStopsToDraw = []; 
 
     const style = CarKind[train_kind] || 'others';
-    const diagram_need_stop = find_diagram_need_to_stop(lk);
+    
+    // 🛑 徹底棄用 diagram_need_stop，避開四碼代號比對失敗與折線地雷！
 
     for (let i = 0; i < value.length; i++) {
         const [, id, time, loc, stop] = value[i];
@@ -842,7 +843,13 @@ function set_path(lk, train_no, train_kind, value) {
         x = Math.round((x + Number.EPSILON) * 100) / 100;
         y = Math.round((y + Number.EPSILON) * 100) / 100;
         
-        if (stop !== -1 || diagram_need_stop.includes(id)) {
+        // 🎯 終極防彈過濾邏輯：
+        // 1. 強制轉型：破解偶數車次 stop 為字串 "-1" 的陷阱，只抓真正有停靠的點
+        const isStop = parseInt(stop, 10) !== -1;
+        // 2. 邊界鎖定：強制畫出進入與離開這張圖表的第一點與最後一點，確保跨頁無縫接軌
+        const isBoundary = (i === 0 || i === value.length - 1);
+
+        if (isStop || isBoundary) {
             pathData += `${x},${y} `;
             coordinates.push([x, y]);
         }
@@ -853,9 +860,7 @@ function set_path(lk, train_no, train_kind, value) {
         const [, id1, time1, loc1] = value[i];
         const [, id2, time2, loc2] = value[i+1];
 
-        // 確認是同一個車站，且時間不同
         if (id1 === id2 && time1 !== time2) {
-            // 檢查這個車站有沒有在名單內
             if (myOpStops.includes(String(id1))) {
                 let arr_x = time1 * 10 - 1200 * DiagramHours[0] + 50;
                 let dep_x = time2 * 10 - 1200 * DiagramHours[0] + 50;
@@ -863,27 +868,22 @@ function set_path(lk, train_no, train_kind, value) {
                 let mid_x = (arr_x + dep_x) / 2;
                 let mid_y = loc1 + 50;
                 
-                // 🌟 核心：重疊檢查機制
                 let overlapCount = 0;
                 for (const pos of _drawnStarPositions) {
-                    // 如果座標差距在 1px 以內，視為重疊
                     if (Math.abs(pos.x - mid_x) < 1 && Math.abs(pos.y - mid_y) < 1) {
                         overlapCount++;
                     }
                 }
 
-                // 如果發生重疊，依照重疊次數進行位移
                 if (overlapCount === 1) {
-                    mid_x -= 3; // 第一個重疊的往左偏 3px
+                    mid_x -= 3; 
                 } else if (overlapCount === 2) {
-                    mid_x += 3; // 第二個重疊的往右偏 3px
+                    mid_x += 3; 
                 } else if (overlapCount > 2) {
-                    mid_x += (overlapCount * 2); // 更多重疊時繼續往外推
+                    mid_x += (overlapCount * 2); 
                 }
 
-                // 記錄這個（可能已經偏移過）的新座標
                 _drawnStarPositions.push({ x: mid_x, y: mid_y });
-                
                 opStopsToDraw.push([mid_x, mid_y]);
             }
         }
