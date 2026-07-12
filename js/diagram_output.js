@@ -201,6 +201,11 @@ async function initial_data() {
         let scheduleData = null;
         if (targetFile) {
             scheduleData = await safeReadJSONFile(targetFile);
+            
+            // 🌟 [關鍵修正] 將載入的 JSON 存入全域變數，讓 diagram_d3.js 也能讀取時刻表
+            if (scheduleData) {
+                window._rawTrainData = scheduleData; 
+            }
         }
 
         // 畫圖或顯示空白
