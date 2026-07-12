@@ -36,6 +36,9 @@ let _activeFilters = new Set();
 let _isBoldLocked = false;       
 let _isPanelOpen = false;        
 let _isMultiSelectMode = false; 
+let _isTimetableMode = false; 
+let _currentLineKind = null;
+
 
 const _filterCategories = [
     { id: 'all', name: '全部', styles: [] },
@@ -146,14 +149,21 @@ function _toggleHighlight(pathId) {
     _refreshSearchResults();
 }
 
+// ==========================================
+// 🌟 清除高亮與關閉浮動介面
+// ==========================================
 function _clearHighlight() {
     _selectedPathIds.clear();
     _updateAllPathVisuals();
     _refreshSearchResults();
+    
+    // 🌟 新增：點擊畫布空白處時，連同快速時刻表一起隱藏
+    const qtc = document.getElementById('d3-quick-timetable-section');
+    if (qtc) qtc.style.display = 'none';
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯 (平滑動畫版)
+// 🌟 畫面跳轉與無限清單邏輯 (幽靈錨點精準置中法，取消水波紋)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -170,15 +180,25 @@ function _panToTrain(pathId) {
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
-    // 🎯 改為使用 window.scrollTo 配合平滑滾動參數，直接計算置中位置
-    const scrollToX = targetX - (window.innerWidth / 2);
-    const scrollToY = targetY - (window.innerHeight / 2);
-
-    window.scrollTo({
-        left: scrollToX,
-        top: scrollToY,
-        behavior: 'smooth'
+    // 建立隱形幽靈錨點
+    const anchor = document.createElement('div');
+    Object.assign(anchor.style, {
+        position: 'absolute',
+        left: targetX + 'px',
+        top: targetY + 'px',
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none',
+        visibility: 'hidden'
     });
+    document.body.appendChild(anchor);
+
+    setTimeout(() => {
+        // 原生置中滾動
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        // 功成身退，兩秒後刪除幽靈錨點
+        setTimeout(() => document.body.removeChild(anchor), 2000);
+    }, 50);
 }
 
 function _refreshSearchResults() {
@@ -188,72 +208,471 @@ function _refreshSearchResults() {
     _renderSearchResults(inp.value.trim(), cont);
 }
 
-function _renderSearchResults(query, container) {
-    container.innerHTML = '';
-    const q = query.toLowerCase();
-    
+// ==========================================
+// 🌟 搜尋結果渲染 (自動解析線段起點，顯示 -XX端)
+// ==========================================
+function _renderSearchResults(query, containerElement) {
+    if (!containerElement) containerElement = document.getElementById('d3-search-results');
+    if (!containerElement) return;
+
+    containerElement.innerHTML = '';
+    const q = query ? query.toLowerCase() : '';
+    let resultCount = 0;
+
     const matches = [];
     for (const [pathId, data] of _trainDataMap) {
-        if (data.train_no.endsWith('-End')) continue; 
+        const catId = _getTrainCategoryId(data.style, data.train_no);
+        if (_activeFilters.size > 0 && !_activeFilters.has(catId)) continue;
+
+        const display_train_no = cleanTrainNoForDisplay(data.train_no);
         
-        if (_activeFilters.size > 0) {
-            const catId = _getTrainCategoryId(data.style, data.train_no);
-            if (!_activeFilters.has(catId)) continue;
+        if (q && !display_train_no.toLowerCase().includes(q) && !data.train_no.toLowerCase().includes(q)) continue;
+        
+        // 🌟 核心修改：如果是 -End 分段，提取該線段畫出來的「第一站」站名
+        let suffixTag = '';
+        const endMatch = data.train_no.match(/-End\d*/);
+        if (endMatch) {
+            let firstStationName = '未知';
+            // rawData 的結構是 [stationName, id, time, loc, stop]
+            // 我們直接抓取陣列裡第一個點 (索引 0) 的站名 (索引 0)
+            if (data.rawData && data.rawData.length > 0) {
+                firstStationName = data.rawData[0][0]; 
+            }
+            
+            // 將原本的 -End 替換為 -XX端
+            suffixTag = `<span style="font-size:10px; color:#fbbf24; background:rgba(251,191,36,0.2); padding:2px 4px; border-radius:4px; margin-left:6px;">-${firstStationName}端</span>`;
         }
 
-        // 🌟 1. 取得過濾後的乾淨車次
-        const display_train_no = cleanTrainNoForDisplay(data.train_no);
-
-        // 🌟 2. 搜尋比對改用乾淨車次
-        if (q && !display_train_no.toLowerCase().includes(q)) continue;
-        matches.push({ pathId, data, display_train_no });
+        matches.push({ pathId, data, display_train_no, suffixTag });
     }
 
-    // 🌟 3. 排序改用乾淨車次 (確保 1, 2, 8 等數字排列正確)
-    matches.sort((a, b) => a.display_train_no.localeCompare(b.display_train_no, undefined, {numeric: true}));
+    // 排序：讓同車次的 -XX端 排在原本車次的緊接著下方
+    matches.sort((a, b) => {
+        const cmp = a.display_train_no.localeCompare(b.display_train_no, undefined, {numeric: true});
+        if (cmp === 0) return a.pathId.localeCompare(b.pathId);
+        return cmp;
+    });
 
     const fragment = document.createDocumentFragment();
 
     for (const match of matches) {
-        const { pathId, data, display_train_no } = match;
+        const { pathId, data, display_train_no, suffixTag } = match;
         const isSelected = _selectedPathIds.has(pathId);
         
         const item = document.createElement('div');
         Object.assign(item.style, {
-            padding: '6px 8px', borderRadius: '4px', cursor: 'pointer',
+            padding: '8px 12px', borderRadius: '4px', cursor: 'pointer',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             background: isSelected ? 'rgba(26,115,232,0.7)' : 'transparent',
-            transition: 'background 0.15s', userSelect: 'none', marginBottom: '2px'
+            transition: 'background 0.15s', userSelect: 'none', marginBottom: '2px',
+            flex: '0 0 auto'
         });
         
-        const kindLabel = _carKindLabel[data.style] || data.style;
-        // 🌟 4. 畫面顯示套用乾淨車次
-        item.innerHTML = `<b class="d3-item-text">${display_train_no}</b><span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>`;
+        const kindLabel = (typeof _carKindLabel !== 'undefined' && _carKindLabel[data.style]) ? _carKindLabel[data.style] : data.style;
+        
+        // 🌟 渲染標籤
+        item.innerHTML = `
+            <span class="d3-item-text" style="color:${isSelected ? '#fff' : '#e2e8f0'}; display:flex; align-items:center;">
+                <b>${display_train_no}</b>${suffixTag}
+            </span>
+            <span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>
+        `;
 
         item.addEventListener('mouseenter', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'rgba(255,255,255,0.1)'; });
         item.addEventListener('mouseleave', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'transparent'; });
+        
         item.addEventListener('click', (e) => {
             e.stopPropagation();
-            _toggleHighlight(pathId);
-            if (_selectedPathIds.has(pathId)) {
-                _panToTrain(pathId); 
+            
+            // 提取真正的 baseId (去除 -End) 來做為選取與高亮判斷
+            const basePathId = pathId.replace(/-End\d*/g, '');
+            
+            if (typeof _isMultiSelectMode !== 'undefined' && _isMultiSelectMode) {
+                if (_selectedPathIds.has(basePathId)) _selectedPathIds.delete(basePathId);
+                else _selectedPathIds.add(basePathId);
+            } else {
+                _selectedPathIds.clear();
+                _selectedPathIds.add(basePathId);
+            }
+            
+            _updateAllPathVisuals();
+            _renderSearchResults(query, containerElement);
+            
+            if (_selectedPathIds.has(basePathId)) {
+                if (typeof _isTimetableMode !== 'undefined' && _isTimetableMode) {
+                    if (typeof _showTimetable === 'function') {
+                        // 傳入精確的 pathId (包含 -End) 給時刻表，確保讀取分段資料
+                        _showTimetable(pathId, display_train_no, null);
+                    }
+                } else {
+                    if (typeof _panToTrain === 'function') {
+                        _panToTrain(pathId); 
+                    }
+                }
             }
         });
+        
         fragment.appendChild(item);
+        resultCount++;
     }
 
-    if (matches.length === 0) {
+    if (resultCount === 0) {
         const empty = document.createElement('div');
-        Object.assign(empty.style, { color: '#888', padding: '4px 8px', textAlign: 'center', fontSize: '12px' });
-        empty.textContent = '無符合車次';
+        Object.assign(empty.style, { color: '#888', padding: '12px', textAlign: 'center', fontSize: '13px' });
+        empty.textContent = '找不到符合的車次';
         fragment.appendChild(empty);
     }
 
-    container.appendChild(fragment);
+    containerElement.appendChild(fragment);
 }
 
 // ==========================================
-// 🌟 UI 控制中心
+// 🌟 確保「快速時刻表」懸浮容器存在 (完全固定不可拖曳，橫向填滿)
+// ==========================================
+function _ensureQuickTimetableContainer() {
+    let container = document.getElementById('d3-quick-timetable-section');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'd3-quick-timetable-section';
+        
+        Object.assign(container.style, {
+            position: 'absolute', 
+            width: '340px',
+            background: '#131b2d',
+            border: '1px solid rgba(255,255,255,0.1)', 
+            borderRadius: '12px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            zIndex: '9999',
+            display: 'none',
+            flexDirection: 'column',
+            padding: '0 0 12px 0', // 🌟 核心修改：移除左右 Padding 以利橫向填滿
+            fontFamily: 'sans-serif',
+            backdropFilter: 'blur(10px)',
+            boxSizing: 'border-box',
+            margin: '0',
+            transformOrigin: 'top left'
+        });
+        
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @media (max-width: 768px) {
+                #d3-quick-timetable-section {
+                    width: 280px !important;
+                }
+            }
+                .timetable-row {
+        background: #131b2d !important;
+    }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(container);
+
+        window._updateQuickUIPos = () => {
+            if (container.style.display === 'none') return;
+            
+            const vv = window.visualViewport;
+            const scale = vv ? vv.scale : 1;
+            const pL = vv ? vv.pageLeft : window.scrollX;
+            const pT = vv ? vv.pageTop : window.scrollY;
+            const vW = vv ? vv.width : window.innerWidth;
+            
+            let uiWidth = container.offsetWidth || (window.innerWidth <= 768 ? 280 : 340);
+
+            let offsetX = 0, offsetY = 0;
+            if (window.innerWidth <= 768) {
+                offsetX = (vW - (uiWidth / scale)) / 2;
+                offsetY = 15 / scale; 
+            } else {
+                offsetX = vW - (uiWidth / scale) - (20 / scale);
+                offsetY = 20 / scale;
+            }
+
+            container.style.left = (pL + offsetX) + 'px';
+            container.style.top = (pT + offsetY) + 'px';
+            container.style.transform = `scale(${1 / scale})`;
+        };
+
+        if (!window._quickUIVVBound) {
+            window._quickUIVVBound = true;
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('scroll', window._updateQuickUIPos);
+                window.visualViewport.addEventListener('resize', window._updateQuickUIPos);
+            }
+            window.addEventListener('scroll', window._updateQuickUIPos);
+        }
+
+        const mainControlBtn = document.getElementById('d3-control-container');
+        if (mainControlBtn) {
+            mainControlBtn.addEventListener('click', () => {
+                container.style.display = 'none';
+            });
+        }
+    }
+    return container;
+}
+
+// ==========================================
+// 🌟 產生時刻表內容與點擊跳轉 (完美橫向填滿 + 色調融合)
+// ==========================================
+async function _showTimetable(pathId, display_train_no, clickY, targetContainerId = 'd3-timetable-section') {
+    const container = document.getElementById(targetContainerId);
+    if (!container) return;
+    
+    container.style.display = 'flex';
+    const rawJsonData = window._rawTrainData;
+    
+    if (!rawJsonData) {
+        container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px 8px 16px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <span style="color:#ff6b6b; font-weight:bold; font-size:14px;">❌ 讀取失敗</span>
+            <button onclick="document.getElementById('${targetContainerId}').style.display='none';" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div style="color:#aaa; font-size:12px; padding: 8px 16px; text-align:center;">找不到時刻表原始資料，請確認是否載入成功</div>`;
+        return;
+    }
+
+    try {
+        const baseId = pathId.replace(/-End\d*/g, '');
+        const hasSpecialChars = /[a-zA-Z\u4e00-\u9fa5]/.test(display_train_no);
+        const railyards = hasSpecialChars ? [] : ['1045', '1145', '5999'];
+
+        let exactTimes = {};
+        let trueOriginId = null;
+        let trueDestId = null;
+
+        if (rawJsonData && rawJsonData.TrainInfos) {
+            const trainInfo = rawJsonData.TrainInfos.find(t => 
+                String(t.Train) === display_train_no || 
+                String(t.TrainNo) === display_train_no || 
+                String(t.Train) === baseId ||
+                String(t.TrainNo) === baseId
+            );
+            
+            if (trainInfo && trainInfo.TimeInfos) {
+                const timeInfos = JSON.parse(JSON.stringify(trainInfo.TimeInfos));
+                
+                timeInfos.forEach((ti, index) => {
+                    if ((display_train_no === '1' || display_train_no === '2') && index === timeInfos.length - 1 && String(ti.Station) === '1000') {
+                        ti.Station = '1001';
+                    }
+                    exactTimes[String(ti.Station)] = { arr: ti.ARRTime, dep: ti.DEPTime };
+                });
+
+                const validJsonStops = timeInfos.filter(ti => !railyards.includes(String(ti.Station)));
+                if (validJsonStops.length > 0) {
+                    trueOriginId = String(validJsonStops[0].Station);
+                    trueDestId = String(validJsonStops[validJsonStops.length - 1].Station);
+                }
+            }
+        }
+
+        const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
+        if (!d3TrainData || !d3TrainData.rawData) throw new Error("無法取得該車次的繪圖原始資料");
+        
+        const rawData = d3TrainData.rawData;
+        let validStationIds = [];
+        
+        if (typeof LinesStationsForBackground !== 'undefined' && _currentLineKind) {
+            const stationsOnPage = LinesStationsForBackground[_currentLineKind];
+            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID));
+            if (validStationIds.includes('1000')) validStationIds.push('1001');
+        }
+
+        let allMergedStops = [];
+        rawData.forEach((stationPoint) => {
+            let [stationName, id, time, loc, stop] = stationPoint;
+            if ((display_train_no === '1' || display_train_no === '2') && pathId.includes('-End') && String(id) === '1000') id = '1001';
+            if (String(id) === '1001') stationName = '台北(環島)';
+
+            const isStop = parseInt(stop, 10) !== -1;
+            if (isStop) {
+                if (allMergedStops.length > 0 && allMergedStops[allMergedStops.length - 1].id === String(id)) {
+                    allMergedStops[allMergedStops.length - 1].depTime = time;
+                } else {
+                    allMergedStops.push({ stationName, id: String(id), arrTime: time, depTime: time, loc });
+                }
+            }
+        });
+
+        allMergedStops.forEach((stop, index) => {
+            if (railyards.includes(stop.id)) stop.remark = "調車場";
+            else if (stop.id === trueOriginId) stop.remark = "起站";
+            else if (stop.id === trueDestId) stop.remark = "終點";
+            else {
+                let isStopping = exactTimes[stop.id] ? (exactTimes[stop.id].arr !== exactTimes[stop.id].dep) : (stop.arrTime !== stop.depTime);
+                stop.remark = isStopping ? "停靠" : "通過";
+            }
+        });
+
+        let mergedStops = allMergedStops.filter(stop => validStationIds.length === 0 || validStationIds.includes(stop.id));
+
+        let targetStopId = null;
+        if (clickY !== undefined && clickY !== null && mergedStops.length > 0) {
+            let minDiff = Infinity;
+            mergedStops.forEach(stop => {
+                let diff = Math.abs(stop.loc + 50 - clickY);
+                if (diff < minDiff) { minDiff = diff; targetStopId = stop.id; }
+            });
+        }
+
+        const isQuick = targetContainerId === 'd3-quick-timetable-section';
+        const closeScript = isQuick
+            ? `document.getElementById('d3-quick-timetable-section').style.display='none';`
+            : `document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;`;
+
+        // 🌟 標題列：左右加入 padding 16px
+        const titleHTML = `
+            <div class="d3-panel-title" style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; margin-bottom:0px; padding:12px 16px 8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: 0; background: transparent; z-index: 10;">
+                <span style="pointer-events: none;">🕒 <b>${display_train_no}</b> 車次時刻表</span>
+                <button onclick="${closeScript}" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
+            </div>`;
+            
+        let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 180px; overflow-y: auto; display:flex; flex-direction:column; position:relative;">`;
+        
+        // 🌟 表頭列：填滿橫行，背景色完美貼合主 UI
+        listHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom: 0px; position:sticky; top:0; background:rgba(19, 27, 45, 1); z-index:5;">
+                <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
+                    <span style="display:inline-block; width: 28px;"></span><span>車站</span>
+                </span>
+                <span style="flex: 1; text-align: center;">到站</span>
+                <span style="flex: 1; text-align: center;">離站</span>
+                <span style="flex: 1; text-align: center;">備註</span>
+            </div>`;
+
+        if (mergedStops.length === 0) {
+            listHTML += `<div style="color:#888; text-align:center; padding:10px 0; font-size:12px;">此路線範圍內無停靠資料</div>`;
+        } else {
+            mergedStops.forEach((stop) => {
+                let arrDisplay = exactTimes[stop.id] && exactTimes[stop.id].arr ? exactTimes[stop.id].arr.substring(0, 8) : formatTime(stop.arrTime);
+                let depDisplay = exactTimes[stop.id] && exactTimes[stop.id].dep ? exactTimes[stop.id].dep.substring(0, 8) : formatTime(stop.depTime);
+                
+                arrDisplay = arrDisplay.replace(/:00$/, '.0').replace(/:30$/, '.5');
+                depDisplay = depDisplay.replace(/:00$/, '.0').replace(/:30$/, '.5');
+                
+                let remarkDisplay = stop.remark; 
+                let isTarget = (stop.id === targetStopId);
+                let bgStyle = isTarget ? 'rgba(56, 189, 248, 0.25)' : 'transparent';
+                let borderStyle = isTarget ? 'border-left: 3px solid #38bdf8;' : 'border-left: 3px solid transparent;';
+
+                let remarkColor = '#aaa';
+                if (remarkDisplay === '起站' || remarkDisplay === '終點') remarkColor = '#38bdf8'; 
+                else if (remarkDisplay === '調車場') remarkColor = '#94a3b8'; 
+                else if (remarkDisplay === '通過') remarkColor = '#fbbf24'; 
+                else if (remarkDisplay === '停靠') remarkColor = '#4ade80'; 
+
+                let timeColumnsHTML = '';
+                if (remarkDisplay === '通過') {
+                    timeColumnsHTML = `
+                        <span style="flex: 1; text-align: center; color:#aaa; font-size:12px; pointer-events:none;">-</span>
+                        <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${depDisplay}</span>
+                    `;
+                } else {
+                    timeColumnsHTML = `
+                        <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${arrDisplay}</span>
+                        <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${depDisplay}</span>
+                    `;
+                }
+
+                // 🌟 資料列：填滿橫行，滑過時的特效也會延伸到最邊緣
+                listHTML += `
+                    <div class="timetable-row" id="d3-stop-row-${targetContainerId}-${stop.id}" data-time="${stop.arrTime}" data-loc="${stop.loc}" 
+                         style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 16px; cursor:pointer; transition: background 0.2s; border-bottom:1px solid rgba(255,255,255,0.05); background:${bgStyle}; ${borderStyle}"
+                         onmouseenter="this.style.background='rgba(255,255,255,0.1)'" 
+                         onmouseleave="this.style.background='${bgStyle}'">
+                        
+                        <span style="flex: 1.2; font-weight:bold; color:#fff; pointer-events:none; display:flex; align-items:center;">
+                            <span style="display:inline-block; width: 24px; font-size:14px; text-align:left;">🚉</span><span>${stop.stationName}</span>
+                        </span> 
+                        
+                        ${timeColumnsHTML}
+                        
+                        <span style="flex: 1; text-align: center; font-weight:bold; color:${remarkColor}; font-size:12px; pointer-events:none;">${remarkDisplay}</span>
+                    </div>`;
+            });
+        }
+        listHTML += `</div>`;
+        container.innerHTML = titleHTML + listHTML;
+
+        if (targetStopId) {
+            setTimeout(() => {
+                let targetRow = document.getElementById(`d3-stop-row-${targetContainerId}-${targetStopId}`);
+                if (targetRow) {
+                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => {
+                        targetRow.style.background = 'rgba(255,255,255,0.05)';
+                        targetRow.style.borderLeft = '3px solid transparent';
+                        targetRow.onmouseleave = function() { this.style.background = 'transparent'; };
+                    }, 2500);
+                }
+            }, 150);
+        }
+
+        const rows = container.querySelectorAll('.timetable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                e.stopPropagation(); 
+
+                const rawTime = parseFloat(this.getAttribute('data-time'));
+                const rawLoc = parseFloat(this.getAttribute('data-loc'));
+                if (isNaN(rawTime) || isNaN(rawLoc)) return;
+
+                container.style.display = 'none'; 
+                if (!isQuick) {
+                    const toggleCb = document.getElementById('d3-timetable-toggle');
+                    if (toggleCb) toggleCb.checked = false;
+                    _isTimetableMode = false;
+                }
+
+                let offsetX = 0; let offsetY = 0;
+                if (typeof _d3Svg !== 'undefined' && _d3Svg && _d3Svg.node()) {
+                    const rect = _d3Svg.node().getBoundingClientRect();
+                    offsetX = rect.left + window.scrollX;
+                    offsetY = rect.top + window.scrollY;
+                }
+
+                const startHour = (typeof DiagramHours !== 'undefined' && DiagramHours.length > 0) ? DiagramHours[0] : 4;
+                
+                const svgX = rawTime * 10 - 1200 * startHour + 50;
+                const svgY = rawLoc + 50;
+                
+                const targetX = offsetX + svgX;
+                const targetY = offsetY + svgY;
+
+                const shiftY = window.innerWidth <= 768 ? (window.innerHeight * 0.15) : 0;
+
+                const anchor = document.createElement('div');
+                Object.assign(anchor.style, {
+                    position: 'absolute',
+                    left: targetX + 'px',
+                    top: (targetY - shiftY) + 'px',
+                    width: '1px',
+                    height: '1px',
+                    pointerEvents: 'none',
+                    visibility: 'hidden'
+                });
+                document.body.appendChild(anchor);
+
+                setTimeout(() => { 
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); 
+                    setTimeout(() => document.body.removeChild(anchor), 2000);
+                }, 50);
+            });
+        });
+
+    } catch (error) {
+        container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 12px 16px 8px 16px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <span style="color:#ff6b6b; font-weight:bold; font-size:14px;">❌ 讀取失敗</span>
+            <button onclick="document.getElementById('${targetContainerId}').style.display='none';" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div style="color:#aaa; font-size:12px; padding: 8px 16px;">${error.message}</div>`;
+        console.error("時刻表解析錯誤：", error);
+    }
+}
+
+// ==========================================
+// 🌟 UI 控制中心 (時刻表填滿橫行 + 放大鏡連動關閉版)
 // ==========================================
 function _init_ui_panels() {
     if (document.getElementById('d3-ui-wrapper')) return;
@@ -275,11 +694,21 @@ function _init_ui_panels() {
     const panelBody = document.createElement('div');
     panelBody.id = 'd3-panel-body';
     Object.assign(panelBody.style, {
-        background: 'rgba(15, 23, 42, 0.95)', color: '#fff', borderRadius: '12px', 
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', flexDirection: 'row', 
+        background: '#131b2d', // ✅ 改成純實心的深藍/黑底色
+        color: '#fff', borderRadius: '12px', 
+        boxShadow: '0 8px 32px rgba(0,0,0,0.6)', display: 'none', 
+        flexDirection: 'column', 
+        maxHeight: 'calc(100vh - 90px)',
         fontFamily: 'Tahoma, Verdana, sans-serif',
         opacity: '0', transform: 'translateY(12px)', transition: 'opacity 0.2s, transform 0.2s',
         pointerEvents: 'all', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden'
+    });
+
+    const topSectionContainer = document.createElement('div');
+    Object.assign(topSectionContainer.style, { 
+        display: 'flex', flexDirection: 'row', width: '100%',
+        flex: '1 1 auto',
+        minHeight: '0'
     });
 
     // --- 左側：過濾區塊 ---
@@ -301,23 +730,19 @@ function _init_ui_panels() {
         fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
         padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
-    
     const boldToggleCb = document.createElement('input');
     boldToggleCb.type = 'checkbox';
     boldToggleCb.id = 'd3-bold-toggle';
     boldToggleCb.checked = _isBoldLocked;
     Object.assign(boldToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
-    
     const boldToggleLabel = document.createElement('label');
     boldToggleLabel.htmlFor = 'd3-bold-toggle';
     boldToggleLabel.textContent = '關閉面板保持線條加粗';
     Object.assign(boldToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
-    
     boldToggleCb.addEventListener('change', (e) => {
         _isBoldLocked = e.target.checked;
         _updateAllPathVisuals();
     });
-    
     boldToggleContainer.appendChild(boldToggleCb);
     boldToggleContainer.appendChild(boldToggleLabel);
 
@@ -327,18 +752,15 @@ function _init_ui_panels() {
         fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
         padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
-    
     const multiToggleCb = document.createElement('input');
     multiToggleCb.type = 'checkbox';
     multiToggleCb.id = 'd3-multi-toggle';
     multiToggleCb.checked = _isMultiSelectMode;
     Object.assign(multiToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
-    
     const multiToggleLabel = document.createElement('label');
     multiToggleLabel.htmlFor = 'd3-multi-toggle';
     multiToggleLabel.textContent = '啟用多選功能 (車種/車次)';
     Object.assign(multiToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
-    
     multiToggleCb.addEventListener('change', (e) => {
         _isMultiSelectMode = e.target.checked;
         if (!_isMultiSelectMode) {
@@ -348,9 +770,33 @@ function _init_ui_panels() {
             _applyFilter();
         }
     });
-    
     multiToggleContainer.appendChild(multiToggleCb);
     multiToggleContainer.appendChild(multiToggleLabel);
+
+    const timetableToggleContainer = document.createElement('div');
+    Object.assign(timetableToggleContainer.style, {
+        display: 'flex', alignItems: 'center', marginBottom: '8px',
+        fontSize: '12px', color: '#fbbc04', cursor: 'pointer',
+        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+    });
+    const timetableToggleCb = document.createElement('input');
+    timetableToggleCb.type = 'checkbox';
+    timetableToggleCb.id = 'd3-timetable-toggle';
+    timetableToggleCb.checked = _isTimetableMode;
+    Object.assign(timetableToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    const timetableToggleLabel = document.createElement('label');
+    timetableToggleLabel.htmlFor = 'd3-timetable-toggle';
+    timetableToggleLabel.textContent = '點擊車次顯示時刻表';
+    Object.assign(timetableToggleLabel.style, { cursor: 'pointer', userSelect: 'none' });
+    timetableToggleCb.addEventListener('change', (e) => {
+        _isTimetableMode = e.target.checked;
+        const ts = document.getElementById('d3-timetable-section');
+        if (!_isTimetableMode && ts) {
+            ts.style.display = 'none';
+        }
+    });
+    timetableToggleContainer.appendChild(timetableToggleCb);
+    timetableToggleContainer.appendChild(timetableToggleLabel);
 
     const filterList = document.createElement('div');
     
@@ -387,11 +833,8 @@ function _init_ui_panels() {
                     _activeFilters.clear(); 
                 } else {
                     if (_isMultiSelectMode) {
-                        if (_activeFilters.has(cat.id)) {
-                            _activeFilters.delete(cat.id); 
-                        } else {
-                            _activeFilters.add(cat.id); 
-                        }
+                        if (_activeFilters.has(cat.id)) _activeFilters.delete(cat.id); 
+                        else _activeFilters.add(cat.id); 
                     } else {
                         if (_activeFilters.has(cat.id)) {
                             _activeFilters.delete(cat.id);
@@ -411,6 +854,7 @@ function _init_ui_panels() {
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(boldToggleContainer);
     filterSection.appendChild(multiToggleContainer); 
+    filterSection.appendChild(timetableToggleContainer);
     filterSection.appendChild(filterList);
 
     // --- 右側：搜尋區塊 ---
@@ -444,8 +888,24 @@ function _init_ui_panels() {
     searchSection.appendChild(searchInput);
     searchSection.appendChild(searchResults);
 
-    panelBody.appendChild(filterSection);
-    panelBody.appendChild(searchSection);
+    topSectionContainer.appendChild(filterSection);
+    topSectionContainer.appendChild(searchSection);
+
+    const timetableSection = document.createElement('div');
+    timetableSection.id = 'd3-timetable-section';
+    timetableSection.className = 'd3-custom-scrollbar';
+    Object.assign(timetableSection.style, {
+        display: 'none', 
+        flexDirection: 'column', 
+        padding: '0 0 12px 0', 
+        borderTop: '1px solid rgba(255,255,255,0.1)', 
+        background: '#131b2d', // ✅ 強制設定為實心色碼
+        flex: '1 1 auto',
+        minHeight: '0'
+    });
+
+    panelBody.appendChild(topSectionContainer);
+    panelBody.appendChild(timetableSection);
 
     // --- 觸發按鈕 ---
     const toggleBtn = document.createElement('button');
@@ -459,11 +919,19 @@ function _init_ui_panels() {
 
     toggleBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        
+        const qtc = document.getElementById('d3-quick-timetable-section');
+        if (qtc) qtc.style.display = 'none';
+
         _isPanelOpen = !_isPanelOpen;
         if (_isPanelOpen) {
             _renderFilterList(); 
             panelBody.style.display = 'flex';
-            requestAnimationFrame(() => { panelBody.style.opacity = '1'; panelBody.style.transform = 'translateY(0)'; });
+            requestAnimationFrame(() => { 
+                // 🌟 把原本的 panelBody.style.opacity = '1'; 改成下面這行：
+                panelBody.style.setProperty('opacity', '1', 'important'); 
+                panelBody.style.transform = 'translateY(0)'; 
+            });
             toggleBtn.textContent = '✕';
             toggleBtn.style.background = '#c5221f';
             _renderSearchResults('', searchResults);
@@ -523,6 +991,267 @@ function _init_ui_panels() {
     }
 }
 
+// ==========================================
+// 🌟 動態抓取資料並寫出時刻表 (排版絕對鎖死版)
+// ==========================================
+async function _fetchAndShowTimetable(pathId, display_train_no) {
+    const container = document.getElementById('d3-timetable-section');
+    if (!container) return;
+    
+    // 🌟 關鍵修復 1：強制外層容器為「垂直排列(column)」，避免水平擠壓
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column'; 
+    container.style.overflow = 'hidden'; 
+    container.innerHTML = '<div style="padding:10px; color:#aaa; text-align:center;">載入時刻表資料中...</div>';
+
+    // 🌟 1. 抓取網址參數
+    const urlParams = new URLSearchParams(window.location.search);
+    const revisedJson = urlParams.get('revisedJson'); 
+    const currentDate = urlParams.get('formattedDate') || urlParams.get('date');
+
+    let jsonPath = '';
+    if (revisedJson) {
+        jsonPath = revisedJson;
+    } else if (currentDate) {
+        jsonPath = `data/${currentDate}.json`;
+    } else {
+        const d = new Date();
+        const yyyymmdd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        jsonPath = `data/${yyyymmdd}.json`;
+    }
+
+    try {
+        // 🌟 2. 讀取 JSON 並快取
+        if (!window._rawJsonCache || window._rawJsonPath !== jsonPath) {
+            const response = await fetch(jsonPath);
+            if (!response.ok) throw new Error(`找不到檔案 ${jsonPath}`);
+            window._rawJsonCache = await response.json();
+            window._rawJsonPath = jsonPath;
+        }
+
+        const rawJsonData = window._rawJsonCache;
+        const baseId = pathId.replace(/-End\d*/g, '');
+
+        // 🌟 3. 建立精確時間字典
+        let exactTimes = {};
+        if (rawJsonData && rawJsonData.TrainInfos) {
+            const trainInfo = rawJsonData.TrainInfos.find(t => 
+                String(t.Train) === display_train_no || 
+                String(t.TrainNo) === display_train_no || 
+                String(t.Train) === baseId ||
+                String(t.TrainNo) === baseId
+            );
+            
+            if (trainInfo && trainInfo.TimeInfos) {
+                trainInfo.TimeInfos.forEach(ti => {
+                    exactTimes[String(ti.Station)] = { arr: ti.ARRTime, dep: ti.DEPTime };
+                });
+            }
+        }
+
+        // 🌟 4. 從 D3 畫布抓取原始資料
+        const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
+        if (!d3TrainData || !d3TrainData.rawData) {
+            throw new Error("無法取得該車次的繪圖原始資料");
+        }
+        
+        const rawData = d3TrainData.rawData;
+        let validStationIds = [];
+        if (typeof LinesStationsForBackground !== 'undefined' && _currentLineKind) {
+            const stationsOnPage = LinesStationsForBackground[_currentLineKind];
+            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID));
+        }
+
+        // 🌟 5. 解析停靠站，合併到站與離站
+        let mergedStops = [];
+        rawData.forEach((stationPoint) => {
+            const [stationName, id, time, loc, stop] = stationPoint;
+            const isStop = parseInt(stop, 10) !== -1;
+            const isOnThisPage = validStationIds.length === 0 || validStationIds.includes(String(id));
+
+            if (isStop && isOnThisPage) {
+                if (mergedStops.length > 0 && mergedStops[mergedStops.length - 1].id === String(id)) {
+                    mergedStops[mergedStops.length - 1].depTime = time;
+                } else {
+                    mergedStops.push({ stationName: stationName, id: String(id), arrTime: time, depTime: time, loc: loc });
+                }
+            }
+        });
+
+        // 🌟 1. 標題區塊 (實心背景、禁止縮放)
+        // 使用純黑底色或極深藍 (#131b2d)，保證絕對不透明
+        const titleHTML = `
+            <div style="flex: 0 0 auto; background-color: #131b2d !important; padding-top: 4px;">
+                
+                <!-- 第一排：車次標題 -->
+                <div class="d3-panel-title" style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid #334155;">
+                    <span>🕒 <b>${display_train_no}</b> 車次時刻表</span>
+                    <button onclick="document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
+                </div>
+                
+                <!-- 第二排：欄位名稱 -->
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:0 8px 6px 8px; border-bottom:1px solid #334155; margin-bottom: 4px;">
+                    <span style="flex: 1.2; text-align: left; padding-left: 60px;">車站</span>
+                    <span style="flex: 1; text-align: center;">到站</span>
+                    <span style="flex: 1; text-align: center;">離站</span>
+                    <span style="flex: 0.8; text-align: center;">備註</span>
+                </div>
+                
+            </div>`;
+            
+        // 🌟 2. 捲動清單區塊 (設定 overflow-y: auto，讓文字在這裡面就被裁切掉，絕對不會捲到標題底下)
+        let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container" style="flex: 1 1 auto; max-height: 180px; overflow-y: auto; overflow-x: hidden; display:flex; flex-direction:column; padding-right: 4px; background-color: #131b2d !important;">`;
+        
+        if (mergedStops.length === 0) {
+            listHTML += `<div style="color:#888; text-align:center; padding:10px 0; font-size:12px;">此路線範圍內無停靠資料</div>`;
+        } else {
+            mergedStops.forEach((stop) => {
+                let arrDisplay = exactTimes[stop.id] && exactTimes[stop.id].arr ? exactTimes[stop.id].arr.substring(0, 8) : formatTime(stop.arrTime);
+                let depDisplay = exactTimes[stop.id] && exactTimes[stop.id].dep ? exactTimes[stop.id].dep.substring(0, 8) : formatTime(stop.depTime);
+                let remarkDisplay = "-"; 
+
+                let isTarget = (typeof targetStopId !== 'undefined' && stop.id === targetStopId);
+                
+                // 🌟 這裡取消了 rgba，全部改成「實心色」
+                // 目標車站背景為實心深藍色(#1e3a8a)，一般車站背景為實心深灰色(#1e293b)
+                let bgStyle = isTarget ? '#1e3a8a' : '#1e293b'; 
+                let hoverStyle = isTarget ? '#1e40af' : '#334155'; // 滑鼠移上去的實心顏色
+                let borderStyle = isTarget ? 'border-left: 3px solid #38bdf8;' : 'border-left: 3px solid transparent;';
+
+                listHTML += `
+                    <div class="timetable-row" id="d3-stop-row-${stop.id}" data-time="${stop.arrTime}" data-loc="${stop.loc}" 
+                         style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:6px 8px; border-radius:4px; cursor:pointer; transition: background 0.2s; margin-bottom:2px; background-color:${bgStyle}; ${borderStyle}"
+                         onmouseenter="this.style.backgroundColor='${hoverStyle}'" 
+                         onmouseleave="this.style.backgroundColor='${bgStyle}'">
+                        <span style="flex: 1.2; font-weight:bold; color:#fff; pointer-events:none;">🚉 ${stop.stationName}</span> 
+                        <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${arrDisplay}</span>
+                        <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${depDisplay}</span>
+                        <span style="flex: 0.8; text-align: center; color:#aaa; font-size:11px; pointer-events:none;">${remarkDisplay}</span>
+                    </div>`;
+            });
+        }
+        listHTML += `</div>`;
+        container.innerHTML = titleHTML + listHTML;
+
+        // 🌟 7. 綁定點擊事件 
+        setTimeout(() => {
+            const rows = container.querySelectorAll('.timetable-row');
+            console.log(`[時刻表UI] 成功找到並綁定了 ${rows.length} 個車站點擊事件`);
+
+            rows.forEach(row => {
+                row.addEventListener('click', function() {
+                    console.log("🟢 1. 成功點擊！");
+
+                    const timeValue = parseFloat(this.getAttribute('data-time'));
+                    const loc = parseFloat(this.getAttribute('data-loc'));
+
+                    if (isNaN(timeValue) || isNaN(loc)) {
+                        console.error("❌ 座標解析失敗", this.getAttribute('data-time'), this.getAttribute('data-loc'));
+                        return;
+                    }
+
+                    const timeDate = new Date(timeValue);
+
+                    try {
+                        if (typeof xScale === 'undefined' || typeof yScale === 'undefined') {
+                            console.error("❌ 找不到 xScale 或 yScale！");
+                            return;
+                        }
+                        if (typeof svg === 'undefined' || typeof zoom === 'undefined') {
+                            console.error("❌ 找不到 svg 或 zoom 變數！");
+                            return;
+                        }
+
+                        const targetX = xScale(timeDate); 
+                        const targetY = yScale(loc);
+                        console.log(`🟢 2. 目標畫面座標: X=${targetX.toFixed(2)}, Y=${targetY.toFixed(2)}`);
+
+                        const currentTransform = d3.zoomTransform(svg.node()); 
+                        const scale = Math.max(currentTransform.k, 1.5); 
+
+                        const screenWidth = window.innerWidth;
+                        const screenHeight = window.innerHeight;
+                        
+                        const translateX = screenWidth / 2 - targetX * scale;
+                        const translateY = screenHeight / 2 - targetY * scale;
+
+                        svg.transition()
+                            .duration(750) 
+                            .call(
+                                zoom.transform, 
+                                d3.zoomIdentity.translate(translateX, translateY).scale(scale)
+                            );
+                            
+                        console.log("🟢 3. 平移動畫觸發成功！");
+                    } catch (error) {
+                        console.error("❌ 平移過程報錯：", error);
+                    }
+                });
+            });
+        }, 100);
+
+    } catch (error) {
+        container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <span style="color:#ff6b6b; font-weight:bold; font-size:14px;">❌ 讀取失敗</span>
+            <button onclick="document.getElementById('d3-timetable-section').style.display='none'; document.getElementById('d3-timetable-toggle').checked=false; _isTimetableMode=false;" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div style="color:#aaa; font-size:12px; padding-top:8px;">${error.message}</div>`;
+        console.error("時刻表抓取錯誤：", error);
+    }
+}
+
+// 🌟 時間格式轉換工具
+function formatTime(rawTime) {
+    if (isNaN(rawTime)) return '--:--:--';
+    let hrs = Math.floor(rawTime / 60);
+    let mins = Math.floor(rawTime % 60);
+    let secs = Math.round((rawTime % 1) * 60);
+    if (secs >= 60) { secs -= 60; mins += 1; }
+    if (mins >= 60) { mins -= 60; hrs += 1; }
+    if (hrs >= 24) hrs -= 24;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// 🌟 點擊時刻表車站，跳轉至地圖對應位置
+document.addEventListener('click', function(e) {
+    const row = e.target.closest('.timetable-row');
+    if (!row) return; 
+
+    const rawTime = parseFloat(row.getAttribute('data-time'));
+    const rawLoc = parseFloat(row.getAttribute('data-loc'));
+    if (isNaN(rawTime) || isNaN(rawLoc)) return;
+
+    // 關閉時刻表
+    const container = document.getElementById('d3-timetable-section');
+    if (container) container.style.display = 'none'; 
+    
+    // 取消勾選狀態
+    const toggleCb = document.getElementById('d3-timetable-toggle');
+    if (toggleCb) toggleCb.checked = false;
+    _isTimetableMode = false;
+
+    // 計算座標
+    let offsetX = 0; let offsetY = 0;
+    if (typeof _d3Svg !== 'undefined' && _d3Svg && _d3Svg.node()) {
+        const rect = _d3Svg.node().getBoundingClientRect();
+        offsetX = rect.left + window.scrollX;
+        offsetY = rect.top + window.scrollY;
+    }
+
+    const startHour = (typeof DiagramHours !== 'undefined' && DiagramHours.length > 0) ? DiagramHours[0] : 4;
+    const targetX = offsetX + rawTime * 10 - 1200 * startHour + 50;
+    const targetY = offsetY + rawLoc + 50;
+    
+    const scrollToX = targetX - (window.innerWidth / 2);
+    const scrollToY = targetY - (window.innerHeight / 2);
+
+    // 平滑跳轉
+    setTimeout(() => {
+        window.scrollTo({ left: scrollToX, top: scrollToY, behavior: 'smooth' });
+    }, 50);
+});
+
 const _carKindLabel = {
     taroko: '太魯閣', puyuma: '普悠瑪', tze_chiang: '自強號', tze_chiang_diesel: '自強（柴）',
     emu1200: '自強 EMU1200', emu300: '自強 EMU300', emu3000: '自強 EMU3000', kuaimu: '快哩慕',
@@ -535,6 +1264,7 @@ const _carKindLabel = {
 // ── 公開 API ──
 
 function draw_diagram_background(line_kind, date) {
+    _currentLineKind = line_kind;
     Object.entries(OperationLines).forEach(([key, value]) => {
         if (key !== line_kind) return;
 
@@ -810,7 +1540,7 @@ function draw_train_path(all_trains_data, realtime_trains) {
 }
 
 // ==========================================
-// 🌟 畫線與疊加運轉停車星星模組 (在地修復終極版)
+// 🌟 畫線與疊加運轉停車星星模組 (修復 rawData 資料遺失問題)
 // ==========================================
 function set_path(lk, train_no, train_kind, value) {
     if (!value || value.length === 0) return;
@@ -831,8 +1561,6 @@ function set_path(lk, train_no, train_kind, value) {
     let opStopsToDraw = []; 
 
     const style = CarKind[train_kind] || 'others';
-    
-    // 🛑 徹底棄用 diagram_need_stop，避開四碼代號比對失敗與折線地雷！
 
     for (let i = 0; i < value.length; i++) {
         const [, id, time, loc, stop] = value[i];
@@ -843,10 +1571,8 @@ function set_path(lk, train_no, train_kind, value) {
         x = Math.round((x + Number.EPSILON) * 100) / 100;
         y = Math.round((y + Number.EPSILON) * 100) / 100;
         
-        // 🎯 終極防彈過濾邏輯：
-        // 1. 強制轉型：破解偶數車次 stop 為字串 "-1" 的陷阱，只抓真正有停靠的點
+        // 破解偶數車次 stop 為字串 "-1" 的陷阱
         const isStop = parseInt(stop, 10) !== -1;
-        // 2. 邊界鎖定：強制畫出進入與離開這張圖表的第一點與最後一點，確保跨頁無縫接軌
         const isBoundary = (i === 0 || i === value.length - 1);
 
         if (isStop || isBoundary) {
@@ -855,7 +1581,7 @@ function set_path(lk, train_no, train_kind, value) {
         }
     }
     
-    // 尋找水平線段 (到站與離站時間不同，且站點相同) 的「中點」
+    // 尋找水平線段中點畫星星
     for (let i = 0; i < value.length - 1; i++) {
         const [, id1, time1, loc1] = value[i];
         const [, id2, time2, loc2] = value[i+1];
@@ -875,13 +1601,9 @@ function set_path(lk, train_no, train_kind, value) {
                     }
                 }
 
-                if (overlapCount === 1) {
-                    mid_x -= 3; 
-                } else if (overlapCount === 2) {
-                    mid_x += 3; 
-                } else if (overlapCount > 2) {
-                    mid_x += (overlapCount * 2); 
-                }
+                if (overlapCount === 1) { mid_x -= 3; } 
+                else if (overlapCount === 2) { mid_x += 3; } 
+                else if (overlapCount > 2) { mid_x += (overlapCount * 2); }
 
                 _drawnStarPositions.push({ x: mid_x, y: mid_y });
                 opStopsToDraw.push([mid_x, mid_y]);
@@ -892,12 +1614,13 @@ function set_path(lk, train_no, train_kind, value) {
     if (coordinates.length < 2) return;
 
     const pathId = lk + train_no;
-    _trainDataMap.set(pathId, { train_no, train_kind, style, firstX, firstY });
+    
+    // 🌟🌟🌟 核心修復：加入了 rawData: value，讓時刻表引擎抓得到資料！
+    _trainDataMap.set(pathId, { train_no, train_kind, style, firstX, firstY, rawData: value });
 
     const text_position = calculate_text_position(coordinates, style);
     add_path(diagram_objects[lk], lk, train_no, pathData, text_position, style);
     
-    // 在線上疊加「空心星星」
     const starGenerator = d3.symbol().type(d3.symbolStar).size(50)();
 
     for (const [cx, cy] of opStopsToDraw) {
@@ -1001,6 +1724,8 @@ function add_text(g, text_string, x, y, style) {
     if (style) el.attr('class', style);
 }
 
+// ── D3 繪圖輔助函式 ──
+
 function add_path(g, lk, train_id, path_string, text_position, style) {
     const pathId = lk + train_id;
 
@@ -1020,7 +1745,8 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
         .style('pointer-events', 'stroke')
         .style('cursor', 'crosshair');
 
-    const basePathId = pathId.replace(/-End$/, '');
+    const basePathId = pathId.replace(/-End\d*/g, '');
+    const display_train_id = cleanTrainNoForDisplay(train_id);
 
     hitEl
         .on('mouseenter', () => {
@@ -1034,22 +1760,59 @@ function add_path(g, lk, train_id, path_string, text_position, style) {
 
     hitEl.on('click', function (event) {
         event.stopPropagation();
+        
+        // 1. 執行單選/多選高亮切換
         _toggleHighlight(basePathId);
+        
+        let clickY = null;
+        try {
+            if (d3.pointer) {
+                clickY = d3.pointer(event, _d3G.node())[1];
+            } else {
+                clickY = d3.mouse(_d3G.node())[1]; 
+            }
+        } catch(e) { console.warn("無法取得 D3 點擊座標", e); }
+
+        // 🌟 2. 判斷要用哪種方式顯示時刻表
+        if (_isPanelOpen) {
+            // 【放大鏡主選單開啟時】：關閉上方快速預覽
+            const qtc = document.getElementById('d3-quick-timetable-section');
+            if (qtc) qtc.style.display = 'none';
+
+            if (_selectedPathIds.has(basePathId) && _isTimetableMode) {
+                if (typeof _showTimetable === 'function') {
+                    _showTimetable(pathId, display_train_id, clickY, 'd3-timetable-section');
+                }
+            }
+        } else {
+            // 【放大鏡主選單關閉時】：直接顯示可拖曳的快速時刻表
+            if (_selectedPathIds.has(basePathId)) {
+                const qtc = _ensureQuickTimetableContainer(); 
+                
+                qtc.style.display = 'flex';
+                
+                // 🌟 強制更新絕對座標，確保 UI 出現在你拖曳/預設好的螢幕實體位置上！
+                if (window._updateQuickUIPos) window._updateQuickUIPos();
+                
+                if (typeof _showTimetable === 'function') {
+                    _showTimetable(pathId, display_train_id, clickY, 'd3-quick-timetable-section');
+                }
+            } else {
+                const qtc = document.getElementById('d3-quick-timetable-section');
+                if (qtc) qtc.style.display = 'none';
+            }
+        }
     });
 
     const hrefTarget = '#' + pathId;
-    
-    // 🌟 取得乾淨的車次名稱 (過濾掉 -End, (林), (高))
-    const display_train_id = cleanTrainNoForDisplay(train_id);
 
     for (const offset of text_position) {
-        // 放棄自訂置中邏輯，完全回歸系統預設對齊，保留原始設定
         const textEl = g.append('text').attr('class', style).classed('d3-train-label', true);
         textEl.append('textPath')
             .attr('href', hrefTarget)
             .attr('startOffset', offset)
             .append('tspan').attr('dy', -3)
-            .text(display_train_id); // 印出乾淨的字串
+            .text(display_train_id);
     }
 }
 
