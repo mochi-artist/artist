@@ -533,7 +533,7 @@ const titleHTML = `
             
 // 🌟 列表容器：直接為外層容器加上 background: #131b2d，這是最關鍵的一步！
 // 這樣即使內部有縮放縫隙，透過去的也是一樣的深色背景，不會看到地圖格線。
-let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 180px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: #131b2d;">`;
+let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 224px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: #131b2d;">`;
 
 // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
 listHTML += `
