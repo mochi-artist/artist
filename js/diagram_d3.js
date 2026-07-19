@@ -195,7 +195,7 @@ function _panToTrain(pathId) {
 
     setTimeout(() => {
         // 原生置中滾動
-        anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
         // 功成身退，兩秒後刪除幽靈錨點
         setTimeout(() => document.body.removeChild(anchor), 2000);
     }, 50);
@@ -537,7 +537,7 @@ let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container
 
 // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
 listHTML += `
-    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
+    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:9.7px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
         <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
             <span style="display:inline-block; width: 28px;"></span><span>車站</span>
         </span>
@@ -603,8 +603,22 @@ listHTML += `
         if (targetStopId) {
             setTimeout(() => {
                 let targetRow = document.getElementById(`d3-stop-row-${targetContainerId}-${targetStopId}`);
-                if (targetRow) {
-                    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 🌟 1. 抓出「只有它需要捲動」的清單外層容器
+                let listContainer = document.getElementById(`d3-timetable-list-container-${targetContainerId}`);
+                
+                if (targetRow && listContainer) {
+                    let prevRow = targetRow.previousElementSibling;
+                    
+                    // 🌟 2. 決定要把誰推到頂端 (如果有上一站就用上一站，否則用自己)
+                    let targetElement = (prevRow && prevRow.classList.contains('timetable-row')) ? prevRow : targetRow;
+                    
+                    // 🌟 3. 使用 scrollTo 針對「特定容器」進行內部捲動，絕不干擾網頁外部！
+                    listContainer.scrollTo({
+                        top: targetElement.offsetTop, // 取得該元素在容器內的相對高度
+                        behavior: 'smooth'
+                    });
+
+                    // 🌟 4. 底下維持原本的變色特效
                     setTimeout(() => {
                         targetRow.style.background = 'rgba(255,255,255,0.05)';
                         targetRow.style.borderLeft = '3px solid transparent';
@@ -660,7 +674,7 @@ listHTML += `
                 document.body.appendChild(anchor);
 
                 setTimeout(() => { 
-                    anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); 
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); 
                     setTimeout(() => document.body.removeChild(anchor), 2000);
                 }, 50);
             });
@@ -1875,4 +1889,3 @@ function find_uncontinuous_index(value) {
     }
     return index;
 }
-
