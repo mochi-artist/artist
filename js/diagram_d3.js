@@ -163,7 +163,7 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯 (幽靈錨點精準置中法，取消水波紋)
+// 🌟 畫面跳轉與無限清單邏輯 (恢復強制置中 + 防面板遮擋機制)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
@@ -180,11 +180,14 @@ function _panToTrain(pathId) {
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
+    // 🌟 核心防遮擋：如果是電腦版，把錨點往左算一點，這樣目標車站就會出現在右半部可視區，不會被左側面板蓋住！
+    const shiftX = (window.innerWidth > 768 && _isPanelOpen) ? 225 : 0;
+
     // 建立隱形幽靈錨點
     const anchor = document.createElement('div');
     Object.assign(anchor.style, {
         position: 'absolute',
-        left: targetX + 'px',
+        left: (targetX - shiftX) + 'px',
         top: targetY + 'px',
         width: '1px',
         height: '1px',
@@ -194,8 +197,8 @@ function _panToTrain(pathId) {
     document.body.appendChild(anchor);
 
     setTimeout(() => {
-        // 原生置中滾動
-        anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        // 🌟 關鍵修復：從 nearest 改回 center，保證車站絕對出現在畫面正中央
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
         // 功成身退，兩秒後刪除幽靈錨點
         setTimeout(() => document.body.removeChild(anchor), 2000);
     }, 50);
@@ -327,7 +330,7 @@ function _renderSearchResults(query, containerElement) {
 }
 
 // ==========================================
-// 🌟 確保「快速時刻表」懸浮容器存在 (完全固定不可拖曳，橫向填滿)
+// 🌟 確保「快速時刻表」懸浮容器存在 (加入電腦版專屬放大 CSS + 拔除留白死角)
 // ==========================================
 function _ensureQuickTimetableContainer() {
     let container = document.getElementById('d3-quick-timetable-section');
@@ -337,16 +340,16 @@ function _ensureQuickTimetableContainer() {
         
         Object.assign(container.style, {
             position: 'absolute', 
-            width: '340px',
-            background: '#131b2d', // 🌟 確保最外層底色填滿，防漏光
+            width: '340px', // 預設寬度，電腦版會被底下的 CSS 覆蓋
+            background: 'rgba(15, 23, 42, 0.95)', 
             border: '1px solid rgba(255,255,255,0.1)', 
             borderRadius: '12px',
-            overflow: 'hidden', // 🌟 強制裁切內部直角，保持完美圓角
+            overflow: 'hidden', 
             boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
             zIndex: '9999',
             display: 'none',
             flexDirection: 'column',
-            padding: '0', // 🌟 改為 0，讓內部 title 和 list 完全貼合邊界
+            padding: '0', // 🌟 核心修正：將 '0 0 12px 0' 改為 '0'，徹底拔除底部的留白死角
             fontFamily: 'sans-serif',
             backdropFilter: 'blur(10px)',
             boxSizing: 'border-box',
@@ -356,13 +359,47 @@ function _ensureQuickTimetableContainer() {
         
         const style = document.createElement('style');
         style.innerHTML = `
+            /* 手機版設定 (維持原樣) */
             @media (max-width: 768px) {
                 #d3-quick-timetable-section {
                     width: 280px !important;
                 }
             }
-            .timetable-row {
-                background: #131b2d !important; /* 確保每一列的背景色也是滿的 */
+            
+            /* 🌟 核心新增：專屬電腦版的額外時刻表放大設定 🌟 */
+            @media (min-width: 769px) {
+                #d3-quick-timetable-section {
+                    width: 500px !important; /* 根據紅框比例大幅加寬 */
+                }
+                #d3-quick-timetable-section .d3-panel-title {
+                    font-size: 18px !important; /* 標題字體放大 */
+                    padding: 16px 24px 12px 24px !important;
+                }
+                #d3-quick-timetable-section .d3-panel-title button {
+                    font-size: 32px !important; /* 關閉按鈕放大 */
+                }
+                #d3-quick-timetable-section .d3-custom-scrollbar {
+                    max-height: 460px !important; /* 增加可視高度，顯示更多車站 */
+                }
+                /* 表頭放大 */
+                #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child {
+                    font-size: 15px !important;
+                    padding: 12px 24px !important;
+                }
+                /* 資料列放大 */
+                #d3-quick-timetable-section .timetable-row {
+                    padding: 12px 24px !important; /* 增加間距 */
+                }
+                #d3-quick-timetable-section .timetable-row > span {
+                    font-size: 15px !important; /* 時間與備註文字放大 */
+                }
+                #d3-quick-timetable-section .timetable-row > span:first-child {
+                    font-size: 18px !important; /* 車站名稱文字放大 */
+                }
+                #d3-quick-timetable-section .timetable-row > span:first-child > span:first-child {
+                    font-size: 20px !important; /* 🚉 圖示放大 */
+                    width: 36px !important;
+                }
             }
         `;
         document.head.appendChild(style);
@@ -377,7 +414,8 @@ function _ensureQuickTimetableContainer() {
             const pT = vv ? vv.pageTop : window.scrollY;
             const vW = vv ? vv.width : window.innerWidth;
             
-            let uiWidth = container.offsetWidth || (window.innerWidth <= 768 ? 280 : 340);
+            // 🌟 座標定位修正：將電腦版的預設寬度改為 500 計算，避免彈出時偏離右側邊界
+            let uiWidth = container.offsetWidth || (window.innerWidth <= 768 ? 280 : 500);
 
             let offsetX = 0, offsetY = 0;
             if (window.innerWidth <= 768) {
@@ -391,8 +429,6 @@ function _ensureQuickTimetableContainer() {
             container.style.left = (pL + offsetX) + 'px';
             container.style.top = (pT + offsetY) + 'px';
             
-            // 🌟 核心修改：在動態縮放時，一併加入 translateZ(0) 強制硬體加速
-            // 這能有效防止手機雙指縮放時，外框與內部元素產生渲染位移差
             container.style.transform = `scale(${1 / scale}) translateZ(0)`;
         };
 
@@ -603,22 +639,31 @@ listHTML += `
         if (targetStopId) {
             setTimeout(() => {
                 let targetRow = document.getElementById(`d3-stop-row-${targetContainerId}-${targetStopId}`);
-                // 🌟 1. 抓出「只有它需要捲動」的清單外層容器
                 let listContainer = document.getElementById(`d3-timetable-list-container-${targetContainerId}`);
                 
                 if (targetRow && listContainer) {
-                    let prevRow = targetRow.previousElementSibling;
+                    let scrollPos = 0;
                     
-                    // 🌟 2. 決定要把誰推到頂端 (如果有上一站就用上一站，否則用自己)
-                    let targetElement = (prevRow && prevRow.classList.contains('timetable-row')) ? prevRow : targetRow;
+                    if (window.innerWidth > 768) {
+                        // 🌟 電腦版專屬：精準計算表頭真實高度，讓跳轉車站完美貼合在表頭正下方
+                        const header = listContainer.firstElementChild;
+                        const headerHeight = header ? header.offsetHeight : 0;
+                        // 計算：目標車站的相對頂部位置 - 表頭高度 + 1px(補償 top: -1px 的偏差)
+                        scrollPos = targetRow.offsetTop - headerHeight + 1;
+                    } else {
+                        // 🌟 手機版：維持原本推到上一站的設定 (不動手機版邏輯)
+                        let prevRow = targetRow.previousElementSibling;
+                        let targetElement = (prevRow && prevRow.classList.contains('timetable-row')) ? prevRow : targetRow;
+                        scrollPos = targetElement.offsetTop;
+                    }
                     
-                    // 🌟 3. 使用 scrollTo 針對「特定容器」進行內部捲動，絕不干擾網頁外部！
+                    // 執行內部捲動
                     listContainer.scrollTo({
-                        top: targetElement.offsetTop, // 取得該元素在容器內的相對高度
+                        top: scrollPos, 
                         behavior: 'smooth'
                     });
 
-                    // 🌟 4. 底下維持原本的變色特效
+                    // 維持原本的變色特效
                     setTimeout(() => {
                         targetRow.style.background = 'rgba(255,255,255,0.05)';
                         targetRow.style.borderLeft = '3px solid transparent';
@@ -637,6 +682,7 @@ listHTML += `
                 const rawLoc = parseFloat(this.getAttribute('data-loc'));
                 if (isNaN(rawTime) || isNaN(rawLoc)) return;
 
+                // 點擊後關閉時刻表面板
                 container.style.display = 'none'; 
                 if (!isQuick) {
                     const toggleCb = document.getElementById('d3-timetable-toggle');
@@ -659,13 +705,14 @@ listHTML += `
                 const targetX = offsetX + svgX;
                 const targetY = offsetY + svgY;
 
+                // 讓錨點往下移一點，目標點就會偏畫面上方，對手機版特別好用
                 const shiftY = window.innerWidth <= 768 ? (window.innerHeight * 0.15) : 0;
 
                 const anchor = document.createElement('div');
                 Object.assign(anchor.style, {
                     position: 'absolute',
                     left: targetX + 'px',
-                    top: (targetY - shiftY) + 'px',
+                    top: (targetY + shiftY) + 'px',
                     width: '1px',
                     height: '1px',
                     pointerEvents: 'none',
@@ -674,7 +721,8 @@ listHTML += `
                 document.body.appendChild(anchor);
 
                 setTimeout(() => { 
-                    anchor.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); 
+                    // 🌟 關鍵修復：從 nearest 改回 center，把目標車站無情地拉回視野中心！
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); 
                     setTimeout(() => document.body.removeChild(anchor), 2000);
                 }, 50);
             });
