@@ -61,7 +61,7 @@ if (!document.getElementById('d3-custom-styles')) {
     style.id = 'd3-custom-styles';
     style.innerHTML = `
         .d3-custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .d3-custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .d3-custom-scrollbar::-webkit-scrollbar-track { background: transparent; } /* 全透明捲軸 */
         .d3-custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
         .d3-custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
         
@@ -72,6 +72,7 @@ if (!document.getElementById('d3-custom-styles')) {
         .d3-item-text { font-size: 14px; }
         .d3-item-badge { font-size: 11px; padding: 2px 8px; }
 
+        /* 📱 手機版極小螢幕覆蓋 */
         @media (max-width: 500px) {
             #d3-panel-body { width: calc(100vw - 24px) !important; }
             .d3-filter-section { width: 45% !important; padding: 10px 6px !important; }
@@ -80,7 +81,19 @@ if (!document.getElementById('d3-custom-styles')) {
             .d3-item-text { font-size: 12px !important; }
             .d3-item-badge { font-size: 10px !important; padding: 2px 5px !important; }
             .d3-panel-title { font-size: 12px !important; }
+            
+            /* 🌟 核心修正：取消彈性拉伸 (flex: 0 0 auto)，徹底消除底部的多餘黑邊！ */
+            #d3-timetable-section { 
+                margin-top: 8px !important; /* 將時刻表稍微往下推開一點距離 */
+                flex: 0 0 auto !important;  /* 👈 關鍵：讓外框「剛好包住內容」，絕對不往下硬拉 */
+            }
+            /* 🌟 精準鎖定清單高度：表頭 + 5格車站 剛好約 195px */
+            #d3-timetable-section .d3-custom-scrollbar { 
+                max-height: 211.5px !important; 
+            }
         }
+        
+        /* 🌟 已經將電腦版的強制加長設定 (max-height: 380px) 刪除，讓時刻表完美回歸 5 格高度 */
     `;
     document.head.appendChild(style);
 }
@@ -560,28 +573,27 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             ? `document.getElementById('d3-quick-timetable-section').style.display='none';`
             : `document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;`;
 
-        // 🌟 標題列：加入 top: -1px 與 transform 修正縮放接縫
-const titleHTML = `
-    <div class="d3-panel-title" style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; margin-bottom:0px; padding:12px 16px 8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: -1px; background: #131b2d; z-index: 10; transform: translateZ(0);">
-        <span style="pointer-events: none;">🕒 <b>${display_train_no}</b> 車次時刻表</span>
-        <button onclick="${closeScript}" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1; display:flex; align-items:center;">&times;</button>
-    </div>`;
+        // 🌟 標題列：將 padding 統一改為 8px 16px，讓高度與下方對齊
+        const titleHTML = `
+            <div class="d3-panel-title" style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; margin-bottom:0px; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: -1px; background: #131b2d; z-index: 10; transform: translateZ(0);">
+                <span style="pointer-events: none;">🕒 <b>${display_train_no}</b> 車次時刻表</span>
+                <button onclick="${closeScript}" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1; display:flex; align-items:center;">&times;</button>
+            </div>`;
             
-// 🌟 列表容器：直接為外層容器加上 background: #131b2d，這是最關鍵的一步！
-// 這樣即使內部有縮放縫隙，透過去的也是一樣的深色背景，不會看到地圖格線。
-let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 224px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: #131b2d;">`;
+// 🌟 列表容器：將 background 改為 transparent，確保不會有死硬的黑底露出！
+let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 224px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
 
 // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
-listHTML += `
-    <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:9.7px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
-        <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
-            <span style="display:inline-block; width: 28px;"></span><span>車站</span>
-        </span>
-        <span style="flex: 1; text-align: center;">到站</span>
-        <span style="flex: 1; text-align: center;">離站</span>
-        <span style="flex: 1; text-align: center;">備註</span>
-    </div>`;
-
+// 🌟 表頭列：將 padding 統一改為 8px 16px，讓高度與資料列完全相同
+        listHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
+                <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
+                    <span style="display:inline-block; width: 28px;"></span><span>車站</span>
+                </span>
+                <span style="flex: 1; text-align: center;">到站</span>
+                <span style="flex: 1; text-align: center;">離站</span>
+                <span style="flex: 1; text-align: center;">備註</span>
+            </div>`;
         if (mergedStops.length === 0) {
             listHTML += `<div style="color:#888; text-align:center; padding:10px 0; font-size:12px;">此路線範圍內無停靠資料</div>`;
         } else {
@@ -594,6 +606,8 @@ listHTML += `
                 
                 let remarkDisplay = stop.remark; 
                 let isTarget = (stop.id === targetStopId);
+                
+                // 🌟 恢復為透明底色，只有目標車站有淡淡的高亮
                 let bgStyle = isTarget ? 'rgba(56, 189, 248, 0.25)' : 'transparent';
                 let borderStyle = isTarget ? 'border-left: 3px solid #38bdf8;' : 'border-left: 3px solid transparent;';
 
@@ -616,7 +630,7 @@ listHTML += `
                     `;
                 }
 
-                // 🌟 資料列：填滿橫行，滑過時的特效也會延伸到最邊緣
+                // 🌟 核心修正：移除 margin、border-radius 與獨立背景色，加上 border-bottom 與 8px 16px 的舒適內距
                 listHTML += `
                     <div class="timetable-row" id="d3-stop-row-${targetContainerId}-${stop.id}" data-time="${stop.arrTime}" data-loc="${stop.loc}" 
                          style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 16px; cursor:pointer; transition: background 0.2s; border-bottom:1px solid rgba(255,255,255,0.05); background:${bgStyle}; ${borderStyle}"
@@ -959,15 +973,19 @@ function _init_ui_panels() {
     topSectionContainer.appendChild(filterSection);
     topSectionContainer.appendChild(searchSection);
 
+    // 🌟 核心修改：移除 12px 底部留白，並強制加入「透明底色」、「底部圓角」與「溢出裁切」
     const timetableSection = document.createElement('div');
     timetableSection.id = 'd3-timetable-section';
     timetableSection.className = 'd3-custom-scrollbar';
     Object.assign(timetableSection.style, {
         display: 'none', 
         flexDirection: 'column', 
-        padding: '0 0 12px 0', 
+        padding: '0', // 👈 拔除底部的 12px 死角
         borderTop: '1px solid rgba(255,255,255,0.1)', 
-        background: '#131b2d', // ✅ 強制設定為實心色碼
+        background: 'transparent', // 👈 改為透明，自然融合主面板底色
+        borderBottomLeftRadius: '12px',  // 👈 強制加上左下圓角
+        borderBottomRightRadius: '12px', // 👈 強制加上右下圓角
+        overflow: 'hidden', // 👈 強制裁切內部超出圓角的資料列
         flex: '1 1 auto',
         minHeight: '0'
     });
