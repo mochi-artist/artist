@@ -89,7 +89,7 @@ if (!document.getElementById('d3-custom-styles')) {
             }
             /* 🌟 精準鎖定清單高度：表頭 + 5格車站 剛好約 195px */
             #d3-timetable-section .d3-custom-scrollbar { 
-                max-height: 212.6px !important; 
+                max-height: 212px !important; 
             }
         }
         
