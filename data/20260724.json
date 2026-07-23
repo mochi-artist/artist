@@ -267070,6 +267070,111 @@
           "ARRTime": "18:12:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6040",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年7月24日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "08:23:00",
+          "ARRTime": "08:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "7030",
+          "Order": "2",
+          "DEPTime": "11:19:00",
+          "ARRTime": "11:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "3",
+          "DEPTime": "11:35:00",
+          "ARRTime": "11:35:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6503",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年7月24日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "3410",
+          "Order": "1",
+          "DEPTime": "11:30:00",
+          "ARRTime": "11:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "3430",
+          "Order": "2",
+          "DEPTime": "11:57:00",
+          "ARRTime": "11:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "3480",
+          "Order": "3",
+          "DEPTime": "13:03:00",
+          "ARRTime": "12:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "4120",
+          "Order": "4",
+          "DEPTime": "14:58:00",
+          "ARRTime": "13:38:00"
+        },
+        {
+          "Route": "",
+          "Station": "4200",
+          "Order": "5",
+          "DEPTime": "15:49:00",
+          "ARRTime": "15:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "6",
+          "DEPTime": "16:22:00",
+          "ARRTime": "16:22:00"
+        }
+      ]
     }
   ]
 }
