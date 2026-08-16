@@ -51,8 +51,8 @@ const _filterCategories = [
     { id: 'local', name: '區間車', styles: ['local'] },
     { id: 'local_express', name: '區間快', styles: ['local_express'] },
     { id: 'ordinary', name: '普快車', styles: ['ordinary', 'fu_hsing'] },
-    { id: 'others', name: '客迴', styles: [] }, 
-    { id: 'special', name: '特殊列車', styles: [] } 
+    { id: 'others', name: '客迴', styles: ['others'] }, 
+    { id: 'special', name: '特殊列車', styles: ['special'] } 
 ];
 
 // 注入美化捲軸與響應式 CSS
@@ -98,15 +98,27 @@ if (!document.getElementById('d3-custom-styles')) {
     document.head.appendChild(style);
 }
 
-// 智慧判定車種分類
+// 智慧判定車種分類 (結合強制規則與 data all 總表動態過濾)
 function _getTrainCategoryId(style, train_no) {
     const base_no = train_no.replace(/-End$/, '');
+
+    // 1. 強制保留規則 (1/2次為莒光，英文字母與3455/3456為客迴)
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
     if (base_no === '3455' || base_no === '3456') return 'others';
     if (/[a-zA-Z]/.test(base_no)) return 'others';
-    for (let i = 1; i < _filterCategories.length - 2; i++) {
+
+    // 2. 🌟 核心動態邏輯：如果總表有載入，且該車次不在總表內，一律歸類為「特殊列車」
+    if (window._masterTrainIds && window._masterTrainIds.size > 0) {
+        if (!window._masterTrainIds.has(base_no)) {
+            return 'special';
+        }
+    }
+
+    // 3. 正常總表內的車次，依照定義好的 styles 進行分類
+    for (let i = 1; i < _filterCategories.length; i++) {
         if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
+
     return 'special';
 }
 
@@ -882,7 +894,8 @@ function _init_ui_panels() {
 
     const filterList = document.createElement('div');
     
-    function _renderFilterList() {
+    // 🌟 將函式掛載到 window，讓外部載入總表後可以呼叫重新整理
+    window._renderFilterList = function() {
         filterList.innerHTML = '';
         const counts = {};
         _filterCategories.forEach(c => counts[c.id] = 0);
@@ -926,12 +939,12 @@ function _init_ui_panels() {
                         }
                     }
                 }
-                _renderFilterList(); 
+                window._renderFilterList(); 
                 _applyFilter(); 
             });
             filterList.appendChild(item);
         });
-    }
+    };
     
     filterSection.appendChild(filterTitle);
     filterSection.appendChild(boldToggleContainer);
@@ -1446,31 +1459,26 @@ function draw_diagram_background(line_kind, date) {
 }
 
 // ==========================================
-// 🌟 統籌畫圖與圖層排序 (💯 100% 全自動時空菜單版)
+// 🌟 統籌畫圖與圖層排序 (全自動基準總表過濾版)
 // ==========================================
 function draw_train_path(all_trains_data, realtime_trains) {
     const urlParams = new URLSearchParams(window.location.search);
     const revisedJson = urlParams.get('revisedJson');
     const dateParam = urlParams.get('date');
 
-    // 核心畫圖執行邏輯 (包裝起來等待菜單讀取)
     const initDrawingWithEpochs = (OP_STOPS_EPOCHS) => {
         let opStopsUrl = null;
+        let masterDiagramUrl = null; // 🌟 存放總表路徑
 
         // 1. 判斷時空路徑
         if (revisedJson) {
             const match = revisedJson.match(/(\d{7})/);
-            if (match) opStopsUrl = `OpStops/OpStops_${match[1]}.json`;
-        } else {
-            let qDate;
-            if (dateParam) {
-                qDate = parseInt(dateParam);
-            } else {
-                const d = new Date();
-                qDate = parseInt(`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`);
+            if (match) {
+                opStopsUrl = `OpStops/OpStops_${match[1]}.json`;
+                masterDiagramUrl = `data all/final_train_diagram_${match[1]}.json`;
             }
-
-            // 比對 Python 給的菜單，找最近的歷史世代
+        } else {
+            let qDate = dateParam ? parseInt(dateParam) : parseInt(`${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}`);
             let activeFileId = null;
             if (OP_STOPS_EPOCHS && OP_STOPS_EPOCHS.length > 0) {
                 for (let i = OP_STOPS_EPOCHS.length - 1; i >= 0; i--) {
@@ -1480,147 +1488,167 @@ function draw_train_path(all_trains_data, realtime_trains) {
                     }
                 }
             }
-            if (activeFileId) opStopsUrl = `OpStops/OpStops_${activeFileId}.json`;
+            if (activeFileId) {
+                opStopsUrl = `OpStops/OpStops_${activeFileId}.json`;
+                masterDiagramUrl = `data all/final_train_diagram_${activeFileId}.json`;
+            }
         }
 
         window._opStopsData = window._opStopsData || {};
 
         const executeDrawing = () => {
-            _drawnStarPositions = []; // 清空重疊座標記錄
+            try {
+                _drawnStarPositions = []; // 清空重疊座標記錄
+                const is_master_mode = !!revisedJson; 
+                const shift_amount = 2880; 
+                const start_time = DiagramHours[0] * 120; 
 
-            // 🌟 自動模式判定：透過網址參數決定
-            // 如果網址有 revisedJson，代表是從「進入改點預覽」進來的總車次檔 (data all)
-            // 如果沒有，代表是從「今日運行圖」或「日期圖庫」進來的日期檔 (data)
-            const is_master_mode = !!revisedJson; 
+                let drawCount = 0;
 
-            // 🌟 空間跳躍引擎參數
-            const shift_amount = 2880; // 24小時的 time 單位 (24 * 60 * 2)
-            const start_time = DiagramHours[0] * 120; // 網頁左邊界時間，通常為 04:00 (480)
+                for (const train_data of all_trains_data) {
+                    for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
+                        if (value.length <= 2) continue;
 
-            for (const train_data of all_trains_data) {
-                for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
-                    if (value.length <= 2) continue;
+                        let realtime_data = realtime_trains != null ? realtime_trains.get(train_no) : undefined;
+                        let sections = [];
+                        let current_section = [];
+                        let order_next = value[0][5];
 
-                    let realtime_data = realtime_trains != null ? realtime_trains.get(train_no) : undefined;
+                        for (let i = 0; i < value.length; i++) {
+                            let pt = [...value[i]];
+                            let orig_time = value[i][2];
+                            let order = pt[5];
 
-                    let sections = [];
-                    let current_section = [];
-                    let order_next = value[0][5];
+                            let is_disconnect = false;
+                            if (order !== order_next) is_disconnect = true;
 
-                    for (let i = 0; i < value.length; i++) {
-                        let pt = [...value[i]];
-                        let orig_time = value[i][2];
-                        let order = pt[5];
+                            if (orig_time !== null && !isNaN(orig_time)) {
+                                if (current_section.length > 0) {
+                                    let orig_prev_time = value[i-1][2];
 
-                        let is_disconnect = false;
-                        if (order !== order_next) is_disconnect = true;
+                                    if (orig_time < orig_prev_time - 1440) {
+                                        is_disconnect = true;
+                                    } else if (!is_disconnect) {
+                                        let prev_cycles = Math.floor((orig_prev_time - start_time) / shift_amount);
+                                        let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
 
-                        if (orig_time !== null && !isNaN(orig_time)) {
-                            if (current_section.length > 0) {
-                                let orig_prev_time = value[i-1][2];
+                                        if (curr_cycles > prev_cycles) {
+                                            let pt_old = [...pt];
+                                            pt_old[2] -= prev_cycles * shift_amount;
+                                            current_section.push(pt_old);
+                                            sections.push(current_section);
 
-                                // 異常髒資料：時間嚴重倒退，強制切斷
-                                if (orig_time < orig_prev_time - 1440) {
-                                    is_disconnect = true;
-                                } else if (!is_disconnect) {
-                                    // 🌟 跨越 04:00 邊界判定
-                                    let prev_cycles = Math.floor((orig_prev_time - start_time) / shift_amount);
-                                    let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
-
-                                    // 當偵測到跨越右邊界時 (例如 03:55 -> 04:01)
-                                    if (curr_cycles > prev_cycles) {
-                                        // A. 將當前點「降維」，把線畫到右邊界 04:00 出圖
-                                        let pt_old = [...pt];
-                                        pt_old[2] -= prev_cycles * shift_amount;
-                                        current_section.push(pt_old);
-                                        sections.push(current_section);
-
-                                        // B. 根據模式決定後續動作！
-                                        if (is_master_mode) {
-                                            // 🔮 全車次版 (data all)：莫比烏斯環，無縫接回左邊 04:00！
-                                            let prev_new = [...value[i-1]];
-                                            prev_new[2] -= curr_cycles * shift_amount;
-                                            pt[2] -= curr_cycles * shift_amount;
-                                            current_section = [prev_new, pt];
-                                            order_next = order + 1;
-                                            continue;
-                                        } else {
-                                            // 🚫 日期檔 (data)：超過明早 4:00 的部分屬於明天，當天直接隱藏！
-                                            current_section = []; 
-                                            break; // 直接跳出這個車次的內部站點迴圈
+                                            if (is_master_mode) {
+                                                let prev_new = [...value[i-1]];
+                                                prev_new[2] -= curr_cycles * shift_amount;
+                                                pt[2] -= curr_cycles * shift_amount;
+                                                current_section = [prev_new, pt];
+                                                order_next = order + 1;
+                                                continue;
+                                            } else {
+                                                current_section = []; 
+                                                break; 
+                                            }
                                         }
+                                        pt[2] -= curr_cycles * shift_amount;
                                     }
-                                    
-                                    // 同週期的正常點，僅做基礎位移
+                                }
+                                if (current_section.length === 0 || is_disconnect) {
+                                    let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
                                     pt[2] -= curr_cycles * shift_amount;
                                 }
                             }
-                            
-                            // 新線段的起點基礎位移
-                            if (current_section.length === 0 || is_disconnect) {
-                                let curr_cycles = Math.floor((orig_time - start_time) / shift_amount);
-                                pt[2] -= curr_cycles * shift_amount;
+
+                            if (is_disconnect) {
+                                if (current_section.length > 1) sections.push(current_section);
+                                current_section = [pt];
+                                order_next = order + 1;
+                                continue;
                             }
-                        }
 
-                        if (is_disconnect) {
-                            if (current_section.length > 1) sections.push(current_section);
-                            current_section = [pt];
+                            current_section.push(pt);
                             order_next = order + 1;
-                            continue;
                         }
 
-                        current_section.push(pt);
-                        order_next = order + 1;
-                    }
+                        if (current_section.length > 1) sections.push(current_section);
 
-                    if (current_section.length > 1) sections.push(current_section);
-
-                    // 將拆分後的每一段畫出
-                    for (let j = 0; j < sections.length; j++) {
-                        let suffix = j === 0 ? '' : (j === 1 ? '-End' : `-End${j}`);
-                        set_path(lk, train_no + suffix, train_kind, sections[j]);
-                        
-                        if (typeof realtime_data !== 'undefined') {
-                            mark_realtime_train_position(lk, sections[j], line_dir, train_kind, realtime_data);
+                        for (let j = 0; j < sections.length; j++) {
+                            let suffix = j === 0 ? '' : (j === 1 ? '-End' : `-End${j}`);
+                            set_path(lk, train_no + suffix, train_kind, sections[j]);
+                            drawCount++;
+                            
+                            if (typeof realtime_data !== 'undefined') {
+                                mark_realtime_train_position(lk, sections[j], line_dir, train_kind, realtime_data);
+                            }
                         }
                     }
                 }
-            }
-            if (_d3G) {
-                _d3G.selectAll('.op-stop-marker').raise();  
-                _d3G.selectAll('[class$="_mark"]').raise(); 
+
+                console.log(`✅ 畫線完成，共繪製了 ${drawCount} 段線條。`);
+
+                if (_d3G) {
+                    _d3G.selectAll('.op-stop-marker').raise();  
+                    _d3G.selectAll('[class$="_mark"]').raise(); 
+                }
+
+                // 🌟 重新計算 UI 分類並顯示
+                if (typeof window._renderFilterList === 'function') {
+                    window._renderFilterList();
+                }
+            } catch (e) {
+                console.error("🔥 畫線模組發生嚴重錯誤:", e);
             }
         };
 
-        // 2. 讀取星星檔並畫圖
-        if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) {
-            d3.json(opStopsUrl).then(function(opStopsData) {
-                console.log(`🌟 運轉停車載入成功！(菜單導航至: ${opStopsUrl})`);
-                window._opStopsData = opStopsData; 
-                window._currentOpStopsUrl = opStopsUrl; 
-                executeDrawing(); 
-            }).catch(function(error) {
-                console.log(`💤 尚未上傳此世代星星檔 (${opStopsUrl})，無星模式畫線。`);
-                window._opStopsData = {}; 
-                window._currentOpStopsUrl = opStopsUrl; 
-                executeDrawing(); 
+        // 🌟 封裝安全的 Fetch，避免網址空白 (data all) 導致崩潰
+        const fetchSafe = (url) => {
+            if (!url) return Promise.resolve(null);
+            return d3.json(encodeURI(url)).catch(err => {
+                console.warn(`資源載入失敗 (可忽略): ${url}`, err);
+                return null;
             });
-        } else {
-            executeDrawing();
-        }
+        };
+
+        // 🌟 雙管齊下：同時抓取星星與總表
+        Promise.all([
+            (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) ? fetchSafe(opStopsUrl) : Promise.resolve(window._opStopsData),
+            fetchSafe(masterDiagramUrl)
+        ]).then(([opStopsData, masterData]) => {
+            
+            if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl && opStopsData) {
+                window._opStopsData = opStopsData; 
+                window._currentOpStopsUrl = opStopsUrl;
+            }
+
+            // 解析總表，建立白名單
+            window._masterTrainIds = new Set();
+            if (masterData) {
+                let trainList = Array.isArray(masterData) ? masterData : (masterData.TrainInfos || masterData.Trains || []);
+                trainList.forEach(t => {
+                    if (t.Train) window._masterTrainIds.add(String(t.Train));
+                    if (t.TrainNo) window._masterTrainIds.add(String(t.TrainNo));
+                });
+                console.log(`✅ 基準總表 (${masterDiagramUrl}) 載入成功，共 ${window._masterTrainIds.size} 筆標準車次`);
+            } else {
+                console.log(`⚠️ 無法載入基準總表 (${masterDiagramUrl})，退回純強制規則過濾模式`);
+            }
+
+            executeDrawing(); 
+        }).catch(err => {
+            console.error("🔥 Promise.all 致命錯誤:", err);
+            executeDrawing(); // 就算壞掉也強制畫線，不讓畫面全空
+        });
     };
 
-    // 🌟 啟動：先確認有沒有拿到菜單
     if (window._cachedRevisedEpochs) {
-        initDrawingWithEpochs(window._cachedRevisedEpochs); // 已經有了就直接用
+        initDrawingWithEpochs(window._cachedRevisedEpochs); 
     } else {
-        d3.json("data all/Revised_Epochs.json").then(epochs => {
-            window._cachedRevisedEpochs = epochs; // 緩存起來，避免切換面板重複讀取
+        d3.json(encodeURI("data all/Revised_Epochs.json")).then(epochs => {
+            window._cachedRevisedEpochs = epochs; 
             initDrawingWithEpochs(epochs);
         }).catch(err => {
             console.log("⚠️ 找不到 data all/Revised_Epochs.json 菜單，正常畫線。");
-            initDrawingWithEpochs([]); // 沒菜單也能安全降級
+            initDrawingWithEpochs([]); 
         });
     }
 }
