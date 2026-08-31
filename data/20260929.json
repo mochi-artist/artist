@@ -256906,6 +256906,412 @@
           "DEPTime": "09:02:00"
         }
       ]
+    },
+    {
+      "Type": "2",
+      "Train": "5109",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月29日行駛。※乘車當日限量發售無座票。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "1",
+          "DEPTime": "08:15:00",
+          "ARRTime": "08:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "2",
+          "DEPTime": "08:24:30",
+          "ARRTime": "08:23:30"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "3",
+          "DEPTime": "08:33:00",
+          "ARRTime": "08:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "08:38:00",
+          "ARRTime": "08:37:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "5",
+          "DEPTime": "08:48:00",
+          "ARRTime": "08:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "6",
+          "DEPTime": "08:57:30",
+          "ARRTime": "08:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "1080",
+          "Order": "7",
+          "DEPTime": "09:18:00",
+          "ARRTime": "09:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "1100",
+          "Order": "8",
+          "DEPTime": "09:30:00",
+          "ARRTime": "09:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "1210",
+          "Order": "9",
+          "DEPTime": "10:01:00",
+          "ARRTime": "09:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "3230",
+          "Order": "10",
+          "DEPTime": "10:46:00",
+          "ARRTime": "10:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "11",
+          "DEPTime": "10:58:00",
+          "ARRTime": "10:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "12",
+          "DEPTime": "11:13:00",
+          "ARRTime": "11:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "3470",
+          "Order": "13",
+          "DEPTime": "11:44:00",
+          "ARRTime": "11:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "4080",
+          "Order": "14",
+          "DEPTime": "12:05:00",
+          "ARRTime": "12:03:00"
+        },
+        {
+          "Route": "",
+          "Station": "4220",
+          "Order": "15",
+          "DEPTime": "12:46:30",
+          "ARRTime": "12:45:30"
+        },
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "16",
+          "DEPTime": "13:13:00",
+          "ARRTime": "13:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "4400",
+          "Order": "17",
+          "DEPTime": "13:23:00",
+          "ARRTime": "13:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4440",
+          "Order": "18",
+          "DEPTime": "13:29:00",
+          "ARRTime": "13:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "5000",
+          "Order": "19",
+          "DEPTime": "13:41:00",
+          "ARRTime": "13:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "20",
+          "DEPTime": "13:55:00",
+          "ARRTime": "13:52:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5238",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月25、29日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "1",
+          "DEPTime": "09:06:00",
+          "ARRTime": "09:01:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "2",
+          "DEPTime": "09:14:00",
+          "ARRTime": "09:12:30"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "3",
+          "DEPTime": "09:25:00",
+          "ARRTime": "09:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "4",
+          "DEPTime": "09:35:00",
+          "ARRTime": "09:33:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "5",
+          "DEPTime": "10:42:00",
+          "ARRTime": "10:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "6",
+          "DEPTime": "10:51:00",
+          "ARRTime": "10:48:30"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "7",
+          "DEPTime": "11:51:00",
+          "ARRTime": "11:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "8",
+          "DEPTime": "12:35:00",
+          "ARRTime": "12:33:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "9",
+          "DEPTime": "12:50:00",
+          "ARRTime": "12:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "6070",
+          "Order": "10",
+          "DEPTime": "13:06:00",
+          "ARRTime": "13:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "6050",
+          "Order": "11",
+          "DEPTime": "13:20:00",
+          "ARRTime": "13:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "12",
+          "DEPTime": "13:52:00",
+          "ARRTime": "13:52:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5269",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月28日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。  第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "16",
+          "DEPTime": "04:38:00",
+          "ARRTime": "04:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "17",
+          "DEPTime": "04:48:00",
+          "ARRTime": "04:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "18",
+          "DEPTime": "04:56:00",
+          "ARRTime": "04:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "19",
+          "DEPTime": "05:06:00",
+          "ARRTime": "05:02:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5280",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1107",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月25-29日行駛。本班次不發售無座票，非持本班次車票旅客，請勿搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "1",
+          "DEPTime": "06:37:00",
+          "ARRTime": "06:37:00"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "2",
+          "DEPTime": "06:51:00",
+          "ARRTime": "06:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "3230",
+          "Order": "3",
+          "DEPTime": "07:02:00",
+          "ARRTime": "07:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "4",
+          "DEPTime": "08:35:00",
+          "ARRTime": "08:33:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "5",
+          "DEPTime": "08:47:00",
+          "ARRTime": "08:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "6",
+          "DEPTime": "08:54:00",
+          "ARRTime": "08:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "7",
+          "DEPTime": "09:10:00",
+          "ARRTime": "09:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "8",
+          "DEPTime": "10:07:00",
+          "ARRTime": "10:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "9",
+          "DEPTime": "10:15:00",
+          "ARRTime": "10:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "10",
+          "DEPTime": "11:12:00",
+          "ARRTime": "11:12:00"
+        }
+      ]
     }
   ]
 }
