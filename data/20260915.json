@@ -256941,6 +256941,41 @@
           "ARRTime": "08:32:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6565",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月15日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "06:40:00",
+          "ARRTime": "06:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7130",
+          "Order": "2",
+          "DEPTime": "07:39:00",
+          "ARRTime": "07:39:00"
+        }
+      ]
     }
   ]
 }
