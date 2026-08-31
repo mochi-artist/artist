@@ -266762,6 +266762,69 @@
           "ARRTime": "17:21:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6089",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年8月28日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "1",
+          "DEPTime": "08:30:00",
+          "ARRTime": "08:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "2",
+          "DEPTime": "11:31:00",
+          "ARRTime": "11:22:00"
+        },
+        {
+          "Route": "",
+          "Station": "6100",
+          "Order": "3",
+          "DEPTime": "13:38:00",
+          "ARRTime": "13:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "6180",
+          "Order": "4",
+          "DEPTime": "14:27:00",
+          "ARRTime": "14:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "6210",
+          "Order": "5",
+          "DEPTime": "14:42:00",
+          "ARRTime": "14:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "6",
+          "DEPTime": "15:12:00",
+          "ARRTime": "15:12:00"
+        }
+      ]
     }
   ]
 }
