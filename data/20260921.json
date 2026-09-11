@@ -260406,6 +260406,153 @@
           "DEPTime": "09:02:00"
         }
       ]
+    },
+    {
+      "Type": "2",
+      "Train": "1408",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月20日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1010",
+          "Order": "1",
+          "DEPTime": "04:03:30",
+          "ARRTime": "04:02:30"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "2",
+          "DEPTime": "04:10:00",
+          "ARRTime": "04:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "3",
+          "DEPTime": "04:17:00",
+          "ARRTime": "04:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "4",
+          "DEPTime": "04:20:30",
+          "ARRTime": "04:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "0970",
+          "Order": "5",
+          "DEPTime": "04:26:00",
+          "ARRTime": "04:25:30"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "6",
+          "DEPTime": "04:29:00",
+          "ARRTime": "04:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "0950",
+          "Order": "7",
+          "DEPTime": "04:31:30",
+          "ARRTime": "04:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "0940",
+          "Order": "8",
+          "DEPTime": "04:35:30",
+          "ARRTime": "04:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "9",
+          "DEPTime": "04:42:00",
+          "ARRTime": "04:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "0920",
+          "Order": "10",
+          "DEPTime": "04:46:00",
+          "ARRTime": "04:45:30"
+        },
+        {
+          "Route": "",
+          "Station": "0910",
+          "Order": "11",
+          "DEPTime": "04:49:30",
+          "ARRTime": "04:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "0900",
+          "Order": "12",
+          "DEPTime": "04:55:00",
+          "ARRTime": "04:55:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6030",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "2",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月21日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "1",
+          "DEPTime": "15:58:00",
+          "ARRTime": "15:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "1210",
+          "Order": "2",
+          "DEPTime": "18:11:00",
+          "ARRTime": "17:56:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "3",
+          "DEPTime": "20:18:00",
+          "ARRTime": "19:40:00"
+        }
+      ]
     }
   ]
 }
