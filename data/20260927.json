@@ -267903,6 +267903,55 @@
           "ARRTime": "20:24:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6024",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "2",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月27日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "1",
+          "DEPTime": "11:04:00",
+          "ARRTime": "09:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4220",
+          "Order": "2",
+          "DEPTime": "11:48:00",
+          "ARRTime": "11:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "3",
+          "DEPTime": "14:27:00",
+          "ARRTime": "14:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "4",
+          "DEPTime": "18:25:00",
+          "ARRTime": "17:40:00"
+        }
+      ]
     }
   ]
 }
