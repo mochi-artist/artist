@@ -267952,6 +267952,76 @@
           "ARRTime": "17:40:00"
         }
       ]
+    },
+    {
+      "Type": "2",
+      "Train": "5211",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1101",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年9月27日行駛。本班次不發售無座票，非持本班次車票旅客，請勿搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "11:23:00",
+          "ARRTime": "11:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "2",
+          "DEPTime": "12:21:00",
+          "ARRTime": "12:19:30"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "3",
+          "DEPTime": "12:29:00",
+          "ARRTime": "12:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "13:33:00",
+          "ARRTime": "13:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "5",
+          "DEPTime": "13:43:00",
+          "ARRTime": "13:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "6",
+          "DEPTime": "13:51:00",
+          "ARRTime": "13:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "7",
+          "DEPTime": "14:08:00",
+          "ARRTime": "13:57:00"
+        }
+      ]
     }
   ]
 }
