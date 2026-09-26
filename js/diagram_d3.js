@@ -40,6 +40,50 @@ let _isTimetableMode = false;
 let _currentLineKind = null;
 
 
+// 🌟 110F 專車替換規則 (依據圖表設定，同步至前端)
+const TEMP_110F_RULES = {
+    "20260925": ["2183", "3231"], "20260926": ["3010", "3035"],
+    "20260927": ["3001", "3018", "3021"], "20260928": ["3006", "1038"],
+    "20260929": ["2013", "2244"], "20260930": ["2123", "2184", "2223"],
+    "20261001": ["2128", "3177", "3228", "2257"], "20261002": ["2144", "2203", "2264"],
+    "20261003": ["6725A", "6725", "6725B"], "20261004": ["2183", "3231"],
+    "20261005": ["3010", "3035"], "20261006": ["3001", "3018", "3021"],
+    "20261007": ["3006", "1038"], "20261008": ["2013", "2244"],
+    "20261009": ["2183", "3231"], "20261010": ["3010", "3035"],
+    "20261011": ["3001", "3018", "3021"], "20261012": ["3006", "1038"],
+    "20261013": ["2013", "2244"], "20261014": ["2143", "2204", "2263"],
+    "20261015": ["2124", "2163", "2224"], "20261016": ["2143", "2204", "2263"],
+    "20261017": ["2124", "2163", "2224"], "20261018": ["6725A", "6725", "6725B"],
+    "20261019": ["2183", "3231"], "20261020": ["3010", "3035"],
+    "20261021": ["3001", "3018", "3021"], "20261022": ["3006", "1038"],
+    "20261023": ["2013", "2244"], "20261024": ["2183", "3231"],
+    "20261025": ["3010", "3035"], "20261026": ["3001", "3018", "3021"],
+    "20261027": ["3006", "1038"], "20261028": ["2013", "2244"],
+    "20261029": ["2143", "2204", "2263"], "20261030": ["2124", "2163", "2224"],
+    "20261031": ["6725A", "6725", "6725B"], "20261101": ["2183", "3231"],
+    "20261102": ["3010", "3035"], "20261103": ["3001", "3018", "3021"],
+    "20261104": ["3006", "1038"], "20261105": ["2013", "2244"],
+    "20261106": ["2183", "3231"], "20261107": ["3010", "3035"],
+    "20261108": ["3001", "3018", "3021"], "20261109": ["3006", "1038"],
+    "20261110": ["2013", "2244"], "20261111": ["2123", "2184", "2223"],
+    "20261112": ["2128", "3177", "3228", "2257"], "20261113": ["2144", "2203", "2264"],
+    "20261114": ["6725A", "6725", "6725B"], "20261115": ["2183", "3231"],
+    "20261116": ["3010", "3035"], "20261117": ["3001", "3018", "3021"],
+    "20261118": ["3006", "1038"], "20261119": ["2013", "2244"],
+    "20261120": ["2183", "3231"], "20261121": ["3010", "3035"],
+    "20261122": ["3001", "3018", "3021"], "20261123": ["3006", "1038"],
+    "20261124": ["2013", "2244"], "20261125": ["2143", "2204", "2263"],
+    "20261126": ["2124", "2163", "2224"], "20261127": ["2143", "2204", "2263"],
+    "20261128": ["2124", "2163", "2224"], "20261129": ["6725A", "6725", "6725B"],
+    "20261130": ["2183", "3231"], "20261201": ["3010", "3035"],
+    "20261202": ["3001", "3018", "3021"], "20261203": ["3006", "1038"],
+    "20261204": ["2013", "2244"], "20261205": ["6725A", "6725", "6725B"],
+    "20261206": ["2183", "3231"], "20261207": ["3010", "3035"],
+    "20261208": ["3001", "3018", "3021"], "20261209": ["3006", "1038"],
+    "20261210": ["2013", "2244"], "20261211": ["2123", "2184", "2223"],
+    "20261212": ["2128", "3177", "3228", "2257"], "20261213": ["2144", "2203", "2264"]
+};
+
 const _filterCategories = [
     { id: 'all', name: '全部', styles: [] },
     { id: 'emu3000', name: '新自強', styles: ['emu3000'] },
@@ -52,7 +96,8 @@ const _filterCategories = [
     { id: 'local_express', name: '區間快', styles: ['local_express'] },
     { id: 'ordinary', name: '普快車', styles: ['ordinary', 'fu_hsing'] },
     { id: 'others', name: '客迴', styles: ['others'] }, 
-    { id: 'special', name: '特殊列車', styles: ['special'] } 
+    { id: 'special', name: '特殊列車', styles: ['special'] },
+    { id: 'painted_train', name: '彩繪列車(表定)', styles: ['painted_train'] } // 🌟 新增分類
 ];
 
 // 注入美化捲軸與響應式 CSS
@@ -100,21 +145,29 @@ if (!document.getElementById('d3-custom-styles')) {
 
 // 智慧判定車種分類 (結合強制規則與 data all 總表動態過濾)
 function _getTrainCategoryId(style, train_no) {
-    const base_no = train_no.replace(/-End$/, '');
+    const base_no = train_no.replace(/-End\d*/g, '');
 
-    // 1. 強制保留規則 (1/2次為莒光，英文字母與3455/3456為客迴)
+    // 1. 🌟 最高優先級：寶可夢彩繪列車動態判定 (依照日期與車次比對)
+    if (window._currentRenderDate && typeof TEMP_110F_RULES !== 'undefined') {
+        const targetTrains = TEMP_110F_RULES[window._currentRenderDate];
+        if (targetTrains && targetTrains.includes(base_no)) {
+            return 'painted_train';
+        }
+    }
+
+    // 2. 強制保留規則 (1/2次為莒光，英文字母與3455/3456為客迴)
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
     if (base_no === '3455' || base_no === '3456') return 'others';
     if (/[a-zA-Z]/.test(base_no)) return 'others';
 
-    // 2. 🌟 核心動態邏輯：如果總表有載入，且該車次不在總表內，一律歸類為「特殊列車」
+    // 3. 核心動態邏輯：如果總表有載入，且該車次不在總表內，歸類為「特殊列車」
     if (window._masterTrainIds && window._masterTrainIds.size > 0) {
         if (!window._masterTrainIds.has(base_no)) {
             return 'special';
         }
     }
 
-    // 3. 正常總表內的車次，依照定義好的 styles 進行分類
+    // 4. 正常總表內的車次，依照定義好的 styles 進行分類
     for (let i = 1; i < _filterCategories.length; i++) {
         if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
@@ -296,14 +349,26 @@ function _renderSearchResults(query, containerElement) {
             flex: '0 0 auto'
         });
         
-        const kindLabel = (typeof _carKindLabel !== 'undefined' && _carKindLabel[data.style]) ? _carKindLabel[data.style] : data.style;
-        
+        // 🌟 獲取基礎標籤名稱
+        const kindLabel_base = (typeof _carKindLabel !== 'undefined' && _carKindLabel[data.style]) ? _carKindLabel[data.style] : data.style;
+        let finalKindLabel = kindLabel_base;
+
+        // 🌟 新增：彩繪列車標籤文字動態覆寫
+        const base_no = data.train_no.replace(/-End\d*/g, '');
+        if (window._currentRenderDate && typeof TEMP_110F_RULES !== 'undefined') {
+            const targetTrains = TEMP_110F_RULES[window._currentRenderDate];
+            if (targetTrains && targetTrains.includes(base_no)) {
+                // 如果該車次在當天被指定為 110F，右側搜尋清單強制顯示這串字
+                finalKindLabel = '寶可夢(800型)';
+            }
+        }
+
         // 🌟 渲染標籤
         item.innerHTML = `
             <span class="d3-item-text" style="color:${isSelected ? '#fff' : '#e2e8f0'}; display:flex; align-items:center;">
                 <b>${display_train_no}</b>${suffixTag}
             </span>
-            <span class="d3-item-badge" style="color:#aaa;">${kindLabel}</span>
+            <span class="d3-item-badge" style="color:#aaa;">${finalKindLabel}</span>
         `;
 
         item.addEventListener('mouseenter', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'rgba(255,255,255,0.1)'; });
@@ -1464,7 +1529,15 @@ function draw_diagram_background(line_kind, date) {
 function draw_train_path(all_trains_data, realtime_trains) {
     const urlParams = new URLSearchParams(window.location.search);
     const revisedJson = urlParams.get('revisedJson');
-    const dateParam = urlParams.get('date');
+    const dateParam = urlParams.get('date') || urlParams.get('formattedDate');
+
+    // 🌟 新增：設定當前畫面渲染的日期，供後續 110F 彩繪列車規則比對
+    let currentRenderDate = dateParam;
+    if (!currentRenderDate) {
+        const d = new Date();
+        currentRenderDate = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    }
+    window._currentRenderDate = currentRenderDate;
 
     const initDrawingWithEpochs = (OP_STOPS_EPOCHS) => {
         let opStopsUrl = null;
