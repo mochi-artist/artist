@@ -263255,6 +263255,97 @@
           "ARRTime": "16:44:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6515",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1112",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月31日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "1",
+          "DEPTime": "07:28:00",
+          "ARRTime": "07:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "2",
+          "DEPTime": "07:38:00",
+          "ARRTime": "07:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "3160",
+          "Order": "3",
+          "DEPTime": "09:49:00",
+          "ARRTime": "09:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "4080",
+          "Order": "4",
+          "DEPTime": "12:02:00",
+          "ARRTime": "12:02:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6585",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月31日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "18:26:00",
+          "ARRTime": "18:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "2",
+          "DEPTime": "20:53:00",
+          "ARRTime": "20:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "1120",
+          "Order": "3",
+          "DEPTime": "21:29:00",
+          "ARRTime": "21:29:00"
+        }
+      ]
     }
   ]
 }
