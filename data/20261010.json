@@ -263668,6 +263668,48 @@
           "ARRTime": "18:12:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6010",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月10日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "10:00:00",
+          "ARRTime": "10:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "2",
+          "DEPTime": "15:40:00",
+          "ARRTime": "15:12:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "3",
+          "DEPTime": "17:02:00",
+          "ARRTime": "17:02:00"
+        }
+      ]
     }
   ]
 }

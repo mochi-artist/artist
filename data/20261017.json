@@ -263318,6 +263318,223 @@
           "ARRTime": "18:12:00"
         }
       ]
+    },
+    {
+      "Type": "4",
+      "Train": "6012",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月17日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "10:00:00",
+          "ARRTime": "10:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "2",
+          "DEPTime": "13:00:00",
+          "ARRTime": "12:57:00"
+        },
+        {
+          "Route": "",
+          "Station": "6100",
+          "Order": "3",
+          "DEPTime": "15:00:00",
+          "ARRTime": "14:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "4",
+          "DEPTime": "16:20:00",
+          "ARRTime": "16:20:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6070",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月17日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "07:48:00",
+          "ARRTime": "07:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "2",
+          "DEPTime": "11:03:00",
+          "ARRTime": "10:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "6100",
+          "Order": "3",
+          "DEPTime": "13:05:00",
+          "ARRTime": "12:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "4",
+          "DEPTime": "14:30:00",
+          "ARRTime": "14:30:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6566",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月17日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "1",
+          "DEPTime": "08:09:00",
+          "ARRTime": "08:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "7150",
+          "Order": "2",
+          "DEPTime": "11:20:00",
+          "ARRTime": "09:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7120",
+          "Order": "3",
+          "DEPTime": "11:30:00",
+          "ARRTime": "11:30:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6568",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月17日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7120",
+          "Order": "1",
+          "DEPTime": "13:27:00",
+          "ARRTime": "13:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "6200",
+          "Order": "2",
+          "DEPTime": "15:23:00",
+          "ARRTime": "15:20:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6575",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月17日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "6200",
+          "Order": "1",
+          "DEPTime": "17:23:00",
+          "ARRTime": "17:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "2",
+          "DEPTime": "17:56:00",
+          "ARRTime": "17:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "3",
+          "DEPTime": "20:23:00",
+          "ARRTime": "20:18:00"
+        }
+      ]
     }
   ]
 }
