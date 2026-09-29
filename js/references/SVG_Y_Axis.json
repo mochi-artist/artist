@@ -543,7 +543,7 @@
   { "ID": "1080", "DSC": "桃園", "SVGYAXIS": 1379, "TERMINAL": "" },
   { "ID": "1090", "DSC": "內壢", "SVGYAXIS": 1518, "TERMINAL": "" },
   { "ID": "1100", "DSC": "中壢", "SVGYAXIS": 1610, "TERMINAL": "" },
-  { "ID": "1105", "DSC": "平鎮", "SVGYAXIS": 1690, "TERMINAL": "" },
+  { "ID": "1105", "DSC": "平鎮", "SVGYAXIS": 1655, "TERMINAL": "" },
   { "ID": "1110", "DSC": "埔心", "SVGYAXIS": 1749, "TERMINAL": "" },
   { "ID": "1120", "DSC": "楊梅", "SVGYAXIS": 1844, "TERMINAL": "" },
   { "ID": "1130", "DSC": "富岡", "SVGYAXIS": 2012, "TERMINAL": "" },
