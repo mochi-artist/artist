@@ -155,19 +155,29 @@ function _getTrainCategoryId(style, train_no) {
         }
     }
 
-    // 2. 強制保留規則 (1/2次為莒光，英文字母與3455/3456為客迴)
+    // 2. 強制保留規則 (1/2次為莒光，3455/3456為客迴)
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
     if (base_no === '3455' || base_no === '3456') return 'others';
+    
+    // 🌟 核心規則一：只要是 6000~6999 的車次 (包含 6669、6669A、6669A出庫)，一律強制歸入「特殊列車」
+    if (/^6\d{3}/.test(base_no)) return 'special';
+
+    // 3. 其餘含有「英文字母」的車次，預設歸類為「客迴」
     if (/[a-zA-Z]/.test(base_no)) return 'others';
 
-    // 3. 核心動態邏輯：如果總表有載入，且該車次不在總表內，歸類為「特殊列車」
+    // 4. 核心動態邏輯：如果總表有載入，且該車次不在總表內，歸類為「特殊列車」
     if (window._masterTrainIds && window._masterTrainIds.size > 0) {
-        if (!window._masterTrainIds.has(base_no)) {
+        // 🌟 核心規則二 (保護常規車次)：
+        // 像 "4235入庫" 這種車，總表裡只有 "4235"。所以我們先把中文字濾掉，用純數字去查表！
+        const pure_no = base_no.replace(/[\u4e00-\u9fa5]/g, ''); 
+        
+        // 如果原本的車次和濾掉中文的數字，都不在總表裡，那才是真正的特殊列車
+        if (!window._masterTrainIds.has(base_no) && !window._masterTrainIds.has(pure_no)) {
             return 'special';
         }
     }
 
-    // 4. 正常總表內的車次，依照定義好的 styles 進行分類
+    // 5. 正常總表內的車次 (包含查表成功的 4235入庫)，依照定義好的 styles 進行分類
     for (let i = 1; i < _filterCategories.length; i++) {
         if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
@@ -582,8 +592,12 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 const timeInfos = JSON.parse(JSON.stringify(trainInfo.TimeInfos));
                 
                 timeInfos.forEach((ti, index) => {
-                    if ((display_train_no === '1' || display_train_no === '2') && index === timeInfos.length - 1 && String(ti.Station) === '1000') {
-                        ti.Station = '1001';
+                    // 🌟 無差別環島判定：只要最後一站等於第一站，強制加上 _LOOP
+                    if (timeInfos.length > 2 && index === timeInfos.length - 1 && ti.Station === timeInfos[0].Station) {
+                        ti.Station = ti.Station + '_LOOP';
+                    }
+                    if (String(ti.Station) === '1001') {
+                        ti.Station = '1000_LOOP'; // 相容舊版資料
                     }
                     exactTimes[String(ti.Station)] = { arr: ti.ARRTime, dep: ti.DEPTime };
                 });
@@ -611,11 +625,21 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         let allMergedStops = [];
         rawData.forEach((stationPoint) => {
             let [stationName, id, time, loc, stop] = stationPoint;
-            if ((display_train_no === '1' || display_train_no === '2') && pathId.includes('-End') && String(id) === '1000') id = '1001';
-            if (String(id) === '1001') stationName = '台北(環島)';
+            
+            // 🌟 1. 將舊版 1001 統一轉為標準的 _LOOP 格式，且【不要】把 _LOOP 刪除
+            if (String(id) === '1001') {
+                id = '1000_LOOP';
+            }
+            
+            // 🌟 2. 只要有 _LOOP，就動態加上 (環島) 字樣
+            if (String(id).endsWith('_LOOP')) {
+                // 先清除可能重複的字眼，再補上
+                stationName = stationName.replace('(環島)', '') + '(環島)'; 
+            }
 
             const isStop = parseInt(stop, 10) !== -1;
             if (isStop) {
+                // 🌟 3. 帶著 _LOOP 存入陣列，這樣才不會跟起點站撞名！
                 if (allMergedStops.length > 0 && allMergedStops[allMergedStops.length - 1].id === String(id)) {
                     allMergedStops[allMergedStops.length - 1].depTime = time;
                 } else {
@@ -629,12 +653,19 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             else if (stop.id === trueOriginId) stop.remark = "起站";
             else if (stop.id === trueDestId) stop.remark = "終點";
             else {
+                // 🌟 4. 因為 stop.id 保留了 _LOOP，這裡就能完美抓到晚上的時間了
                 let isStopping = exactTimes[stop.id] ? (exactTimes[stop.id].arr !== exactTimes[stop.id].dep) : (stop.arrTime !== stop.depTime);
                 stop.remark = isStopping ? "停靠" : "通過";
             }
         });
 
-        let mergedStops = allMergedStops.filter(stop => validStationIds.length === 0 || validStationIds.includes(stop.id));
+        // 🌟 5. 篩選掉非本頁面的車站 (比對時才把 _LOOP 暫時拿掉)
+        let mergedStops = allMergedStops.filter(stop => {
+            if (validStationIds.length === 0) return true;
+            let real_id = stop.id.replace('_LOOP', '');
+            if (real_id === '1001') real_id = '1000';
+            return validStationIds.includes(real_id);
+        });
 
         let targetStopId = null;
         if (clickY !== undefined && clickY !== null && mergedStops.length > 0) {
@@ -1531,11 +1562,14 @@ function draw_train_path(all_trains_data, realtime_trains) {
     const revisedJson = urlParams.get('revisedJson');
     const dateParam = urlParams.get('date') || urlParams.get('formattedDate');
 
-    // 🌟 新增：設定當前畫面渲染的日期，供後續 110F 彩繪列車規則比對
-    let currentRenderDate = dateParam;
-    if (!currentRenderDate) {
-        const d = new Date();
-        currentRenderDate = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    // 🌟 核心修正：如果是看「總表 (data all)」，將日期設為 null，藉此關閉每日彩繪列車規則
+    let currentRenderDate = null;
+    if (!revisedJson) { 
+        currentRenderDate = dateParam;
+        if (!currentRenderDate) {
+            const d = new Date();
+            currentRenderDate = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+        }
     }
     window._currentRenderDate = currentRenderDate;
 
