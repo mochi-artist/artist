@@ -45,18 +45,28 @@ function json_to_trains_data(json_data, train_no_input, line_kind) {
 }
 
 // 處理單一車次資料
+// 處理單一車次資料
 function calculate_space_time(train, line_kind) {
-    const train_id = train['Train'];                // 車次代碼
-    const car_class = train['CarClass'];            // 車種代碼
-    const line = train['Line'];                     // 路線代號
-    const line_dir = train['LineDir'];              // 順行1、逆行2
+    const train_id = train['Train'];                
+    const car_class = train['CarClass'];            
+    const line = train['Line'];                     
+    const line_dir = train['LineDir'];              
     const timetable = train['TimeInfos'];
 
-    let timetable_dict = {};                        // 暫存車次時刻表物件
-    let _trains_data = [];                          // 時刻表轉換後的時間空間資料
+    let timetable_dict = {};                        
+    let _trains_data = [];                          
+
+    // 🌟 全自動環島修正：如果起終點是同一站，將終點站的 ID 加上 '_LOOP' 避免字典被覆蓋
+    if (timetable.length > 2) {
+        let first_st = timetable[0].Station;
+        let last_idx = timetable.length - 1;
+        if (timetable[last_idx].Station === first_st) {
+            timetable[last_idx].Station = first_st + '_LOOP';
+        }
+    }
 
     // 建立時刻表字典
-    for (let TimeInfos of train.TimeInfos) {
+    for (let TimeInfos of timetable) {
         timetable_dict[TimeInfos.Station] = [TimeInfos.ARRTime, TimeInfos.DEPTime, TimeInfos.Station, TimeInfos.Order];
     }
 
@@ -82,6 +92,7 @@ function calculate_space_time(train, line_kind) {
 // ==========================================
 
 // 查詢車次會「停靠與通過」的所有車站
+// 查詢車次會「停靠與通過」的所有車站
 function find_passing_stations(timetable, line, line_dir) {
     const start_station = timetable[0]['Station'];
     let end_station = timetable[timetable.length - 1]['Station'];
@@ -93,9 +104,9 @@ function find_passing_stations(timetable, line, line_dir) {
     let cheng_zhui = false;
     let roundabout_train = false;
     
-    // 🌟 修正 1：精準判定環島列車 (當起點等於終點，且時刻表站數大於 2 站時)
-    if (end_station === '1001' || (start_station === end_station && timetable.length > 2)) {
-        end_station = start_station;
+    // 🌟 修正：精準判定環島列車 (終點帶有 _LOOP，或是舊版資料的 1001)
+    if (end_station.endsWith('_LOOP') || end_station === '1001' || (start_station === end_station && timetable.length > 2)) {
+        end_station = start_station; // 將導航目標還原為真實車站 (例如 3160)
         roundabout_train = true;
     }
 
@@ -149,17 +160,19 @@ function find_passing_stations(timetable, line, line_dir) {
     };
 
     // --- 開始模擬火車行走 ---
+    // --- 開始模擬火車行走 ---
     while (true) {
         const dsc = Route[station]?.DSC || `未知站(${station})`;
         const routeKm = Route[station]?.KM || 0; 
         
         _passing_stations.push([String(station), dsc, routeKm, km]);
 
-        // 🌟 修正 2：加入 `_passing_stations.length > 1` 判定
-        // 確保火車至少走出了起點站，之後若再次遇到終點站才算真正繞完一圈抵達！
+        // 🌟 修正：確保火車至少走出了起點站，抵達終點時切換虛擬 ID
         if (station === end_station && _passing_stations.length > 1) {
-            if (roundabout_train && timetable[timetable.length - 1]['Station'] === '1001') {
-                _passing_stations[_passing_stations.length - 1][0] = '1001';
+            if (roundabout_train) {
+                // 將路徑的最後一站改為 _LOOP 或 1001，讓後續時間插補能配對成功
+                let pseudo_end_id = timetable[timetable.length - 1]['Station'];
+                _passing_stations[_passing_stations.length - 1][0] = pseudo_end_id;
             }
             break;
         }
@@ -211,7 +224,6 @@ function estimate_timeSpace(timetable, passing_stations) {
     // 將起終點中間歷經的停靠與通過車站均找出
     for (const [StationId, StationName, LocationKM, KM] of passing_stations) {
         if (timetable_stations.includes(StationId)) {
-            // 🛡️ 防護網：使用 Optional Chaining (?.) 避免座標缺少時報錯
             let ARRTime = parseFloat(SVG_X_Axis[timetable[StationId][0]]?.ax1 ?? NaN);
             let DEPTime = parseFloat(SVG_X_Axis[timetable[StationId][1]]?.ax1 ?? NaN);
             let Order = parseInt(timetable[StationId][3]);
@@ -225,16 +237,12 @@ function estimate_timeSpace(timetable, passing_stations) {
         }
     }
 
-    // 環島、跨午夜車次處理
+    // 跨午夜車次處理
     let after_midnight_row_index = -1;
     let last_time_value = -1;
 
     Object.entries(_estimate_time_space).forEach(([key, value]) => {
-        // 環島車次處理
-        if (value[0] === "1001") {
-            value[0] = "1000";
-        }
-        // 跨午夜車次處理
+        // 🌟 注意：這裡【不要】拔除 _LOOP，讓它保留到 D3 時刻表處理！
         if (!isNaN(value[3])) {
             if (value[3] < last_time_value) {
                 after_midnight_row_index = parseInt(key);
@@ -243,7 +251,6 @@ function estimate_timeSpace(timetable, passing_stations) {
         }
     });
 
-    // 跨午夜車次處理：將超過午夜的時間一律加上 2880
     if (after_midnight_row_index !== -1) {
         Object.entries(_estimate_time_space).forEach(([key, value]) => {
             if (parseInt(key) >= after_midnight_row_index) {
@@ -252,16 +259,10 @@ function estimate_timeSpace(timetable, passing_stations) {
         });
     }
 
-    // 線性插補運算 (補齊通過站的時間)
     let interpolate = [];
-    Object.entries(_estimate_time_space).forEach(([key, value]) => {
-        interpolate.push(value[3]);
-    });
-
+    Object.entries(_estimate_time_space).forEach(([key, value]) => interpolate.push(value[3]));
     const interpolatedArray = linearInterpolation(interpolate);
-    Object.entries(_estimate_time_space).forEach(([key, value]) => {
-        value[3] = interpolatedArray[key];
-    });
+    Object.entries(_estimate_time_space).forEach(([key, value]) => value[3] = interpolatedArray[key]);
 
     return _estimate_time_space;
 }
@@ -275,10 +276,16 @@ function time_space_to_operation_lines(estimate_time_space, line_kind) {
     }
 
     Object.entries(estimate_time_space).forEach(([key, value]) => {
+        // 🌟 在對應背景 Y 軸時，暫時把 _LOOP 或 1001 轉成真實車站來抓座標
+        let original_id = value[0];
+        let real_id = original_id.replace('_LOOP', '');
+        if (real_id === '1001') real_id = '1000';
+
         Object.entries(LinesStations).forEach(([key1, value1]) => {
-            if (key1 === line_kind) { // 只處理目前選擇的路線
-                if (value[0] in value1) {
-                    _operation_lines[key1].push([value[1], value[0], value[3], LinesStations[key1][value[0]]['SVGYAXIS'], value[4], parseInt(key)]);
+            if (key1 === line_kind) {
+                if (real_id in value1) {
+                    // 🌟 存入資料時，依舊保留 original_id (帶有 _LOOP) 交給 D3
+                    _operation_lines[key1].push([value[1], original_id, value[3], LinesStations[key1][real_id]['SVGYAXIS'], value[4], parseInt(key)]);
                 }
             }
         });
