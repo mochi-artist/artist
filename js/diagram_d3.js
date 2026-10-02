@@ -576,16 +576,23 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         const hasSpecialChars = /[a-zA-Z\u4e00-\u9fa5]/.test(display_train_no);
         const railyards = hasSpecialChars ? [] : ['1045', '1145', '5999'];
 
+        // 🌟 核心修正 1：提早取得 D3 原始資料，撈回帶有 (林) / (高) 的原始車次號碼
+        const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
+        if (!d3TrainData || !d3TrainData.rawData) throw new Error("無法取得該車次的繪圖原始資料");
+        
+        const original_train_no = d3TrainData.train_no.replace(/-End\d*/g, '');
+
         let exactTimes = {};
         let trueOriginId = null;
         let trueDestId = null;
 
         if (rawJsonData && rawJsonData.TrainInfos) {
+            // 🌟 核心修正 2：優先使用 original_train_no (例如 821(日)(林)) 去 JSON 裡精準尋找！
             const trainInfo = rawJsonData.TrainInfos.find(t => 
+                String(t.Train) === original_train_no || 
+                String(t.TrainNo) === original_train_no || 
                 String(t.Train) === display_train_no || 
-                String(t.TrainNo) === display_train_no || 
-                String(t.Train) === baseId ||
-                String(t.TrainNo) === baseId
+                String(t.TrainNo) === display_train_no
             );
             
             if (trainInfo && trainInfo.TimeInfos) {
@@ -610,9 +617,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             }
         }
 
-        const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
-        if (!d3TrainData || !d3TrainData.rawData) throw new Error("無法取得該車次的繪圖原始資料");
-        
         const rawData = d3TrainData.rawData;
         let validStationIds = [];
         
@@ -626,6 +630,9 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         rawData.forEach((stationPoint) => {
             let [stationName, id, time, loc, stop] = stationPoint;
             
+            // 🌟 新增：清理站名，移除高鐵專屬的 (高) 標籤 (兼容全形與半形括號)
+            stationName = stationName.replace(/\(高\)/g, '').replace(/（高）/g, '');
+
             // 🌟 1. 將舊版 1001 統一轉為標準的 _LOOP 格式，且【不要】把 _LOOP 刪除
             if (String(id) === '1001') {
                 id = '1000_LOOP';
