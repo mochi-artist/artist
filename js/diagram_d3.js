@@ -147,7 +147,47 @@ if (!document.getElementById('d3-custom-styles')) {
 function _getTrainCategoryId(style, train_no) {
     const base_no = train_no.replace(/-End\d*/g, '');
 
-    // 1. 🌟 最高優先級：寶可夢彩繪列車動態判定 (依照日期與車次比對)
+    // 🌟 核心修正 1：高鐵 (THSR) 專屬攔截機制
+    if (typeof _currentLineKind !== 'undefined' && _currentLineKind === 'thsr') {
+        const pathId = _currentLineKind + train_no;
+        const basePathId = _currentLineKind + base_no;
+        const tData = _trainDataMap.get(pathId) || _trainDataMap.get(basePathId);
+        const carClass = tData ? tData.train_kind : null;
+
+        if (carClass === '1107') return 'direct';       // 直達車
+        if (carClass === '1111') return 'skip_stop';    // 跳站式
+        if (carClass === '1131') return 'all_stop';     // 站站停
+        return 'special'; 
+    }
+
+    // 🌟 核心修正 2：林鐵 (LINE_Alishan) 專屬攔截機制
+    if (typeof _currentLineKind !== 'undefined' && _currentLineKind === 'LINE_Alishan') {
+        const pathId = _currentLineKind + train_no;
+        const basePathId = _currentLineKind + base_no;
+        const tData = _trainDataMap.get(pathId) || _trainDataMap.get(basePathId);
+        const carClass = tData ? tData.train_kind : null;
+
+        // 🌟 核心修改：將祝客列車透過車站 ID 細分為沼平線與神木線
+        if (carClass === '0002') {
+            if (tData && tData.rawData) {
+                // rawData 陣列格式為: [stationName, id, time, loc, stop]
+                const hasZhaoping = tData.rawData.some(point => String(point[1]) === '9018');
+                const hasShenmu = tData.rawData.some(point => String(point[1]) === '9016');
+                
+                if (hasZhaoping) return 'chushan_zhaoping';
+                if (hasShenmu) return 'chushan_shenmu';
+            }
+            return 'chushan'; // 預設防呆
+        }
+
+        if (carClass === '0003') return 'formosensis';  // 福森號
+        if (carClass === '1107') return 'alishan';      // 阿里山號
+        if (carClass === '1131') return 'vivid';        // 栩悅號
+        
+        return 'special'; // 防呆
+    }
+
+    // 1. 最高優先級：寶可夢彩繪列車動態判定
     if (window._currentRenderDate && typeof TEMP_110F_RULES !== 'undefined') {
         const targetTrains = TEMP_110F_RULES[window._currentRenderDate];
         if (targetTrains && targetTrains.includes(base_no)) {
@@ -155,29 +195,25 @@ function _getTrainCategoryId(style, train_no) {
         }
     }
 
-    // 2. 強制保留規則 (1/2次為莒光，3455/3456為客迴)
+    // 2. 強制保留規則
     if (base_no === '1' || base_no === '2') return 'chu_kuang';
     if (base_no === '3455' || base_no === '3456') return 'others';
     
-    // 🌟 核心規則一：只要是 6000~6999 的車次 (包含 6669、6669A、6669A出庫)，一律強制歸入「特殊列車」
+    // 3. 6000~6999 車次強制歸入「特殊列車」
     if (/^6\d{3}/.test(base_no)) return 'special';
 
-    // 3. 其餘含有「英文字母」的車次，預設歸類為「客迴」
+    // 4. 其餘含有「英文字母」的車次
     if (/[a-zA-Z]/.test(base_no)) return 'others';
 
-    // 4. 核心動態邏輯：如果總表有載入，且該車次不在總表內，歸類為「特殊列車」
+    // 5. 總表動態過濾
     if (window._masterTrainIds && window._masterTrainIds.size > 0) {
-        // 🌟 核心規則二 (保護常規車次)：
-        // 像 "4235入庫" 這種車，總表裡只有 "4235"。所以我們先把中文字濾掉，用純數字去查表！
         const pure_no = base_no.replace(/[\u4e00-\u9fa5]/g, ''); 
-        
-        // 如果原本的車次和濾掉中文的數字，都不在總表裡，那才是真正的特殊列車
         if (!window._masterTrainIds.has(base_no) && !window._masterTrainIds.has(pure_no)) {
             return 'special';
         }
     }
 
-    // 5. 正常總表內的車次 (包含查表成功的 4235入庫)，依照定義好的 styles 進行分類
+    // 6. 正常分類
     for (let i = 1; i < _filterCategories.length; i++) {
         if (_filterCategories[i].styles.includes(style)) return _filterCategories[i].id;
     }
@@ -363,14 +399,19 @@ function _renderSearchResults(query, containerElement) {
         const kindLabel_base = (typeof _carKindLabel !== 'undefined' && _carKindLabel[data.style]) ? _carKindLabel[data.style] : data.style;
         let finalKindLabel = kindLabel_base;
 
-        // 🌟 新增：彩繪列車標籤文字動態覆寫
+        // 🌟 彩繪列車標籤文字動態覆寫
         const base_no = data.train_no.replace(/-End\d*/g, '');
         if (window._currentRenderDate && typeof TEMP_110F_RULES !== 'undefined') {
             const targetTrains = TEMP_110F_RULES[window._currentRenderDate];
             if (targetTrains && targetTrains.includes(base_no)) {
-                // 如果該車次在當天被指定為 110F，右側搜尋清單強制顯示這串字
                 finalKindLabel = '寶可夢(800型)';
             }
+        }
+
+        // 🌟 核心修改：如果是高鐵 (thsr) 或是 林鐵 (LINE_Alishan)，隱藏右側的車種標籤 (拔除普悠瑪等錯誤顯示)
+        let badgeHtml = `<span class="d3-item-badge" style="color:#aaa;">${finalKindLabel}</span>`;
+        if (typeof _currentLineKind !== 'undefined' && (_currentLineKind === 'thsr' || _currentLineKind === 'LINE_Alishan')) {
+            badgeHtml = ``; // 高鐵與林鐵模式直接清空標籤
         }
 
         // 🌟 渲染標籤
@@ -378,7 +419,7 @@ function _renderSearchResults(query, containerElement) {
             <span class="d3-item-text" style="color:${isSelected ? '#fff' : '#e2e8f0'}; display:flex; align-items:center;">
                 <b>${display_train_no}</b>${suffixTag}
             </span>
-            <span class="d3-item-badge" style="color:#aaa;">${finalKindLabel}</span>
+            ${badgeHtml}
         `;
 
         item.addEventListener('mouseenter', () => { if (!_selectedPathIds.has(pathId)) item.style.background = 'rgba(255,255,255,0.1)'; });
@@ -630,8 +671,8 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         rawData.forEach((stationPoint) => {
             let [stationName, id, time, loc, stop] = stationPoint;
             
-            // 🌟 新增：清理站名，移除高鐵專屬的 (高) 標籤 (兼容全形與半形括號)
-            stationName = stationName.replace(/\(高\)/g, '').replace(/（高）/g, '');
+            // 🌟 新增：清理站名，移除高鐵與林鐵專屬的 (高) / (林) 標籤 (兼容全形與半形括號)
+            stationName = stationName.replace(/[(（][高林][)）]/g, '');
 
             // 🌟 1. 將舊版 1001 統一轉為標準的 _LOOP 格式，且【不要】把 _LOOP 刪除
             if (String(id) === '1001') {
@@ -997,21 +1038,50 @@ function _init_ui_panels() {
 
     const filterList = document.createElement('div');
     
-    // 🌟 將函式掛載到 window，讓外部載入總表後可以呼叫重新整理
     window._renderFilterList = function() {
         filterList.innerHTML = '';
+        
+        let activeCategories = _filterCategories; // 預設使用台鐵菜單
+        
+        if (_currentLineKind === 'thsr') {
+            activeCategories = [
+                { id: 'all', name: '全部', styles: [] },
+                { id: 'all_stop', name: '站站停', styles: ['all_stop'] },
+                { id: 'skip_stop', name: '跳站式', styles: ['skip_stop'] },
+                { id: 'direct', name: '直達車', styles: ['direct'] },
+                { id: 'special', name: '特殊列車', styles: ['special'] }
+            ];
+        } else if (_currentLineKind === 'LINE_Alishan') {
+            activeCategories = [
+                { id: 'all', name: '全部', styles: [] },
+                { id: 'alishan', name: '阿里山號', styles: ['alishan'] },
+                { id: 'vivid', name: '栩悅號', styles: ['vivid'] },
+                { id: 'formosensis', name: '福森號', styles: ['formosensis'] },
+                // 🌟 核心修改：拆分祝客列車為沼平線與神木線
+                { id: 'chushan_zhaoping', name: '祝客列車(沼平線)', styles: ['chushan_zhaoping'] },
+                { id: 'chushan_shenmu', name: '祝客列車(神木線)', styles: ['chushan_shenmu'] },
+                { id: 'special', name: '特殊列車', styles: ['special'] }
+            ];
+        }
+
         const counts = {};
-        _filterCategories.forEach(c => counts[c.id] = 0);
+        activeCategories.forEach(c => counts[c.id] = 0);
         
         let total = 0;
         for (const [pathId, data] of _trainDataMap) {
             if (data.train_no.endsWith('-End')) continue;
-            counts[_getTrainCategoryId(data.style, data.train_no)]++;
+            
+            const catId = _getTrainCategoryId(data.style, data.train_no);
+            if (counts[catId] !== undefined) {
+                counts[catId]++;
+            } else {
+                if (counts['special'] !== undefined) counts['special']++;
+            }
             total++;
         }
         counts['all'] = total;
 
-        _filterCategories.forEach(cat => {
+        activeCategories.forEach(cat => {
             if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
 
             const item = document.createElement('div');
