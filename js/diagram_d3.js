@@ -287,13 +287,18 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉邏輯 (完全對齊點擊車站的視角體驗)
+// 🌟 畫面跳轉邏輯 (完美複製時刻表的「幽靈錨點」對焦法)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
 
-    // 1. 計算畫布的絕對座標基準
+    // 🌟 1. 強制關閉手機虛擬鍵盤，避免螢幕高度被鍵盤擠壓導致算錯
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+
+    // 2. 計算畫布的絕對座標基準
     let offsetX = 0; 
     let offsetY = 0;
     if (typeof _d3Svg !== 'undefined' && _d3Svg && _d3Svg.node()) {
@@ -302,22 +307,34 @@ function _panToTrain(pathId) {
         offsetY = rect.top + window.scrollY;
     }
 
-    // 2. 取得該車次的起站絕對座標
+    // 3. 取得該車次的起站絕對座標
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
-    // 3. 🌟 完全對齊時刻表車站的計算公式 (拿掉所有多餘的偏移量，保持純粹置中)
-    const scrollToX = targetX - (window.innerWidth / 2);
-    const scrollToY = targetY - (window.innerHeight / 2);
+    // 🌟 4. 完全移植時刻表的「幽靈錨點」邏輯！
+    // 讓錨點往下移一點，目標點就會偏畫面上方，對手機版特別好用
+    const shiftY = window.innerWidth <= 768 ? (window.innerHeight * 0.15) : 0;
 
-    // 4. 執行平滑跳轉 (加入與時刻表相同的 50ms 緩衝延遲)
-    setTimeout(() => {
-        window.scrollTo({ 
-            left: Math.max(0, scrollToX), 
-            top: Math.max(0, scrollToY), 
-            behavior: 'smooth' 
-        });
-    }, 50);
+    const anchor = document.createElement('div');
+    Object.assign(anchor.style, {
+        position: 'absolute',
+        left: targetX + 'px',
+        top: (targetY + shiftY) + 'px',
+        width: '1px',
+        height: '1px',
+        pointerEvents: 'none',
+        visibility: 'hidden'
+    });
+    document.body.appendChild(anchor);
+
+    // 5. 執行跳轉
+    setTimeout(() => { 
+        // 🌟 使用原生 scrollIntoView 的 center 模式，把目標無情地拉回視野中心！
+        anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); 
+        
+        // 功成身退，兩秒後刪除幽靈錨點
+        setTimeout(() => document.body.removeChild(anchor), 2000);
+    }, 50); // 給予 50ms 讓鍵盤收起、版面穩定的時間
 }
 
 function _refreshSearchResults() {
