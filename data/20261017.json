@@ -973,6 +973,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "81",
+          "ARRTime": "10:45:00",
+          "DEPTime": "10:45:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "82",
           "ARRTime": "10:48:00",
@@ -2912,6 +2919,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "120",
+          "ARRTime": "17:05:00",
+          "DEPTime": "17:05:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "121",
           "ARRTime": "17:08:00",
@@ -4571,6 +4585,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "39",
+          "ARRTime": "07:50:00",
+          "DEPTime": "07:50:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "40",
           "ARRTime": "07:53:00",
@@ -5845,6 +5866,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "81",
+          "ARRTime": "11:01:00",
+          "DEPTime": "11:01:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "82",
           "ARRTime": "11:04:00",
@@ -6748,6 +6776,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "11:31:00",
+          "DEPTime": "11:31:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "11:34:00",
@@ -7595,6 +7630,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "83",
+          "ARRTime": "10:35:30",
+          "DEPTime": "10:35:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "84",
           "ARRTime": "10:38:00",
@@ -8089,6 +8131,13 @@
           "Order": "29",
           "ARRTime": "06:29:00",
           "DEPTime": "06:29:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "06:31:30",
+          "DEPTime": "06:31:30"
         },
         {
           "Route": "",
@@ -9352,6 +9401,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "12:33:00",
+          "DEPTime": "12:33:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "12:36:00",
@@ -9776,6 +9832,13 @@
           "Order": "28",
           "ARRTime": "07:14:00",
           "DEPTime": "07:14:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "07:16:30",
+          "DEPTime": "07:16:30"
         },
         {
           "Route": "",
@@ -11018,6 +11081,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "11:36:30",
+          "DEPTime": "11:36:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "11:39:30",
@@ -11484,6 +11554,13 @@
           "Order": "29",
           "ARRTime": "07:21:30",
           "DEPTime": "07:21:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "07:24:30",
+          "DEPTime": "07:24:30"
         },
         {
           "Route": "",
@@ -12702,6 +12779,13 @@
           "Order": "29",
           "ARRTime": "08:34:30",
           "DEPTime": "08:34:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "08:37:30",
+          "DEPTime": "08:37:30"
         },
         {
           "Route": "",
@@ -13965,6 +14049,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "13:30:00",
+          "DEPTime": "13:30:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "13:33:00",
@@ -14396,6 +14487,13 @@
           "Order": "29",
           "ARRTime": "09:49:30",
           "DEPTime": "09:49:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "09:52:30",
+          "DEPTime": "09:52:30"
         },
         {
           "Route": "",
@@ -15659,6 +15757,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "14:21:30",
+          "DEPTime": "14:21:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "14:24:30",
@@ -16090,6 +16195,13 @@
           "Order": "23",
           "ARRTime": "10:36:30",
           "DEPTime": "10:36:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "10:39:30",
+          "DEPTime": "10:39:30"
         },
         {
           "Route": "",
@@ -17318,6 +17430,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "11:02:30",
+          "DEPTime": "11:02:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "31",
           "ARRTime": "11:05:00",
@@ -18529,6 +18648,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "15:05:30",
+          "DEPTime": "15:05:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "15:08:30",
@@ -18953,6 +19079,13 @@
           "Order": "29",
           "ARRTime": "12:26:30",
           "DEPTime": "12:26:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "12:29:30",
+          "DEPTime": "12:29:30"
         },
         {
           "Route": "",
@@ -20216,6 +20349,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "16:25:00",
+          "DEPTime": "16:25:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "16:28:00",
@@ -20591,6 +20731,13 @@
           "Order": "28",
           "ARRTime": "12:50:00",
           "DEPTime": "12:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "12:52:30",
+          "DEPTime": "12:52:30"
         },
         {
           "Route": "",
@@ -21861,6 +22008,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "17:03:30",
+          "DEPTime": "17:03:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "17:06:30",
@@ -22733,6 +22887,13 @@
           "Order": "29",
           "ARRTime": "13:58:30",
           "DEPTime": "13:58:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "14:01:30",
+          "DEPTime": "14:01:30"
         },
         {
           "Route": "",
@@ -24066,6 +24227,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "18:16:00",
+          "DEPTime": "18:16:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "18:19:00",
@@ -25361,6 +25529,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "13:35:30",
+          "DEPTime": "13:35:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "13:38:30",
@@ -25827,6 +26002,13 @@
           "Order": "35",
           "ARRTime": "14:36:00",
           "DEPTime": "14:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "36",
+          "ARRTime": "14:38:30",
+          "DEPTime": "14:38:30"
         },
         {
           "Route": "",
@@ -27041,6 +27223,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "84",
+          "ARRTime": "19:00:30",
+          "DEPTime": "19:00:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "85",
           "ARRTime": "19:03:30",
@@ -27423,6 +27612,13 @@
           "Order": "23",
           "ARRTime": "14:58:30",
           "DEPTime": "14:58:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "15:01:30",
+          "DEPTime": "15:01:30"
         },
         {
           "Route": "",
@@ -28735,6 +28931,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "19:28:00",
+          "DEPTime": "19:28:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "19:31:00",
@@ -29117,6 +29320,13 @@
           "Order": "29",
           "ARRTime": "16:18:30",
           "DEPTime": "16:18:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "16:21:30",
+          "DEPTime": "16:21:30"
         },
         {
           "Route": "",
@@ -30359,6 +30569,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "15:54:30",
+          "DEPTime": "15:54:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "15:57:30",
@@ -30741,6 +30958,13 @@
           "Order": "23",
           "ARRTime": "16:01:30",
           "DEPTime": "16:01:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "16:04:30",
+          "DEPTime": "16:04:30"
         },
         {
           "Route": "",
@@ -31983,6 +32207,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "21:00:30",
+          "DEPTime": "21:00:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "21:03:30",
@@ -32816,6 +33047,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "21:57:00",
+          "DEPTime": "21:57:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "22:00:00",
@@ -33240,6 +33478,13 @@
           "Order": "29",
           "ARRTime": "16:39:30",
           "DEPTime": "16:39:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "16:42:30",
+          "DEPTime": "16:42:30"
         },
         {
           "Route": "",
@@ -34482,6 +34727,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "21:38:30",
+          "DEPTime": "21:38:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "21:41:30",
@@ -34906,6 +35158,13 @@
           "Order": "29",
           "ARRTime": "17:34:30",
           "DEPTime": "17:34:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "17:37:00",
+          "DEPTime": "17:37:00"
         },
         {
           "Route": "",
@@ -36190,6 +36449,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "84",
+          "ARRTime": "22:31:30",
+          "DEPTime": "22:31:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "85",
           "ARRTime": "22:34:30",
@@ -36614,6 +36880,13 @@
           "Order": "29",
           "ARRTime": "17:52:30",
           "DEPTime": "17:52:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "17:55:30",
+          "DEPTime": "17:55:30"
         },
         {
           "Route": "",
@@ -38311,6 +38584,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "91",
+          "ARRTime": "23:25:00",
+          "DEPTime": "23:25:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "92",
           "ARRTime": "23:28:00",
@@ -38693,6 +38973,13 @@
           "Order": "23",
           "ARRTime": "18:46:30",
           "DEPTime": "18:46:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "18:49:30",
+          "DEPTime": "18:49:30"
         },
         {
           "Route": "",
@@ -39526,6 +39813,13 @@
           "Order": "29",
           "ARRTime": "19:37:30",
           "DEPTime": "19:37:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "19:40:30",
+          "DEPTime": "19:40:30"
         },
         {
           "Route": "",
@@ -40387,6 +40681,13 @@
           "Order": "29",
           "ARRTime": "19:09:00",
           "DEPTime": "19:09:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "19:11:30",
+          "DEPTime": "19:11:30"
         },
         {
           "Route": "",
@@ -41514,6 +41815,13 @@
           "Order": "23",
           "ARRTime": "21:39:30",
           "DEPTime": "21:39:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "21:42:30",
+          "DEPTime": "21:42:30"
         },
         {
           "Route": "",
@@ -42931,6 +43239,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "83",
+          "ARRTime": "09:56:30",
+          "DEPTime": "09:56:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "84",
           "ARRTime": "09:59:30",
@@ -43621,6 +43936,13 @@
           "Order": "48",
           "ARRTime": "08:21:00",
           "DEPTime": "08:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "08:23:30",
+          "DEPTime": "08:23:30"
         },
         {
           "Route": "",
@@ -44587,6 +44909,13 @@
           "Order": "48",
           "ARRTime": "10:16:30",
           "DEPTime": "10:16:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "10:19:30",
+          "DEPTime": "10:19:30"
         },
         {
           "Route": "",
@@ -45829,6 +46158,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "17:26:30",
+          "DEPTime": "17:26:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "17:29:30",
@@ -46795,6 +47131,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "19:38:30",
+          "DEPTime": "19:38:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "19:41:30",
@@ -47485,6 +47828,13 @@
           "Order": "48",
           "ARRTime": "18:16:30",
           "DEPTime": "18:16:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "18:19:30",
+          "DEPTime": "18:19:30"
         },
         {
           "Route": "",
@@ -48657,6 +49007,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "78",
+          "ARRTime": "14:05:30",
+          "DEPTime": "14:05:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "79",
           "ARRTime": "14:08:00",
@@ -49123,6 +49480,13 @@
           "Order": "29",
           "ARRTime": "11:37:30",
           "DEPTime": "11:37:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "11:40:30",
+          "DEPTime": "11:40:30"
         },
         {
           "Route": "",
@@ -50365,6 +50729,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "88",
+          "ARRTime": "20:23:00",
+          "DEPTime": "20:23:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "89",
           "ARRTime": "20:26:00",
@@ -50789,6 +51160,13 @@
           "Order": "29",
           "ARRTime": "13:17:30",
           "DEPTime": "13:17:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "13:20:30",
+          "DEPTime": "13:20:30"
         },
         {
           "Route": "",
@@ -51608,6 +51986,13 @@
           "Order": "15",
           "ARRTime": "09:14:30",
           "DEPTime": "09:14:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "09:17:00",
+          "DEPTime": "09:17:00"
         },
         {
           "Route": "",
@@ -52892,6 +53277,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "84",
+          "ARRTime": "21:19:30",
+          "DEPTime": "21:19:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "85",
           "ARRTime": "21:22:30",
@@ -53309,6 +53701,13 @@
           "Order": "29",
           "ARRTime": "12:14:00",
           "DEPTime": "12:14:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "12:17:00",
+          "DEPTime": "12:17:00"
         },
         {
           "Route": "",
@@ -54177,6 +54576,13 @@
           "Order": "38",
           "ARRTime": "09:20:00",
           "DEPTime": "09:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "39",
+          "ARRTime": "09:25:30",
+          "DEPTime": "09:25:30"
         },
         {
           "Route": "",
@@ -55612,6 +56018,13 @@
           "Order": "29",
           "ARRTime": "20:51:00",
           "DEPTime": "20:51:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "20:54:00",
+          "DEPTime": "20:54:00"
         },
         {
           "Route": "",
@@ -69503,6 +69916,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "126",
+          "ARRTime": "23:49:00",
+          "DEPTime": "23:49:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "127",
           "ARRTime": "23:52:00",
@@ -72506,6 +72926,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "06:33:30",
+          "DEPTime": "06:33:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "06:36:30",
@@ -73105,6 +73532,13 @@
           "Order": "9",
           "ARRTime": "06:00:30",
           "DEPTime": "06:00:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "10",
+          "ARRTime": "06:03:30",
+          "DEPTime": "06:03:30"
         },
         {
           "Route": "",
@@ -75523,6 +75957,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "75",
+          "ARRTime": "20:25:00",
+          "DEPTime": "20:25:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "76",
           "ARRTime": "20:29:00",
@@ -75555,6 +75996,13 @@
           "Order": "1",
           "ARRTime": "20:46:00",
           "DEPTime": "20:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "20:49:30",
+          "DEPTime": "20:49:30"
         },
         {
           "Route": "",
@@ -76206,6 +76654,13 @@
           "Order": "38",
           "ARRTime": "08:47:00",
           "DEPTime": "08:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "39",
+          "ARRTime": "08:51:30",
+          "DEPTime": "08:51:30"
         },
         {
           "Route": "",
@@ -76955,6 +77410,13 @@
           "Order": "48",
           "ARRTime": "20:03:30",
           "DEPTime": "20:03:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "20:06:30",
+          "DEPTime": "20:06:30"
         },
         {
           "Route": "",
@@ -99463,6 +99925,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "32",
+          "ARRTime": "08:03:00",
+          "DEPTime": "08:03:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "33",
           "ARRTime": "08:07:00",
@@ -100055,6 +100524,13 @@
           "Order": "29",
           "ARRTime": "14:17:30",
           "DEPTime": "14:17:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "14:21:00",
+          "DEPTime": "14:21:00"
         },
         {
           "Route": "",
@@ -102886,6 +103362,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "08:00:30",
+          "DEPTime": "08:00:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "31",
           "ARRTime": "08:03:00",
@@ -103835,6 +104318,13 @@
           "Order": "29",
           "ARRTime": "15:42:30",
           "DEPTime": "15:42:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "15:45:30",
+          "DEPTime": "15:45:30"
         },
         {
           "Route": "",
@@ -180698,6 +181188,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "39",
+          "ARRTime": "08:26:00",
+          "DEPTime": "08:26:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "40",
           "ARRTime": "08:29:00",
@@ -181458,6 +181955,13 @@
           "Order": "29",
           "ARRTime": "12:31:30",
           "DEPTime": "12:31:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "12:34:30",
+          "DEPTime": "12:34:30"
         },
         {
           "Route": "",
@@ -182546,6 +183050,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "22",
+          "ARRTime": "17:29:30",
+          "DEPTime": "17:29:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "23",
           "ARRTime": "17:33:00",
@@ -183148,6 +183659,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "17:31:30",
+          "DEPTime": "17:31:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "50",
           "ARRTime": "17:34:00",
@@ -183701,6 +184219,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "46",
+          "ARRTime": "18:27:30",
+          "DEPTime": "18:27:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "47",
           "ARRTime": "18:30:30",
@@ -184006,6 +184531,13 @@
           "Order": "1",
           "ARRTime": "18:47:00",
           "DEPTime": "18:47:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "18:49:30",
+          "DEPTime": "18:49:30"
         },
         {
           "Route": "",
@@ -184478,6 +185010,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "36",
+          "ARRTime": "18:32:30",
+          "DEPTime": "18:32:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "37",
           "ARRTime": "18:36:00",
@@ -184818,6 +185357,13 @@
           "Order": "45",
           "ARRTime": "19:43:30",
           "DEPTime": "19:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "46",
+          "ARRTime": "19:47:30",
+          "DEPTime": "19:47:30"
         },
         {
           "Route": "",
@@ -189420,6 +189966,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "05:26:30",
+          "DEPTime": "05:26:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "05:30:00",
@@ -189910,6 +190463,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "12",
+          "ARRTime": "05:49:30",
+          "DEPTime": "05:49:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "13",
           "ARRTime": "05:53:00",
@@ -190236,6 +190796,13 @@
           "Order": "15",
           "ARRTime": "05:53:30",
           "DEPTime": "05:54:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "05:57:30",
+          "DEPTime": "05:57:30"
         },
         {
           "Route": "",
@@ -190687,6 +191254,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "06:17:30",
+          "DEPTime": "06:17:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "06:21:00",
@@ -191114,6 +191688,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "06:21:30",
+          "DEPTime": "06:21:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "25",
           "ARRTime": "06:24:00",
@@ -191342,6 +191923,13 @@
           "Order": "15",
           "ARRTime": "06:41:00",
           "DEPTime": "06:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "06:45:30",
+          "DEPTime": "06:45:30"
         },
         {
           "Route": "",
@@ -191762,6 +192350,13 @@
           "Order": "29",
           "ARRTime": "06:51:30",
           "DEPTime": "06:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "06:55:30",
+          "DEPTime": "06:55:30"
         },
         {
           "Route": "",
@@ -192276,6 +192871,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "25",
+          "ARRTime": "07:10:30",
+          "DEPTime": "07:10:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "26",
           "ARRTime": "07:14:00",
@@ -192700,6 +193302,13 @@
           "Order": "29",
           "ARRTime": "07:05:30",
           "DEPTime": "07:06:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "07:09:30",
+          "DEPTime": "07:09:30"
         },
         {
           "Route": "",
@@ -193389,6 +193998,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "32",
+          "ARRTime": "07:34:30",
+          "DEPTime": "07:34:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "33",
           "ARRTime": "07:38:00",
@@ -193806,6 +194422,13 @@
           "Order": "29",
           "ARRTime": "07:40:30",
           "DEPTime": "07:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "07:44:30",
+          "DEPTime": "07:44:30"
         },
         {
           "Route": "",
@@ -194446,6 +195069,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "19",
+          "ARRTime": "08:19:00",
+          "DEPTime": "08:19:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "20",
           "ARRTime": "08:22:30",
@@ -194919,6 +195549,13 @@
           "Order": "29",
           "ARRTime": "08:14:30",
           "DEPTime": "08:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "08:18:30",
+          "DEPTime": "08:18:30"
         },
         {
           "Route": "",
@@ -195514,6 +196151,13 @@
           "Order": "29",
           "ARRTime": "08:52:30",
           "DEPTime": "08:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "08:56:30",
+          "DEPTime": "08:56:30"
         },
         {
           "Route": "",
@@ -196182,6 +196826,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "09:07:30",
+          "DEPTime": "09:07:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "09:11:00",
@@ -196501,6 +197152,13 @@
           "Order": "15",
           "ARRTime": "09:37:00",
           "DEPTime": "09:38:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "09:40:30",
+          "DEPTime": "09:40:30"
         },
         {
           "Route": "",
@@ -196928,6 +197586,13 @@
           "Order": "29",
           "ARRTime": "09:20:30",
           "DEPTime": "09:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "09:24:30",
+          "DEPTime": "09:24:30"
         },
         {
           "Route": "",
@@ -197505,6 +198170,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "59",
+          "ARRTime": "10:15:30",
+          "DEPTime": "10:15:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "60",
           "ARRTime": "10:19:00",
@@ -197929,6 +198601,13 @@
           "Order": "29",
           "ARRTime": "09:43:30",
           "DEPTime": "09:44:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "09:47:30",
+          "DEPTime": "09:47:30"
         },
         {
           "Route": "",
@@ -198380,6 +199059,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "10:39:30",
+          "DEPTime": "10:39:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "10:44:00",
@@ -198804,6 +199490,13 @@
           "Order": "29",
           "ARRTime": "10:22:00",
           "DEPTime": "10:22:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "10:26:00",
+          "DEPTime": "10:26:00"
         },
         {
           "Route": "",
@@ -199423,6 +200116,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "11:22:30",
+          "DEPTime": "11:22:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "11:26:00",
@@ -199840,6 +200540,13 @@
           "Order": "28",
           "ARRTime": "10:49:30",
           "DEPTime": "10:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "10:53:30",
+          "DEPTime": "10:53:30"
         },
         {
           "Route": "",
@@ -200291,6 +200998,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "11:50:30",
+          "DEPTime": "11:50:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "11:54:00",
@@ -200715,6 +201429,13 @@
           "Order": "29",
           "ARRTime": "11:15:30",
           "DEPTime": "11:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "11:19:30",
+          "DEPTime": "11:19:30"
         },
         {
           "Route": "",
@@ -201187,6 +201908,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "50",
+          "ARRTime": "12:14:30",
+          "DEPTime": "12:14:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "51",
           "ARRTime": "12:18:00",
@@ -201597,6 +202325,13 @@
           "Order": "28",
           "ARRTime": "11:51:30",
           "DEPTime": "11:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "11:55:30",
+          "DEPTime": "11:55:30"
         },
         {
           "Route": "",
@@ -202171,6 +202906,13 @@
           "Order": "15",
           "ARRTime": "12:41:00",
           "DEPTime": "12:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "12:45:30",
+          "DEPTime": "12:45:30"
         },
         {
           "Route": "",
@@ -202776,6 +203518,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "49",
+          "ARRTime": "13:03:30",
+          "DEPTime": "13:03:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "50",
           "ARRTime": "13:07:00",
@@ -203193,6 +203942,13 @@
           "Order": "29",
           "ARRTime": "12:38:30",
           "DEPTime": "12:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "12:42:30",
+          "DEPTime": "12:42:30"
         },
         {
           "Route": "",
@@ -203644,6 +204400,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "13:21:30",
+          "DEPTime": "13:21:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "13:25:00",
@@ -204061,6 +204824,13 @@
           "Order": "28",
           "ARRTime": "13:23:00",
           "DEPTime": "13:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "13:27:30",
+          "DEPTime": "13:27:30"
         },
         {
           "Route": "",
@@ -204554,6 +205324,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "13:59:30",
+          "DEPTime": "13:59:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "14:04:00",
@@ -204978,6 +205755,13 @@
           "Order": "29",
           "ARRTime": "13:38:30",
           "DEPTime": "13:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "13:42:30",
+          "DEPTime": "13:42:30"
         },
         {
           "Route": "",
@@ -205429,6 +206213,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "14:28:30",
+          "DEPTime": "14:28:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "14:32:00",
@@ -205853,6 +206644,13 @@
           "Order": "29",
           "ARRTime": "14:10:30",
           "DEPTime": "14:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "14:14:30",
+          "DEPTime": "14:14:30"
         },
         {
           "Route": "",
@@ -206304,6 +207102,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "14:59:30",
+          "DEPTime": "14:59:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "15:04:00",
@@ -206686,6 +207491,13 @@
           "Order": "29",
           "ARRTime": "14:49:30",
           "DEPTime": "14:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "14:53:30",
+          "DEPTime": "14:53:30"
         },
         {
           "Route": "",
@@ -207137,6 +207949,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "15:23:30",
+          "DEPTime": "15:23:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "15:27:00",
@@ -207554,6 +208373,13 @@
           "Order": "29",
           "ARRTime": "15:20:30",
           "DEPTime": "15:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "15:24:30",
+          "DEPTime": "15:24:30"
         },
         {
           "Route": "",
@@ -208005,6 +208831,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "15:59:30",
+          "DEPTime": "15:59:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "16:03:00",
@@ -208429,6 +209262,13 @@
           "Order": "29",
           "ARRTime": "15:47:30",
           "DEPTime": "15:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "15:51:30",
+          "DEPTime": "15:51:30"
         },
         {
           "Route": "",
@@ -208880,6 +209720,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "16:37:30",
+          "DEPTime": "16:37:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "16:41:00",
@@ -209304,6 +210151,13 @@
           "Order": "29",
           "ARRTime": "16:07:00",
           "DEPTime": "16:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "16:11:30",
+          "DEPTime": "16:11:30"
         },
         {
           "Route": "",
@@ -209755,6 +210609,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "16:57:30",
+          "DEPTime": "16:57:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "17:02:00",
@@ -210165,6 +211026,13 @@
           "Order": "28",
           "ARRTime": "16:44:30",
           "DEPTime": "16:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "16:48:30",
+          "DEPTime": "16:48:30"
         },
         {
           "Route": "",
@@ -210777,6 +211645,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "21",
+          "ARRTime": "17:44:30",
+          "DEPTime": "17:44:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "22",
           "ARRTime": "17:48:00",
@@ -211274,6 +212149,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "17:13:30",
+          "DEPTime": "17:13:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "31",
           "ARRTime": "17:16:00",
@@ -211722,6 +212604,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "18:07:30",
+          "DEPTime": "18:07:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "18:11:00",
@@ -212146,6 +213035,13 @@
           "Order": "29",
           "ARRTime": "17:46:30",
           "DEPTime": "17:47:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "17:50:30",
+          "DEPTime": "17:50:30"
         },
         {
           "Route": "",
@@ -212597,6 +213493,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "18:33:30",
+          "DEPTime": "18:33:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "18:37:00",
@@ -213014,6 +213917,13 @@
           "Order": "29",
           "ARRTime": "18:21:30",
           "DEPTime": "18:22:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "18:25:30",
+          "DEPTime": "18:25:30"
         },
         {
           "Route": "",
@@ -213528,6 +214438,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "19:04:30",
+          "DEPTime": "19:04:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "19:08:00",
@@ -213910,6 +214827,13 @@
           "Order": "23",
           "ARRTime": "18:53:00",
           "DEPTime": "18:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "18:58:30",
+          "DEPTime": "18:58:30"
         },
         {
           "Route": "",
@@ -214613,6 +215537,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "19:32:30",
+          "DEPTime": "19:32:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "19:37:00",
@@ -215030,6 +215961,13 @@
           "Order": "28",
           "ARRTime": "19:25:00",
           "DEPTime": "19:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "19:29:30",
+          "DEPTime": "19:29:30"
         },
         {
           "Route": "",
@@ -215782,6 +216720,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "20:14:30",
+          "DEPTime": "20:14:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "20:18:00",
@@ -216209,6 +217154,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "20:01:30",
+          "DEPTime": "20:01:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "31",
           "ARRTime": "20:04:00",
@@ -216500,6 +217452,13 @@
           "Order": "15",
           "ARRTime": "20:30:00",
           "DEPTime": "20:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "20:33:30",
+          "DEPTime": "20:33:30"
         },
         {
           "Route": "",
@@ -216927,6 +217886,13 @@
           "Order": "29",
           "ARRTime": "20:29:00",
           "DEPTime": "20:29:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "20:33:00",
+          "DEPTime": "20:33:00"
         },
         {
           "Route": "",
@@ -217434,6 +218400,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "24",
+          "ARRTime": "21:00:00",
+          "DEPTime": "21:00:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "25",
           "ARRTime": "21:02:30",
@@ -217816,6 +218789,13 @@
           "Order": "46",
           "ARRTime": "20:50:00",
           "DEPTime": "20:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "20:54:30",
+          "DEPTime": "20:54:30"
         },
         {
           "Route": "",
@@ -218239,6 +219219,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "21:13:30",
+          "DEPTime": "21:13:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "30",
           "ARRTime": "21:16:00",
@@ -218593,6 +219580,13 @@
           "Order": "17",
           "ARRTime": "22:32:00",
           "DEPTime": "22:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "18",
+          "ARRTime": "22:38:30",
+          "DEPTime": "22:38:30"
         },
         {
           "Route": "",
@@ -219069,6 +220063,13 @@
           "Order": "29",
           "ARRTime": "21:30:30",
           "DEPTime": "21:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "21:34:30",
+          "DEPTime": "21:34:30"
         },
         {
           "Route": "",
@@ -219660,6 +220661,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "21:50:30",
+          "DEPTime": "21:50:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "21:55:00",
@@ -220080,6 +221088,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "22:10:30",
+          "DEPTime": "22:10:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "30",
           "ARRTime": "22:13:00",
@@ -220322,6 +221337,13 @@
           "Order": "6",
           "ARRTime": "22:11:00",
           "DEPTime": "22:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "22:15:30",
+          "DEPTime": "22:15:30"
         },
         {
           "Route": "",
@@ -220745,6 +221767,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "29",
+          "ARRTime": "22:37:30",
+          "DEPTime": "22:37:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "30",
           "ARRTime": "22:40:00",
@@ -221165,6 +222194,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "47",
+          "ARRTime": "22:56:30",
+          "DEPTime": "22:56:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "48",
           "ARRTime": "23:00:00",
@@ -221550,6 +222586,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "23:08:30",
+          "DEPTime": "23:08:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "31",
           "ARRTime": "23:11:00",
@@ -221743,6 +222786,13 @@
           "Order": "1",
           "ARRTime": "23:34:00",
           "DEPTime": "23:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "23:36:30",
+          "DEPTime": "23:36:30"
         },
         {
           "Route": "",
@@ -222072,6 +223122,13 @@
           "Order": "29",
           "ARRTime": "23:22:30",
           "DEPTime": "23:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "23:26:30",
+          "DEPTime": "23:26:30"
         },
         {
           "Route": "",
@@ -222443,6 +223500,13 @@
           "Order": "29",
           "ARRTime": "23:44:30",
           "DEPTime": "23:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "30",
+          "ARRTime": "23:48:30",
+          "DEPTime": "23:48:30"
         },
         {
           "Route": "",
@@ -225911,6 +226975,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "05:32:30",
+          "DEPTime": "05:32:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "05:36:00",
@@ -226002,6 +227073,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "06:44:00",
+          "DEPTime": "06:44:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "06:48:00",
@@ -226034,6 +227112,13 @@
           "Order": "1",
           "ARRTime": "05:53:00",
           "DEPTime": "05:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "05:56:30",
+          "DEPTime": "05:56:30"
         },
         {
           "Route": "",
@@ -226125,6 +227210,13 @@
           "Order": "5",
           "ARRTime": "07:30:00",
           "DEPTime": "07:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "07:34:30",
+          "DEPTime": "07:34:30"
         },
         {
           "Route": "",
@@ -226296,6 +227388,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "06:36:30",
+          "DEPTime": "06:36:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "06:40:00",
@@ -226384,6 +227483,13 @@
           "Order": "5",
           "ARRTime": "07:49:00",
           "DEPTime": "07:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "07:53:30",
+          "DEPTime": "07:53:30"
         },
         {
           "Route": "",
@@ -226513,6 +227619,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "07:00:30",
+          "DEPTime": "07:00:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "07:04:00",
@@ -226601,6 +227714,13 @@
           "Order": "5",
           "ARRTime": "08:28:00",
           "DEPTime": "08:28:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "08:32:00",
+          "DEPTime": "08:32:00"
         },
         {
           "Route": "",
@@ -226772,6 +227892,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "16",
+          "ARRTime": "07:41:30",
+          "DEPTime": "07:41:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "17",
           "ARRTime": "07:45:00",
@@ -226870,6 +227997,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "08:10:30",
+          "DEPTime": "08:10:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "08:14:00",
@@ -226958,6 +228092,13 @@
           "Order": "5",
           "ARRTime": "08:48:00",
           "DEPTime": "08:48:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "08:52:00",
+          "DEPTime": "08:52:00"
         },
         {
           "Route": "",
@@ -227157,6 +228298,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "08:42:30",
+          "DEPTime": "08:42:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "08:46:00",
@@ -227248,6 +228396,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "09:11:30",
+          "DEPTime": "09:11:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "09:15:00",
@@ -227315,6 +228470,13 @@
           "Order": "6",
           "ARRTime": "09:09:00",
           "DEPTime": "09:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "09:13:30",
+          "DEPTime": "09:13:30"
         },
         {
           "Route": "",
@@ -227409,6 +228571,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "09:43:00",
+          "DEPTime": "09:43:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "09:45:30",
@@ -227476,6 +228645,13 @@
           "Order": "1",
           "ARRTime": "09:27:00",
           "DEPTime": "09:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "09:30:30",
+          "DEPTime": "09:30:30"
         },
         {
           "Route": "",
@@ -227570,6 +228746,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "10:08:00",
+          "DEPTime": "10:08:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "10:12:00",
@@ -227637,6 +228820,13 @@
           "Order": "6",
           "ARRTime": "09:45:00",
           "DEPTime": "09:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "09:48:30",
+          "DEPTime": "09:48:30"
         },
         {
           "Route": "",
@@ -227731,6 +228921,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "10:47:30",
+          "DEPTime": "10:47:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "10:50:00",
@@ -227777,6 +228974,13 @@
           "Order": "1",
           "ARRTime": "10:21:00",
           "DEPTime": "10:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "10:24:30",
+          "DEPTime": "10:24:30"
         },
         {
           "Route": "",
@@ -227871,6 +229075,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "11:14:00",
+          "DEPTime": "11:14:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "11:16:30",
@@ -227952,6 +229163,13 @@
           "Order": "6",
           "ARRTime": "11:01:00",
           "DEPTime": "11:03:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "11:05:30",
+          "DEPTime": "11:05:30"
         },
         {
           "Route": "",
@@ -228046,6 +229264,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "11:47:00",
+          "DEPTime": "11:47:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "11:49:30",
@@ -228113,6 +229338,13 @@
           "Order": "1",
           "ARRTime": "11:39:00",
           "DEPTime": "11:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "11:42:30",
+          "DEPTime": "11:42:30"
         },
         {
           "Route": "",
@@ -228249,6 +229481,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "12:07:00",
+          "DEPTime": "12:07:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "12:11:00",
@@ -228295,6 +229534,13 @@
           "Order": "3",
           "ARRTime": "11:58:00",
           "DEPTime": "12:02:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "4",
+          "ARRTime": "12:04:30",
+          "DEPTime": "12:04:30"
         },
         {
           "Route": "",
@@ -228389,6 +229635,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "12:47:00",
+          "DEPTime": "12:47:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "12:51:00",
@@ -228421,6 +229674,13 @@
           "Order": "1",
           "ARRTime": "12:24:00",
           "DEPTime": "12:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "12:27:30",
+          "DEPTime": "12:27:30"
         },
         {
           "Route": "",
@@ -228512,6 +229772,13 @@
           "Order": "5",
           "ARRTime": "13:00:00",
           "DEPTime": "13:00:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "13:04:00",
+          "DEPTime": "13:04:00"
         },
         {
           "Route": "",
@@ -228620,6 +229887,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "12:57:30",
+          "DEPTime": "12:57:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "13:01:00",
@@ -228711,6 +229985,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "13:47:30",
+          "DEPTime": "13:47:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "13:51:00",
@@ -228743,6 +230024,13 @@
           "Order": "1",
           "ARRTime": "13:36:00",
           "DEPTime": "13:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "13:39:30",
+          "DEPTime": "13:39:30"
         },
         {
           "Route": "",
@@ -228837,6 +230125,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "14:09:00",
+          "DEPTime": "14:09:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "14:11:30",
@@ -228883,6 +230178,13 @@
           "Order": "1",
           "ARRTime": "14:07:00",
           "DEPTime": "14:07:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "14:10:30",
+          "DEPTime": "14:10:30"
         },
         {
           "Route": "",
@@ -228974,6 +230276,13 @@
           "Order": "5",
           "ARRTime": "14:43:00",
           "DEPTime": "14:43:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "14:47:00",
+          "DEPTime": "14:47:00"
         },
         {
           "Route": "",
@@ -229082,6 +230391,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "14:44:30",
+          "DEPTime": "14:44:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "14:48:00",
@@ -229173,6 +230489,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "15:10:00",
+          "DEPTime": "15:10:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "15:14:00",
@@ -229219,6 +230542,13 @@
           "Order": "3",
           "ARRTime": "15:07:00",
           "DEPTime": "15:09:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "4",
+          "ARRTime": "15:11:30",
+          "DEPTime": "15:11:30"
         },
         {
           "Route": "",
@@ -229313,6 +230643,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "15:41:00",
+          "DEPTime": "15:41:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "15:43:30",
@@ -229359,6 +230696,13 @@
           "Order": "1",
           "ARRTime": "15:40:00",
           "DEPTime": "15:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "15:43:30",
+          "DEPTime": "15:43:30"
         },
         {
           "Route": "",
@@ -229450,6 +230794,13 @@
           "Order": "5",
           "ARRTime": "16:12:00",
           "DEPTime": "16:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "16:16:30",
+          "DEPTime": "16:16:30"
         },
         {
           "Route": "",
@@ -229558,6 +230909,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "16:08:30",
+          "DEPTime": "16:08:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "16:12:00",
@@ -229649,6 +231007,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "16:37:00",
+          "DEPTime": "16:37:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "16:39:30",
@@ -229709,6 +231074,13 @@
           "Order": "3",
           "ARRTime": "16:27:00",
           "DEPTime": "16:29:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "4",
+          "ARRTime": "16:31:30",
+          "DEPTime": "16:31:30"
         },
         {
           "Route": "",
@@ -229800,6 +231172,13 @@
           "Order": "5",
           "ARRTime": "16:53:00",
           "DEPTime": "16:54:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "16:57:30",
+          "DEPTime": "16:57:30"
         },
         {
           "Route": "",
@@ -229929,6 +231308,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "4",
+          "ARRTime": "17:09:30",
+          "DEPTime": "17:09:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "5",
           "ARRTime": "17:13:00",
@@ -230020,6 +231406,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "17:44:30",
+          "DEPTime": "17:44:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "17:48:00",
@@ -230087,6 +231480,13 @@
           "Order": "6",
           "ARRTime": "17:35:00",
           "DEPTime": "17:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "17:38:30",
+          "DEPTime": "17:38:30"
         },
         {
           "Route": "",
@@ -230181,6 +231581,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "18:06:00",
+          "DEPTime": "18:06:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "18:09:30",
@@ -230255,6 +231662,13 @@
           "Order": "5",
           "ARRTime": "18:38:00",
           "DEPTime": "18:38:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "18:42:00",
+          "DEPTime": "18:42:00"
         },
         {
           "Route": "",
@@ -230370,6 +231784,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "18:03:30",
+          "DEPTime": "18:03:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "18:07:00",
@@ -230461,6 +231882,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "19:06:00",
+          "DEPTime": "19:06:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "19:10:00",
@@ -230521,6 +231949,13 @@
           "Order": "5",
           "ARRTime": "19:19:00",
           "DEPTime": "19:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "19:23:30",
+          "DEPTime": "19:23:30"
         },
         {
           "Route": "",
@@ -230699,6 +232134,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "4",
+          "ARRTime": "18:42:30",
+          "DEPTime": "18:42:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "5",
           "ARRTime": "18:46:00",
@@ -230790,6 +232232,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "19:47:00",
+          "DEPTime": "19:47:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "19:51:00",
@@ -230822,6 +232271,13 @@
           "Order": "1",
           "ARRTime": "19:20:00",
           "DEPTime": "19:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "19:23:30",
+          "DEPTime": "19:23:30"
         },
         {
           "Route": "",
@@ -230913,6 +232369,13 @@
           "Order": "5",
           "ARRTime": "20:09:00",
           "DEPTime": "20:09:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "20:13:00",
+          "DEPTime": "20:13:00"
         },
         {
           "Route": "",
@@ -231018,6 +232481,13 @@
           "Order": "6",
           "ARRTime": "20:02:00",
           "DEPTime": "20:04:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "20:06:30",
+          "DEPTime": "20:06:30"
         },
         {
           "Route": "",
@@ -231154,6 +232624,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "20:47:00",
+          "DEPTime": "20:47:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "20:51:00",
@@ -231186,6 +232663,13 @@
           "Order": "1",
           "ARRTime": "20:24:00",
           "DEPTime": "20:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "20:27:30",
+          "DEPTime": "20:27:30"
         },
         {
           "Route": "",
@@ -231280,6 +232764,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "21:18:30",
+          "DEPTime": "21:18:30"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "21:22:00",
@@ -231312,6 +232803,13 @@
           "Order": "1",
           "ARRTime": "21:05:00",
           "DEPTime": "21:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "21:08:30",
+          "DEPTime": "21:08:30"
         },
         {
           "Route": "",
@@ -231403,6 +232901,13 @@
           "Order": "5",
           "ARRTime": "21:45:00",
           "DEPTime": "21:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "21:49:30",
+          "DEPTime": "21:49:30"
         },
         {
           "Route": "",
@@ -231511,6 +233016,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "22:45:00",
+          "DEPTime": "22:45:00"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "8",
           "ARRTime": "22:49:00",
@@ -231578,6 +233090,13 @@
           "Order": "6",
           "ARRTime": "21:21:00",
           "DEPTime": "21:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "21:25:30",
+          "DEPTime": "21:25:30"
         },
         {
           "Route": "",
@@ -231672,6 +233191,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "22:06:00",
+          "DEPTime": "22:06:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "22:10:00",
@@ -231704,6 +233230,13 @@
           "Order": "1",
           "ARRTime": "21:43:00",
           "DEPTime": "21:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "21:46:30",
+          "DEPTime": "21:46:30"
         },
         {
           "Route": "",
@@ -231795,6 +233328,13 @@
           "Order": "5",
           "ARRTime": "22:43:00",
           "DEPTime": "22:43:30"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "22:47:00",
+          "DEPTime": "22:47:00"
         },
         {
           "Route": "",
@@ -231931,6 +233471,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "2",
+          "ARRTime": "22:23:30",
+          "DEPTime": "22:23:30"
+        },
+        {
+          "Route": "",
           "Station": "4250",
           "Order": "3",
           "ARRTime": "22:27:00",
@@ -232022,6 +233569,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "23:04:00",
+          "DEPTime": "23:04:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "23:08:00",
@@ -232085,6 +233639,13 @@
         },
         {
           "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "23:58:00",
+          "DEPTime": "23:58:00"
+        },
+        {
+          "Route": "",
           "Station": "4220",
           "Order": "7",
           "ARRTime": "00:02:00",
@@ -232145,6 +233706,13 @@
           "Order": "5",
           "ARRTime": "06:57:00",
           "DEPTime": "06:57:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "6",
+          "ARRTime": "07:00:00",
+          "DEPTime": "07:00:00"
         },
         {
           "Route": "",
@@ -232250,6 +233818,13 @@
           "Order": "6",
           "ARRTime": "17:46:00",
           "DEPTime": "17:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "17:51:30",
+          "DEPTime": "17:51:30"
         },
         {
           "Route": "",
@@ -232439,6 +234014,13 @@
           "Order": "6",
           "ARRTime": "18:51:00",
           "DEPTime": "18:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "4240",
+          "Order": "7",
+          "ARRTime": "18:54:30",
+          "DEPTime": "18:54:30"
         },
         {
           "Route": "",
@@ -264826,7 +266408,7 @@
     },
     {
       "Type": "4",
-      "Train": "6568出(預估)",
+      "Train": "6568(預估)",
       "BreastFeed": "Y",
       "Route": "",
       "Package": "N",
