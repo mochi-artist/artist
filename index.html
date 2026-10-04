@@ -8,8 +8,12 @@
     <script>
         // 💡 只要修改這裡引號內的文字，全網頁所有的紅色改點按鈕都會自動同步更新！
         const REVISED_BTN_TEXT = "進入預覽";
+        
+        // 💡 修改全車次檔途徑標題！
+        const REVISED_BADGE_TEXT = "(10/03平鎮啟用，10/17台南地下段啟用)";
     </script>
     <!-- ========================================== -->
+    
 
     <title id="web_name"></title>
     <meta charset="UTF-8">
@@ -72,7 +76,8 @@
 
     <div class="hero-section">
         <div class="container text-center">
-            <h1 class="fw-bold mb-2">台灣鐵路/軌道運行圖 <span class="revised-only revised-badge text-danger ms-2" style="font-size: 0.6em; vertical-align: middle;">(10/03平鎮啟用，10/18(預計)台南地下段啟用)</span></h1>
+            <!-- 🌟 加上 id="revised-badge-text" 並且把原本裡面的字清空 -->
+            <h1 class="fw-bold mb-2">台灣鐵路/軌道運行圖 <span id="revised-badge-text" class="revised-only revised-badge text-danger ms-2" style="font-size: 0.6em; vertical-align: middle;"></span></h1>
             <p class="text-white-50 mb-0 fs-5">今天日期：<span id="today_date"></span></p>
         </div>
     </div>
@@ -512,6 +517,10 @@
     $(document).ready(function () {
         $('#web_name').append(web_name)
         $('#today_date').append(today_date)
+        
+        // 🌟 新增這行：自動把最上方設定的副標題文字塞入畫面中
+        $('#revised-badge-text').text(REVISED_BADGE_TEXT)
+        
         $("meta[name='description']").attr("content", description)
         $("meta[name='keywords']").attr("content", keywords)
         $('footer').append(footer)
