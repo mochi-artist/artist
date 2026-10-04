@@ -287,44 +287,36 @@ function _clearHighlight() {
 }
 
 // ==========================================
-// 🌟 畫面跳轉與無限清單邏輯 (恢復強制置中 + 防面板遮擋機制)
+// 🌟 畫面跳轉邏輯 (完全對齊點擊車站的視角體驗)
 // ==========================================
 function _panToTrain(pathId) {
     const data = _trainDataMap.get(pathId);
     if (!data || data.firstX === undefined || data.firstY === undefined) return;
 
-    let offsetX = 0;
+    // 1. 計算畫布的絕對座標基準
+    let offsetX = 0; 
     let offsetY = 0;
-    if (_d3Svg && _d3Svg.node()) {
+    if (typeof _d3Svg !== 'undefined' && _d3Svg && _d3Svg.node()) {
         const rect = _d3Svg.node().getBoundingClientRect();
         offsetX = rect.left + window.scrollX;
         offsetY = rect.top + window.scrollY;
     }
 
+    // 2. 取得該車次的起站絕對座標
     const targetX = offsetX + data.firstX;
     const targetY = offsetY + data.firstY;
 
-    // 🌟 核心防遮擋：如果是電腦版，把錨點往左算一點，這樣目標車站就會出現在右半部可視區，不會被左側面板蓋住！
-    const shiftX = (window.innerWidth > 768 && _isPanelOpen) ? 225 : 0;
+    // 3. 🌟 完全對齊時刻表車站的計算公式 (拿掉所有多餘的偏移量，保持純粹置中)
+    const scrollToX = targetX - (window.innerWidth / 2);
+    const scrollToY = targetY - (window.innerHeight / 2);
 
-    // 建立隱形幽靈錨點
-    const anchor = document.createElement('div');
-    Object.assign(anchor.style, {
-        position: 'absolute',
-        left: (targetX - shiftX) + 'px',
-        top: targetY + 'px',
-        width: '1px',
-        height: '1px',
-        pointerEvents: 'none',
-        visibility: 'hidden'
-    });
-    document.body.appendChild(anchor);
-
+    // 4. 執行平滑跳轉 (加入與時刻表相同的 50ms 緩衝延遲)
     setTimeout(() => {
-        // 🌟 關鍵修復：從 nearest 改回 center，保證車站絕對出現在畫面正中央
-        anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        // 功成身退，兩秒後刪除幽靈錨點
-        setTimeout(() => document.body.removeChild(anchor), 2000);
+        window.scrollTo({ 
+            left: Math.max(0, scrollToX), 
+            top: Math.max(0, scrollToY), 
+            behavior: 'smooth' 
+        });
     }, 50);
 }
 
