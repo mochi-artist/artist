@@ -705,14 +705,31 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             }
         });
 
-        allMergedStops.forEach((stop, index) => {
-            if (railyards.includes(stop.id)) stop.remark = "調車場";
+       allMergedStops.forEach((stop, index) => {
+            // 先取得乾淨的車站代碼 (移除 _LOOP 後綴)，確保比對絕對精準
+            const cleanStopId = String(stop.id).replace('_LOOP', '');
+
+            if (railyards.includes(stop.id) || railyards.includes(cleanStopId)) stop.remark = "調車場";
             else if (stop.id === trueOriginId) stop.remark = "起站";
             else if (stop.id === trueDestId) stop.remark = "終點";
             else {
-                // 🌟 4. 因為 stop.id 保留了 _LOOP，這裡就能完美抓到晚上的時間了
+                // 判斷該站是否有停靠 (到站時間 !== 離站時間)
                 let isStopping = exactTimes[stop.id] ? (exactTimes[stop.id].arr !== exactTimes[stop.id].dep) : (stop.arrTime !== stop.depTime);
-                stop.remark = isStopping ? "停靠" : "通過";
+                
+                // 取得當前車次號碼
+                const baseTrainNo = original_train_no.replace(/-End$/, '');
+                
+                // 讀取該車次的客製化 OpStops 運轉停車名單
+                const myOpStops = window._opStopsData ? (window._opStopsData[baseTrainNo] || []) : [];
+                
+                // 🌟 真正修正：這些是「車站代碼」，只要火車在這些號誌站有停靠，就一定是運轉停車！
+                const specialOpStopStations = ['2115', '3355', '5170', '5175', '5180'];
+                
+                if (myOpStops.includes(String(stop.id)) || myOpStops.includes(cleanStopId) || (specialOpStopStations.includes(cleanStopId) && isStopping)) {
+                    stop.remark = "運轉停車";
+                } else {
+                    stop.remark = isStopping ? "停靠" : "通過";
+                }
             }
         });
 
@@ -781,9 +798,12 @@ let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container
                 else if (remarkDisplay === '調車場') remarkColor = '#94a3b8'; 
                 else if (remarkDisplay === '通過') remarkColor = '#fbbf24'; 
                 else if (remarkDisplay === '停靠') remarkColor = '#4ade80'; 
+                // 🌟 新增：設定「運轉停車」專屬的紫色 (或是你喜歡的其他顏色)
+                else if (remarkDisplay === '運轉停車') remarkColor = '#c084fc'; 
 
                 let timeColumnsHTML = '';
-                if (remarkDisplay === '通過') {
+                // 🌟 修正：只讓「通過」隱藏到站時間（變成 -），運轉停車則保留雙時間！
+                if (remarkDisplay === '通過') { 
                     timeColumnsHTML = `
                         <span style="flex: 1; text-align: center; color:#aaa; font-size:12px; pointer-events:none;">-</span>
                         <span style="flex: 1; text-align: center; color:#fbbc04; font-size:12px; pointer-events:none;">${depDisplay}</span>
@@ -1701,6 +1721,23 @@ function draw_train_path(all_trains_data, realtime_trains) {
                 for (const train_data of all_trains_data) {
                     for (const [lk, train_no, train_kind, , line_dir, value] of train_data) {
                         if (value.length <= 2) continue;
+
+                        // 🌟 新增：週五 452 次專屬隱藏機制 (南段 LINE_WS 與 南迴線 LINE_S)
+                        const base_no = train_no.replace(/-End\d*/g, '');
+                        if (base_no === '452' && (lk === 'LINE_WS' || lk === 'LINE_S')) {
+                            if (window._currentRenderDate) {
+                                // 將字串 "20261009" 解析為真實日期物件
+                                const y = parseInt(window._currentRenderDate.substring(0, 4));
+                                const m = parseInt(window._currentRenderDate.substring(4, 6)) - 1; // 月份從 0 開始
+                                const d = parseInt(window._currentRenderDate.substring(6, 8));
+                                const dateObj = new Date(y, m, d);
+                                
+                                // getDay() === 5 代表星期五
+                                if (dateObj.getDay() === 5) {
+                                    continue; // 觸發隱藏：直接跳過不處理，連搜尋清單都不會加入！
+                                }
+                            }
+                        }
 
                         let realtime_data = realtime_trains != null ? realtime_trains.get(train_no) : undefined;
                         let sections = [];
