@@ -5,14 +5,12 @@ import re
 # ================= 設定區 =================
 DATA_DIR = "data"
 
-# 如果使用者輸入 ALL，預設涵蓋這些規則車次
 RULE_CLASS_0001 = ['6652', '6655', '6629', '6630']
 RULE_CLASS_0002 = ['6631', '6632', '6633', '6676', '6677']
 ALL_RULE_TRAINS = set(RULE_CLASS_0001 + RULE_CLASS_0002)
 # =========================================
 
 def main():
-    # 從 GitHub Actions 網頁按鈕接收參數
     target_trains_input = os.environ.get('TARGET_TRAINS', '').strip()
     target_months_input = os.environ.get('TARGET_MONTHS', '').strip()
 
@@ -24,17 +22,16 @@ def main():
     if target_trains_input.upper() == 'ALL':
         target_trains = ALL_RULE_TRAINS
     else:
-        # 支援用逗號或空格分隔多筆輸入 (例如 "6631, 6632")
         target_trains = set([t.strip() for t in re.split(r'[,\s、]+', target_trains_input) if t.strip()])
 
-    # 2️⃣ 解析「目標月份」
-    target_months = []
+    # 2️⃣ 解析「目標月份/年月」
+    target_filters = []
     if target_months_input.upper() != 'ALL':
-        target_months = [m.strip().zfill(2) for m in re.split(r'[,\s、]+', target_months_input) if m.strip()]
+        target_filters = [m.strip() for m in re.split(r'[,\s、]+', target_months_input) if m.strip()]
 
     print("==================================================")
     print(f"🎯 目標車次: {', '.join(target_trains)}")
-    print(f"📅 目標月份: {', '.join(target_months) if target_months else '所有月份'}")
+    print(f"📅 目標時間: {', '.join(target_filters) if target_filters else '所有時間'}")
     print("==================================================")
 
     if not os.path.exists(DATA_DIR):
@@ -52,10 +49,18 @@ def main():
         
         date_str = filename.replace('.json', '')
         
-        # 檢查檔案是否符合目標月份
-        if target_months and len(date_str) == 8:
-            file_month = date_str[4:6]
-            if file_month not in target_months:
+        # 🌟 升級版判斷邏輯：支援 6 碼 (YYYYMM) 或 2 碼 (MM)
+        if target_filters and len(date_str) == 8:
+            matched = False
+            for f in target_filters:
+                if len(f) == 6 and date_str.startswith(f):
+                    matched = True
+                    break
+                elif len(f) <= 2 and date_str[4:6] == f.zfill(2):
+                    matched = True
+                    break
+            
+            if not matched:
                 continue
 
         filepath = os.path.join(DATA_DIR, filename)
@@ -64,19 +69,16 @@ def main():
                 daily_data = json.load(f)
 
             affected = 0
-            # 處理包含 TrainInfos 的標準結構
             if isinstance(daily_data, dict) and "TrainInfos" in daily_data:
                 orig_len = len(daily_data["TrainInfos"])
                 daily_data["TrainInfos"] = [t for t in daily_data["TrainInfos"] if str(t.get("TrainNo", t.get("Train"))) not in target_trains]
                 affected = orig_len - len(daily_data["TrainInfos"])
                 
-            # 處理純陣列結構
             elif isinstance(daily_data, list):
                 orig_len = len(daily_data)
                 daily_data = [t for t in daily_data if str(t.get("TrainNo", t.get("Train"))) not in target_trains]
                 affected = orig_len - len(daily_data)
 
-            # 如果有刪除到東西，才進行存檔
             if affected > 0:
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(daily_data, f, ensure_ascii=False, indent=2)
@@ -91,7 +93,7 @@ def main():
     if modified_files:
         print(f"✅ 執行完畢！共從 {len(modified_files)} 個檔案中，總計刪除 {total_deleted} 筆車次資料。")
     else:
-        print("⚪ 掃描完畢，該月份沒有找到指定的車次資料，無需修改。")
+        print("⚪ 掃描完畢，沒有找到需要刪除的資料。")
 
 if __name__ == "__main__":
     main()
