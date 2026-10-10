@@ -1,0 +1,39 @@
+name: 📝 手動解析公告文字並匯入車次
+
+# 觸發條件：只限手動點擊 (workflow_dispatch)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  parse-and-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 檢出程式碼
+        uses: actions/checkout@v4
+
+      - name: 🐍 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 🚀 執行文字公告解析腳本
+        run: python change/auto_update_from_text.py
+
+      - name: 💾 自動提交並推播 (Commit & Push)
+        run: |
+          git config --global user.name "Text Parser Bot"
+          git config --global user.email "bot@github.com"
+          
+          # 追蹤資料夾與被清空的文字檔
+          git add data/ train_data.txt
+          
+          if git diff-index --quiet HEAD --; then
+            echo "沒有檔案變動，略過提交。"
+          else
+            git commit -m "📝 從 train_data.txt 解析並匯入加班車次 [skip ci]"
+            git push
+          fi
