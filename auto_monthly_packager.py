@@ -129,36 +129,50 @@ def main():
         print("❌ 錯誤：基準總表中沒有 TrainInfos 資料。")
         return
 
-    # 🌟 設定台灣時區
     tz_tw = timezone(timedelta(hours=8))
     now = datetime.now(tz_tw)
     current_month = now.month
     current_day = now.day
 
     # ==========================================
-    # 🧪 接收 YAML 傳來的測試開關
+    # 🌟 接收 YAML 傳來的環境變數
     # ==========================================
-    if os.environ.get('SIMULATE_15TH') == 'true':
-        print("==================================================")
+    # 判斷是否為總表更新 (Push 事件) 或是 手動打勾模擬更新
+    is_push = os.environ.get('EVENT_NAME') == 'push' or os.environ.get('SIMULATE_PUSH') == 'true'
+    # 判斷是否為手動模擬 15 號
+    is_simulated_15th = os.environ.get('SIMULATE_15TH') == 'true'
+
+    if is_simulated_15th:
         print("🧪 測試模式啟動：強制模擬今天是 15 號！")
-        print("==================================================")
-        current_day = 15  # 強制欺騙系統今天已經是 15 號了
+        current_day = 15
 
-    target_months = [current_month]
+    # 用來存放要執行的任務清單 (月份, 從哪一天開始)
+    target_tasks = [] 
 
+    # 🎯 條件 1：總表有變動，才需要更新當月 (今天 ~ 月底) 的檔案
+    if is_push:
+        print("🔄 偵測到總表更新 (或模擬更新)！將更新當月自今日起的資料。")
+        target_tasks.append((current_month, current_day))
+
+    # 🎯 條件 2：只要過了 15 號，就產出「下個月」(1號 ~ 月底) 的檔案
     if current_day >= 15:
         if current_month == 12:
             print("⚠️ 警告：今天已是 12/15 之後。暫停輸出明年 1 月資料！")
         else:
-            target_months.append(current_month + 1)
+            if not is_push:
+                print("📅 例行排程 / 15號觸發：僅產出下個月的資料。")
+            target_tasks.append((current_month + 1, 1))
+
+    # 如果兩個條件都沒達成，代表今天是平日且總表沒改，就直接休息！
+    if not target_tasks:
+        print("💤 今天不是 15 號，總表也沒有更新，無需執行任何打包動作。")
+        return
 
     print("==================================================")
-    print(f"🚀 自動打包開始 | 認知今日: {current_month}/{current_day} | 目標月份: {target_months}")
+    print(f"🚀 自動打包開始 | 認知今日: {current_month}/{current_day}")
     print("==================================================")
 
-    for m in target_months:
-        # 如果是當月，從今天開始覆寫；如果是跨到下個月的預先產出，則從 1 號開始
-        start_d = current_day if m == current_month else 1
+    for m, start_d in target_tasks:
         generate_for_month(m, train_infos, start_day=start_d)
 
     print("==================================================")
