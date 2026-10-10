@@ -33,9 +33,23 @@ jobs:
           git config --global user.name "Smart Manager Bot"
           git config --global user.email "bot@github.com"
           
-          # 追蹤 data 資料夾、暫存檔與日誌
-          git add data/ pending_trains.json pending_log.txt
+          # 1. 追蹤 data 資料夾
+          git add data/
           
+          # 2. 安全處理暫存檔 (存在就加入，不存在就告訴 Git 忽略或移除追蹤)
+          if [ -f pending_trains.json ]; then
+            git add pending_trains.json
+          else
+            git rm --ignore-unmatch pending_trains.json
+          fi
+          
+          if [ -f pending_log.txt ]; then
+            git add pending_log.txt
+          else
+            git rm --ignore-unmatch pending_log.txt
+          fi
+          
+          # 3. 提交變更
           if git diff-index --quiet HEAD --; then
             echo "沒有抓到新車次，略過提交。"
           else
