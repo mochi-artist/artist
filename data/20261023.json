@@ -103336,41 +103336,6 @@
     },
     {
       "Type": "1",
-      "Train": "727出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1111",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "11:23:00",
-          "DEPTime": "11:23:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "11:29:00",
-          "DEPTime": "11:55:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "727",
       "BreastFeed": "N",
       "Route": "",
@@ -103569,6 +103534,41 @@
           "Order": "2",
           "ARRTime": "12:13:00",
           "DEPTime": "12:13:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "727出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1111",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "11:23:00",
+          "DEPTime": "11:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "11:29:00",
+          "DEPTime": "11:55:00"
         }
       ]
     },
@@ -104701,41 +104701,6 @@
     },
     {
       "Type": "1",
-      "Train": "1008A出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1280",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "N",
-      "Note": "六日及例停",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1045",
-          "Order": "1",
-          "ARRTime": "06:00:00",
-          "DEPTime": "06:00:00"
-        },
-        {
-          "Route": "",
-          "Station": "1040",
-          "Order": "2",
-          "ARRTime": "06:06:00",
-          "DEPTime": "06:18:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1008A",
       "BreastFeed": "N",
       "Route": "",
@@ -104822,6 +104787,41 @@
           "Order": "10",
           "ARRTime": "06:53:00",
           "DEPTime": "06:53:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1008A出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1280",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "六日及例停",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1045",
+          "Order": "1",
+          "ARRTime": "06:00:00",
+          "DEPTime": "06:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "2",
+          "ARRTime": "06:06:00",
+          "DEPTime": "06:18:00"
         }
       ]
     },
@@ -106171,41 +106171,6 @@
     },
     {
       "Type": "1",
-      "Train": "1048出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1132",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "22:30:00",
-          "DEPTime": "22:30:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "22:35:00",
-          "DEPTime": "22:48:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1048",
       "BreastFeed": "N",
       "Route": "",
@@ -106397,6 +106362,41 @@
           "Order": "25",
           "ARRTime": "00:21:00",
           "DEPTime": "00:21:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1048出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1132",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "22:30:00",
+          "DEPTime": "22:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "22:35:00",
+          "DEPTime": "22:48:00"
         }
       ]
     },
@@ -107032,41 +107032,6 @@
     },
     {
       "Type": "1",
-      "Train": "1109出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1045",
-          "Order": "1",
-          "ARRTime": "04:59:00",
-          "DEPTime": "04:59:00"
-        },
-        {
-          "Route": "",
-          "Station": "1040",
-          "Order": "2",
-          "ARRTime": "05:05:00",
-          "DEPTime": "05:13:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1109",
       "BreastFeed": "N",
       "Route": "",
@@ -107216,6 +107181,41 @@
           "Order": "19",
           "ARRTime": "06:31:00",
           "DEPTime": "06:31:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1109出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1045",
+          "Order": "1",
+          "ARRTime": "04:59:00",
+          "DEPTime": "04:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "2",
+          "ARRTime": "05:05:00",
+          "DEPTime": "05:13:00"
         }
       ]
     },
@@ -107858,41 +107858,6 @@
     },
     {
       "Type": "1",
-      "Train": "1120出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "N",
-      "Note": "六日及例停",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "05:19:00",
-          "DEPTime": "05:19:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "05:24:00",
-          "DEPTime": "05:38:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1120",
       "BreastFeed": "N",
       "Route": "",
@@ -108105,6 +108070,41 @@
           "Order": "28",
           "ARRTime": "07:44:00",
           "DEPTime": "07:44:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1120出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "六日及例停",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "05:19:00",
+          "DEPTime": "05:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "05:24:00",
+          "DEPTime": "05:38:00"
         }
       ]
     },
@@ -109034,41 +109034,6 @@
     },
     {
       "Type": "1",
-      "Train": "1124出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "05:43:00",
-          "DEPTime": "05:43:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "05:48:00",
-          "DEPTime": "05:59:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1124",
       "BreastFeed": "N",
       "Route": "",
@@ -109281,6 +109246,41 @@
           "Order": "28",
           "ARRTime": "08:18:00",
           "DEPTime": "08:18:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1124出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "05:43:00",
+          "DEPTime": "05:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "05:48:00",
+          "DEPTime": "05:59:00"
         }
       ]
     },
@@ -110189,41 +110189,6 @@
     },
     {
       "Type": "1",
-      "Train": "1129入庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "1",
-          "ARRTime": "08:58:00",
-          "DEPTime": "09:10:00"
-        },
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "2",
-          "ARRTime": "09:15:00",
-          "DEPTime": "09:15:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1129A",
       "BreastFeed": "N",
       "Route": "",
@@ -110268,6 +110233,41 @@
           "Order": "4",
           "ARRTime": "06:35:00",
           "DEPTime": "06:35:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1129入庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "1",
+          "ARRTime": "08:58:00",
+          "DEPTime": "09:10:00"
+        },
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "2",
+          "ARRTime": "09:15:00",
+          "DEPTime": "09:15:00"
         }
       ]
     },
@@ -111526,41 +111526,6 @@
     },
     {
       "Type": "1",
-      "Train": "1136出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "07:16:00",
-          "DEPTime": "07:16:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "07:21:00",
-          "DEPTime": "07:32:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1136",
       "BreastFeed": "N",
       "Route": "",
@@ -111780,6 +111745,41 @@
           "Order": "29",
           "ARRTime": "09:52:00",
           "DEPTime": "09:52:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1136出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "07:16:00",
+          "DEPTime": "07:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "07:21:00",
+          "DEPTime": "07:32:00"
         }
       ]
     },
@@ -114620,41 +114620,6 @@
     },
     {
       "Type": "1",
-      "Train": "1154出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "08:23:00",
-          "DEPTime": "08:23:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "08:28:00",
-          "DEPTime": "08:39:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1154",
       "BreastFeed": "N",
       "Route": "",
@@ -114874,6 +114839,41 @@
           "Order": "29",
           "ARRTime": "10:58:00",
           "DEPTime": "10:58:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1154出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "08:23:00",
+          "DEPTime": "08:23:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "08:28:00",
+          "DEPTime": "08:39:00"
         }
       ]
     },
@@ -115488,41 +115488,6 @@
     },
     {
       "Type": "1",
-      "Train": "1160出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "10:13:00",
-          "DEPTime": "10:13:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "10:18:00",
-          "DEPTime": "10:28:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1160",
       "BreastFeed": "N",
       "Route": "",
@@ -115735,6 +115700,41 @@
           "Order": "6",
           "ARRTime": "12:39:00",
           "DEPTime": "12:39:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1160出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "10:13:00",
+          "DEPTime": "10:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "10:18:00",
+          "DEPTime": "10:28:00"
         }
       ]
     },
@@ -117910,41 +117910,6 @@
     },
     {
       "Type": "1",
-      "Train": "1174出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "10:26:00",
-          "DEPTime": "10:26:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "10:31:00",
-          "DEPTime": "10:45:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1174",
       "BreastFeed": "N",
       "Route": "",
@@ -118157,6 +118122,41 @@
           "Order": "28",
           "ARRTime": "13:02:00",
           "DEPTime": "13:02:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1174出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "10:26:00",
+          "DEPTime": "10:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "10:31:00",
+          "DEPTime": "10:45:00"
         }
       ]
     },
@@ -120682,41 +120682,6 @@
     },
     {
       "Type": "1",
-      "Train": "1194出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "12:15:00",
-          "DEPTime": "12:15:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "12:20:00",
-          "DEPTime": "12:32:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1194",
       "BreastFeed": "N",
       "Route": "",
@@ -120936,6 +120901,41 @@
           "Order": "29",
           "ARRTime": "15:03:00",
           "DEPTime": "15:03:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1194出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "12:15:00",
+          "DEPTime": "12:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "12:20:00",
+          "DEPTime": "12:32:00"
         }
       ]
     },
@@ -123412,41 +123412,6 @@
     },
     {
       "Type": "1",
-      "Train": "1214出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "14:26:00",
-          "DEPTime": "14:26:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "14:31:00",
-          "DEPTime": "14:42:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1214",
       "BreastFeed": "N",
       "Route": "",
@@ -123659,6 +123624,41 @@
           "Order": "28",
           "ARRTime": "16:50:00",
           "DEPTime": "16:50:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1214出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "14:26:00",
+          "DEPTime": "14:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "14:31:00",
+          "DEPTime": "14:42:00"
         }
       ]
     },
@@ -129775,41 +129775,6 @@
     },
     {
       "Type": "1",
-      "Train": "1254出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "18:21:00",
-          "DEPTime": "18:21:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "18:26:00",
-          "DEPTime": "18:38:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1254",
       "BreastFeed": "N",
       "Route": "",
@@ -130022,6 +129987,41 @@
           "Order": "28",
           "ARRTime": "20:57:00",
           "DEPTime": "20:57:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1254出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "18:21:00",
+          "DEPTime": "18:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "18:26:00",
+          "DEPTime": "18:38:00"
         }
       ]
     },
@@ -133114,41 +133114,6 @@
     },
     {
       "Type": "1",
-      "Train": "1274出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "19:58:00",
-          "DEPTime": "19:58:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "20:03:00",
-          "DEPTime": "20:14:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "1274",
       "BreastFeed": "N",
       "Route": "",
@@ -133410,6 +133375,41 @@
           "Order": "4",
           "ARRTime": "23:14:00",
           "DEPTime": "23:14:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "1274出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "19:58:00",
+          "DEPTime": "19:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "20:03:00",
+          "DEPTime": "20:14:00"
         }
       ]
     },
@@ -146788,7 +146788,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -164645,7 +164645,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1131",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -183059,41 +183059,6 @@
     },
     {
       "Type": "1",
-      "Train": "3001出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1132",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "05:34:00",
-          "DEPTime": "05:34:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "05:40:00",
-          "DEPTime": "05:52:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "3001",
       "BreastFeed": "N",
       "Route": "",
@@ -183257,6 +183222,41 @@
           "Order": "21",
           "ARRTime": "08:23:00",
           "DEPTime": "08:23:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "3001出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1132",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "05:34:00",
+          "DEPTime": "05:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "05:40:00",
+          "DEPTime": "05:52:00"
         }
       ]
     },
@@ -226585,41 +226585,6 @@
     },
     {
       "Type": "1",
-      "Train": "3301出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "05:08:00",
-          "DEPTime": "05:08:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "05:14:00",
-          "DEPTime": "05:26:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "3301",
       "BreastFeed": "N",
       "Route": "",
@@ -226697,7 +226662,7 @@
     },
     {
       "Type": "1",
-      "Train": "3303出庫",
+      "Train": "3301出庫",
       "BreastFeed": "N",
       "Route": "",
       "Package": "N",
@@ -226718,15 +226683,15 @@
           "Route": "",
           "Station": "5999",
           "Order": "1",
-          "ARRTime": "05:45:00",
-          "DEPTime": "05:45:00"
+          "ARRTime": "05:08:00",
+          "DEPTime": "05:08:00"
         },
         {
           "Route": "",
           "Station": "5050",
           "Order": "2",
-          "ARRTime": "05:51:00",
-          "DEPTime": "06:08:00"
+          "ARRTime": "05:14:00",
+          "DEPTime": "05:26:00"
         }
       ]
     },
@@ -226811,6 +226776,41 @@
           "Order": "9",
           "ARRTime": "06:52:00",
           "DEPTime": "06:52:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "3303出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "05:45:00",
+          "DEPTime": "05:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "05:51:00",
+          "DEPTime": "06:08:00"
         }
       ]
     },
@@ -227530,76 +227530,6 @@
     },
     {
       "Type": "1",
-      "Train": "3316入庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "1",
-          "ARRTime": "11:12:00",
-          "DEPTime": "11:22:00"
-        },
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "2",
-          "ARRTime": "11:28:00",
-          "DEPTime": "11:28:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
-      "Train": "3316A出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1280",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "09:39:00",
-          "DEPTime": "09:39:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "09:45:00",
-          "DEPTime": "10:00:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "3316A",
       "BreastFeed": "N",
       "Route": "",
@@ -227672,6 +227602,76 @@
           "Order": "8",
           "ARRTime": "10:26:00",
           "DEPTime": "10:26:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "3316A出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1280",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "09:39:00",
+          "DEPTime": "09:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "09:45:00",
+          "DEPTime": "10:00:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "3316入庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "1",
+          "ARRTime": "11:12:00",
+          "DEPTime": "11:22:00"
+        },
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "2",
+          "ARRTime": "11:28:00",
+          "DEPTime": "11:28:00"
         }
       ]
     },
@@ -227887,41 +227887,6 @@
     },
     {
       "Type": "1",
-      "Train": "3323出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "13:06:00",
-          "DEPTime": "13:06:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "13:12:00",
-          "DEPTime": "13:27:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "3323",
       "BreastFeed": "N",
       "Route": "",
@@ -228106,6 +228071,41 @@
           "Order": "2",
           "ARRTime": "15:15:00",
           "DEPTime": "15:15:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "3323出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "13:06:00",
+          "DEPTime": "13:06:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "13:12:00",
+          "DEPTime": "13:27:00"
         }
       ]
     },
@@ -249419,41 +249419,6 @@
     },
     {
       "Type": "1",
-      "Train": "4148A出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1280",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "06:00:00",
-          "DEPTime": "06:00:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "06:05:00",
-          "DEPTime": "06:16:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "4148A",
       "BreastFeed": "N",
       "Route": "",
@@ -249519,6 +249484,41 @@
           "Order": "7",
           "ARRTime": "06:35:00",
           "DEPTime": "06:35:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "4148A出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1280",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "06:00:00",
+          "DEPTime": "06:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "06:05:00",
+          "DEPTime": "06:16:00"
         }
       ]
     },
@@ -250070,41 +250070,6 @@
     },
     {
       "Type": "1",
-      "Train": "4154出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "06:37:00",
-          "DEPTime": "06:37:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "06:42:00",
-          "DEPTime": "06:53:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "4154",
       "BreastFeed": "N",
       "Route": "",
@@ -250324,6 +250289,41 @@
           "Order": "29",
           "ARRTime": "09:09:00",
           "DEPTime": "09:09:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "4154出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "06:37:00",
+          "DEPTime": "06:37:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "06:42:00",
+          "DEPTime": "06:53:00"
         }
       ]
     },
@@ -258239,41 +258239,6 @@
     },
     {
       "Type": "1",
-      "Train": "4225入庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "1",
-          "ARRTime": "23:16:00",
-          "DEPTime": "23:29:00"
-        },
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "2",
-          "ARRTime": "23:34:00",
-          "DEPTime": "23:34:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "4225A",
       "BreastFeed": "N",
       "Route": "",
@@ -258311,6 +258276,41 @@
           "Order": "3",
           "ARRTime": "20:06:00",
           "DEPTime": "20:06:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "4225入庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "1",
+          "ARRTime": "23:16:00",
+          "DEPTime": "23:29:00"
+        },
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "2",
+          "ARRTime": "23:34:00",
+          "DEPTime": "23:34:00"
         }
       ]
     },
@@ -258729,41 +258729,6 @@
     },
     {
       "Type": "1",
-      "Train": "4232出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "16:07:00",
-          "DEPTime": "16:07:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "16:12:00",
-          "DEPTime": "16:24:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "4232",
       "BreastFeed": "N",
       "Route": "",
@@ -259144,6 +259109,41 @@
           "Order": "52",
           "ARRTime": "20:41:00",
           "DEPTime": "20:41:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "4232出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "16:07:00",
+          "DEPTime": "16:07:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "16:12:00",
+          "DEPTime": "16:24:00"
         }
       ]
     },
@@ -261662,41 +261662,6 @@
     },
     {
       "Type": "1",
-      "Train": "4252出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "2",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1131",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "1145",
-          "Order": "1",
-          "ARRTime": "20:19:00",
-          "DEPTime": "20:19:00"
-        },
-        {
-          "Route": "",
-          "Station": "1150",
-          "Order": "2",
-          "ARRTime": "20:24:00",
-          "DEPTime": "20:35:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "4252",
       "BreastFeed": "N",
       "Route": "",
@@ -262056,6 +262021,41 @@
           "Order": "11",
           "ARRTime": "23:54:00",
           "DEPTime": "23:54:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "4252出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1131",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1145",
+          "Order": "1",
+          "ARRTime": "20:19:00",
+          "DEPTime": "20:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "1150",
+          "Order": "2",
+          "ARRTime": "20:24:00",
+          "DEPTime": "20:35:00"
         }
       ]
     },
@@ -269298,6 +269298,1007 @@
       ]
     },
     {
+      "Type": "2",
+      "Train": "5138",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。※乘車當日限量發售無座票。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "1",
+          "DEPTime": "14:56:00",
+          "ARRTime": "14:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "5000",
+          "Order": "2",
+          "DEPTime": "15:07:30",
+          "ARRTime": "15:06:00"
+        },
+        {
+          "Route": "",
+          "Station": "4440",
+          "Order": "3",
+          "DEPTime": "15:19:00",
+          "ARRTime": "15:18:00"
+        },
+        {
+          "Route": "",
+          "Station": "4400",
+          "Order": "4",
+          "DEPTime": "15:27:00",
+          "ARRTime": "15:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "5",
+          "DEPTime": "15:35:00",
+          "ARRTime": "15:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "4220",
+          "Order": "6",
+          "DEPTime": "16:03:00",
+          "ARRTime": "16:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "4080",
+          "Order": "7",
+          "DEPTime": "16:43:00",
+          "ARRTime": "16:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "8",
+          "DEPTime": "17:35:00",
+          "ARRTime": "17:33:00"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "9",
+          "DEPTime": "17:50:00",
+          "ARRTime": "17:47:00"
+        },
+        {
+          "Route": "",
+          "Station": "3230",
+          "Order": "10",
+          "DEPTime": "18:01:00",
+          "ARRTime": "17:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "1210",
+          "Order": "11",
+          "DEPTime": "18:45:00",
+          "ARRTime": "18:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "1100",
+          "Order": "12",
+          "DEPTime": "19:12:00",
+          "ARRTime": "19:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "1080",
+          "Order": "13",
+          "DEPTime": "19:22:00",
+          "ARRTime": "19:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "14",
+          "DEPTime": "19:45:00",
+          "ARRTime": "19:43:30"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "15",
+          "DEPTime": "19:58:00",
+          "ARRTime": "19:54:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "16",
+          "DEPTime": "20:05:00",
+          "ARRTime": "20:04:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "17",
+          "DEPTime": "20:24:00",
+          "ARRTime": "20:24:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5142",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1108",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "1",
+          "DEPTime": "16:05:00",
+          "ARRTime": "15:56:00"
+        },
+        {
+          "Route": "",
+          "Station": "5000",
+          "Order": "2",
+          "DEPTime": "16:18:00",
+          "ARRTime": "16:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "4440",
+          "Order": "3",
+          "DEPTime": "16:31:00",
+          "ARRTime": "16:29:30"
+        },
+        {
+          "Route": "",
+          "Station": "4400",
+          "Order": "4",
+          "DEPTime": "16:40:00",
+          "ARRTime": "16:37:00"
+        },
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "5",
+          "DEPTime": "16:49:00",
+          "ARRTime": "16:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "4220",
+          "Order": "6",
+          "DEPTime": "17:16:00",
+          "ARRTime": "17:14:00"
+        },
+        {
+          "Route": "",
+          "Station": "4080",
+          "Order": "7",
+          "DEPTime": "17:54:00",
+          "ARRTime": "17:52:30"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "8",
+          "DEPTime": "18:51:00",
+          "ARRTime": "18:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "9",
+          "DEPTime": "19:07:00",
+          "ARRTime": "19:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "1210",
+          "Order": "10",
+          "DEPTime": "20:03:30",
+          "ARRTime": "20:02:30"
+        },
+        {
+          "Route": "",
+          "Station": "1100",
+          "Order": "11",
+          "DEPTime": "20:32:30",
+          "ARRTime": "20:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "1080",
+          "Order": "12",
+          "DEPTime": "20:42:30",
+          "ARRTime": "20:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "13",
+          "DEPTime": "21:04:00",
+          "ARRTime": "21:02:30"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "14",
+          "DEPTime": "21:18:00",
+          "ARRTime": "21:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "15",
+          "DEPTime": "21:26:00",
+          "ARRTime": "21:25:00"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "16",
+          "DEPTime": "21:38:00",
+          "ARRTime": "21:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "17",
+          "DEPTime": "21:48:00",
+          "ARRTime": "21:48:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5145",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1108",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "1",
+          "DEPTime": "16:31:00",
+          "ARRTime": "16:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "2",
+          "DEPTime": "16:41:00",
+          "ARRTime": "16:39:30"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "3",
+          "DEPTime": "16:53:00",
+          "ARRTime": "16:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "4",
+          "DEPTime": "17:03:30",
+          "ARRTime": "17:00:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "5",
+          "DEPTime": "17:13:30",
+          "ARRTime": "17:12:00"
+        },
+        {
+          "Route": "",
+          "Station": "1210",
+          "Order": "6",
+          "DEPTime": "18:12:00",
+          "ARRTime": "18:09:00"
+        },
+        {
+          "Route": "",
+          "Station": "3230",
+          "Order": "7",
+          "DEPTime": "19:01:00",
+          "ARRTime": "18:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "8",
+          "DEPTime": "19:14:00",
+          "ARRTime": "19:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "9",
+          "DEPTime": "19:31:00",
+          "ARRTime": "19:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "4080",
+          "Order": "10",
+          "DEPTime": "20:26:00",
+          "ARRTime": "20:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "4220",
+          "Order": "11",
+          "DEPTime": "21:04:30",
+          "ARRTime": "21:02:00"
+        },
+        {
+          "Route": "",
+          "Station": "4340",
+          "Order": "12",
+          "DEPTime": "21:35:00",
+          "ARRTime": "21:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "4400",
+          "Order": "13",
+          "DEPTime": "21:46:00",
+          "ARRTime": "21:44:00"
+        },
+        {
+          "Route": "",
+          "Station": "4440",
+          "Order": "14",
+          "DEPTime": "21:53:00",
+          "ARRTime": "21:51:30"
+        },
+        {
+          "Route": "",
+          "Station": "5000",
+          "Order": "15",
+          "DEPTime": "22:06:00",
+          "ARRTime": "22:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "16",
+          "DEPTime": "22:22:00",
+          "ARRTime": "22:19:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5226",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1101",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "1",
+          "DEPTime": "17:55:00",
+          "ARRTime": "17:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "2",
+          "DEPTime": "18:03:00",
+          "ARRTime": "18:02:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "3",
+          "DEPTime": "18:14:00",
+          "ARRTime": "18:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "18:21:00",
+          "ARRTime": "18:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "5",
+          "DEPTime": "19:26:00",
+          "ARRTime": "19:24:30"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "6",
+          "DEPTime": "19:34:00",
+          "ARRTime": "19:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "7",
+          "DEPTime": "20:33:00",
+          "ARRTime": "20:33:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5229",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1101",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "21:15:00",
+          "ARRTime": "21:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "2",
+          "DEPTime": "22:13:00",
+          "ARRTime": "22:11:30"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "3",
+          "DEPTime": "22:22:00",
+          "ARRTime": "22:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "23:27:00",
+          "ARRTime": "23:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "5",
+          "DEPTime": "23:37:00",
+          "ARRTime": "23:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "6",
+          "DEPTime": "23:45:00",
+          "ARRTime": "23:44:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "7",
+          "DEPTime": "23:53:00",
+          "ARRTime": "23:51:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5239",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "1",
+          "DEPTime": "11:25:00",
+          "ARRTime": "11:25:00"
+        },
+        {
+          "Route": "",
+          "Station": "6050",
+          "Order": "2",
+          "DEPTime": "11:45:30",
+          "ARRTime": "11:44:30"
+        },
+        {
+          "Route": "",
+          "Station": "6080",
+          "Order": "3",
+          "DEPTime": "12:04:30",
+          "ARRTime": "12:03:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "4",
+          "DEPTime": "12:19:00",
+          "ARRTime": "12:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "5",
+          "DEPTime": "12:33:00",
+          "ARRTime": "12:31:30"
+        },
+        {
+          "Route": "",
+          "Station": "6160",
+          "Order": "6",
+          "DEPTime": "12:46:00",
+          "ARRTime": "12:44:30"
+        },
+        {
+          "Route": "",
+          "Station": "6180",
+          "Order": "7",
+          "DEPTime": "12:55:00",
+          "ARRTime": "12:53:30"
+        },
+        {
+          "Route": "",
+          "Station": "6220",
+          "Order": "8",
+          "DEPTime": "13:05:30",
+          "ARRTime": "13:04:30"
+        },
+        {
+          "Route": "",
+          "Station": "6250",
+          "Order": "9",
+          "DEPTime": "13:26:30",
+          "ARRTime": "13:25:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "10",
+          "DEPTime": "13:36:00",
+          "ARRTime": "13:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "11",
+          "DEPTime": "14:36:30",
+          "ARRTime": "14:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "12",
+          "DEPTime": "14:45:00",
+          "ARRTime": "14:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "13",
+          "DEPTime": "15:55:00",
+          "ARRTime": "15:54:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "14",
+          "DEPTime": "16:00:00",
+          "ARRTime": "15:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "15",
+          "DEPTime": "16:11:00",
+          "ARRTime": "16:07:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "16",
+          "DEPTime": "16:22:00",
+          "ARRTime": "16:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "17",
+          "DEPTime": "16:29:00",
+          "ARRTime": "16:29:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5248",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。本列次不發售無座票，非持本班次車票旅客，請勿搭乘。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "1",
+          "DEPTime": "17:10:00",
+          "ARRTime": "17:10:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "2",
+          "DEPTime": "17:19:00",
+          "ARRTime": "17:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "3",
+          "DEPTime": "17:29:00",
+          "ARRTime": "17:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "17:36:00",
+          "ARRTime": "17:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "5",
+          "DEPTime": "19:51:00",
+          "ARRTime": "19:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "6",
+          "DEPTime": "20:32:00",
+          "ARRTime": "20:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "7",
+          "DEPTime": "20:48:00",
+          "ARRTime": "20:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "6070",
+          "Order": "8",
+          "DEPTime": "21:05:00",
+          "ARRTime": "21:04:00"
+        },
+        {
+          "Route": "",
+          "Station": "6050",
+          "Order": "9",
+          "DEPTime": "21:15:00",
+          "ARRTime": "21:14:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "10",
+          "DEPTime": "21:44:00",
+          "ARRTime": "21:44:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5252",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "110G",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。※115年光復連假花東實名制班次。 本列次不發售無座票，非持本班次車票旅客，請勿搭乘。 第6節為騰雲座艙，為本公司公告指定不發售無座位車票之車廂，持當日當次騰雲座艙車票旅客始可搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "1",
+          "DEPTime": "19:10:00",
+          "ARRTime": "19:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "2",
+          "DEPTime": "19:18:00",
+          "ARRTime": "19:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "3",
+          "DEPTime": "19:29:00",
+          "ARRTime": "19:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "4",
+          "DEPTime": "19:36:00",
+          "ARRTime": "19:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "5",
+          "DEPTime": "19:40:00",
+          "ARRTime": "19:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "6",
+          "DEPTime": "21:49:00",
+          "ARRTime": "21:47:00"
+        },
+        {
+          "Route": "",
+          "Station": "6180",
+          "Order": "7",
+          "DEPTime": "22:10:30",
+          "ARRTime": "22:09:30"
+        },
+        {
+          "Route": "",
+          "Station": "6160",
+          "Order": "8",
+          "DEPTime": "22:19:00",
+          "ARRTime": "22:18:00"
+        },
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "9",
+          "DEPTime": "22:32:00",
+          "ARRTime": "22:31:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "10",
+          "DEPTime": "22:47:00",
+          "ARRTime": "22:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "6080",
+          "Order": "11",
+          "DEPTime": "22:59:30",
+          "ARRTime": "22:58:30"
+        },
+        {
+          "Route": "",
+          "Station": "6070",
+          "Order": "12",
+          "DEPTime": "23:06:00",
+          "ARRTime": "23:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "6050",
+          "Order": "13",
+          "DEPTime": "23:16:00",
+          "ARRTime": "23:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "6020",
+          "Order": "14",
+          "DEPTime": "23:29:00",
+          "ARRTime": "23:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "15",
+          "DEPTime": "23:41:00",
+          "ARRTime": "23:41:00"
+        }
+      ]
+    },
+    {
+      "Type": "2",
+      "Train": "5281",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "1",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "Y",
+      "CarClass": "1107",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "民國115年10月23、26日行駛。本班次不發售無座票，非持本班次車票旅客，請勿搭乘。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "17:08:00",
+          "ARRTime": "17:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "2",
+          "DEPTime": "18:06:00",
+          "ARRTime": "18:04:30"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "3",
+          "DEPTime": "18:14:00",
+          "ARRTime": "18:12:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "4",
+          "DEPTime": "19:12:30",
+          "ARRTime": "19:11:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "5",
+          "DEPTime": "19:31:00",
+          "ARRTime": "19:29:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "6",
+          "DEPTime": "19:41:00",
+          "ARRTime": "19:38:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "7",
+          "DEPTime": "19:50:30",
+          "ARRTime": "19:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "3230",
+          "Order": "8",
+          "DEPTime": "21:26:00",
+          "ARRTime": "21:24:30"
+        },
+        {
+          "Route": "",
+          "Station": "3300",
+          "Order": "9",
+          "DEPTime": "21:38:00",
+          "ARRTime": "21:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "3360",
+          "Order": "10",
+          "DEPTime": "21:56:00",
+          "ARRTime": "21:56:00"
+        }
+      ]
+    },
+    {
       "Type": "1",
       "Train": "5898",
       "BreastFeed": "N",
@@ -269684,41 +270685,6 @@
     },
     {
       "Type": "1",
-      "Train": "5899A出庫",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "1280",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "Y",
-      "Note": "每日行駛。",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "5999",
-          "Order": "1",
-          "ARRTime": "08:41:00",
-          "DEPTime": "08:41:00"
-        },
-        {
-          "Route": "",
-          "Station": "5050",
-          "Order": "2",
-          "ARRTime": "08:47:00",
-          "DEPTime": "08:52:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "5899A",
       "BreastFeed": "N",
       "Route": "",
@@ -269796,6 +270762,41 @@
     },
     {
       "Type": "1",
+      "Train": "5899A出庫",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1280",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "每日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "5999",
+          "Order": "1",
+          "ARRTime": "08:41:00",
+          "DEPTime": "08:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "5050",
+          "Order": "2",
+          "ARRTime": "08:47:00",
+          "DEPTime": "08:52:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
       "Train": "5899S",
       "BreastFeed": "N",
       "Route": "",
@@ -269826,6 +270827,713 @@
           "Order": "2",
           "ARRTime": "09:02:00",
           "DEPTime": "09:02:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6615",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1104",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月4、11、18、24日，民國115年10月2、8、16、23、30日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "1",
+          "DEPTime": "16:23:00",
+          "ARRTime": "16:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "7290",
+          "Order": "2",
+          "DEPTime": "16:49:00",
+          "ARRTime": "16:47:00"
+        },
+        {
+          "Route": "",
+          "Station": "7360",
+          "Order": "3",
+          "DEPTime": "17:21:00",
+          "ARRTime": "17:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "0920",
+          "Order": "4",
+          "DEPTime": "17:32:00",
+          "ARRTime": "17:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "5",
+          "DEPTime": "17:46:00",
+          "ARRTime": "17:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "6",
+          "DEPTime": "17:53:30",
+          "ARRTime": "17:52:30"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "7",
+          "DEPTime": "17:58:00",
+          "ARRTime": "17:57:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "8",
+          "DEPTime": "18:08:00",
+          "ARRTime": "18:05:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6652",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月3-6、10-13、17-20、24-27日，民國115年10月1-4、8-11、15-18、22-25日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "09:24:00",
+          "ARRTime": "07:56:00"
+        },
+        {
+          "Route": "",
+          "Station": "7270",
+          "Order": "2",
+          "DEPTime": "11:20:00",
+          "ARRTime": "10:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "7230",
+          "Order": "3",
+          "DEPTime": "12:40:00",
+          "ARRTime": "11:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "7210",
+          "Order": "4",
+          "DEPTime": "12:47:00",
+          "ARRTime": "12:46:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "5",
+          "DEPTime": "13:05:00",
+          "ARRTime": "12:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "7180",
+          "Order": "6",
+          "DEPTime": "13:11:00",
+          "ARRTime": "13:11:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6655",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年9月3-6、10-13、17-20、24-27日，民國115年10月1-4、8-11、15-18、22-25日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7180",
+          "Order": "1",
+          "DEPTime": "13:52:00",
+          "ARRTime": "13:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "2",
+          "DEPTime": "14:26:00",
+          "ARRTime": "13:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "7270",
+          "Order": "3",
+          "DEPTime": "15:12:00",
+          "ARRTime": "14:51:00"
+        },
+        {
+          "Route": "",
+          "Station": "7350",
+          "Order": "4",
+          "DEPTime": "16:38:00",
+          "ARRTime": "15:38:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "5",
+          "DEPTime": "18:29:00",
+          "ARRTime": "17:21:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6676",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月1-4、8-11、15-18、22-25、29-31日，民國115年11月1、5-8、12-15、19-22、27-29日，民國115年12月3-6、10-13、17-20、24-27、31日，民國116年1月1-3、8-10、15-17、22-24、29-31日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "DEPTime": "10:05:00",
+          "ARRTime": "10:05:00"
+        },
+        {
+          "Route": "",
+          "Station": "6220",
+          "Order": "2",
+          "DEPTime": "10:45:00",
+          "ARRTime": "10:25:00"
+        },
+        {
+          "Route": "",
+          "Station": "6110",
+          "Order": "3",
+          "DEPTime": "13:05:00",
+          "ARRTime": "11:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "6070",
+          "Order": "4",
+          "DEPTime": "13:45:00",
+          "ARRTime": "13:45:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6677",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月1-4、8-11、15-18、22-25、29-31日，民國115年11月1、5-8、12-15、19-22、27-29日，民國115年12月3-6、10-13、17-20、24-27、31日，民國116年1月1-3、8-10、15-17、22-24、29-31日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "6070",
+          "Order": "1",
+          "DEPTime": "14:55:00",
+          "ARRTime": "14:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "6080",
+          "Order": "2",
+          "DEPTime": "16:11:00",
+          "ARRTime": "15:02:00"
+        },
+        {
+          "Route": "",
+          "Station": "6100",
+          "Order": "3",
+          "DEPTime": "16:45:00",
+          "ARRTime": "16:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "4",
+          "DEPTime": "18:12:00",
+          "ARRTime": "18:12:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6775",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1130",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "1",
+          "ARRTime": "09:20:00",
+          "DEPTime": "09:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "6140",
+          "Order": "2",
+          "ARRTime": "09:28:00",
+          "DEPTime": "09:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "6150",
+          "Order": "3",
+          "ARRTime": "09:30:00",
+          "DEPTime": "09:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "6160",
+          "Order": "4",
+          "ARRTime": "09:36:00",
+          "DEPTime": "09:36:00"
+        },
+        {
+          "Route": "",
+          "Station": "6170",
+          "Order": "5",
+          "ARRTime": "09:40:00",
+          "DEPTime": "09:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "6180",
+          "Order": "6",
+          "ARRTime": "09:45:00",
+          "DEPTime": "10:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "6190",
+          "Order": "7",
+          "ARRTime": "10:34:00",
+          "DEPTime": "10:34:00"
+        },
+        {
+          "Route": "",
+          "Station": "6200",
+          "Order": "8",
+          "ARRTime": "10:35:30",
+          "DEPTime": "10:35:30"
+        },
+        {
+          "Route": "",
+          "Station": "6210",
+          "Order": "9",
+          "ARRTime": "10:39:00",
+          "DEPTime": "10:39:00"
+        },
+        {
+          "Route": "",
+          "Station": "6220",
+          "Order": "10",
+          "ARRTime": "10:41:00",
+          "DEPTime": "10:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "6230",
+          "Order": "11",
+          "ARRTime": "10:42:30",
+          "DEPTime": "10:42:30"
+        },
+        {
+          "Route": "",
+          "Station": "6240",
+          "Order": "12",
+          "ARRTime": "10:44:30",
+          "DEPTime": "10:44:30"
+        },
+        {
+          "Route": "",
+          "Station": "6250",
+          "Order": "13",
+          "ARRTime": "10:50:00",
+          "DEPTime": "10:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "14",
+          "ARRTime": "10:55:00",
+          "DEPTime": "11:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "7010",
+          "Order": "15",
+          "ARRTime": "11:55:00",
+          "DEPTime": "11:55:00"
+        },
+        {
+          "Route": "",
+          "Station": "7020",
+          "Order": "16",
+          "ARRTime": "11:59:30",
+          "DEPTime": "11:59:30"
+        },
+        {
+          "Route": "",
+          "Station": "7030",
+          "Order": "17",
+          "ARRTime": "12:05:00",
+          "DEPTime": "12:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "7040",
+          "Order": "18",
+          "ARRTime": "12:49:30",
+          "DEPTime": "12:49:30"
+        },
+        {
+          "Route": "",
+          "Station": "7050",
+          "Order": "19",
+          "ARRTime": "13:01:00",
+          "DEPTime": "13:01:00"
+        },
+        {
+          "Route": "",
+          "Station": "7060",
+          "Order": "20",
+          "ARRTime": "13:07:30",
+          "DEPTime": "13:19:00"
+        },
+        {
+          "Route": "",
+          "Station": "7070",
+          "Order": "21",
+          "ARRTime": "13:23:30",
+          "DEPTime": "13:23:30"
+        },
+        {
+          "Route": "",
+          "Station": "7080",
+          "Order": "22",
+          "ARRTime": "13:32:00",
+          "DEPTime": "13:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "7090",
+          "Order": "23",
+          "ARRTime": "13:35:00",
+          "DEPTime": "13:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "7100",
+          "Order": "24",
+          "ARRTime": "13:40:00",
+          "DEPTime": "13:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7110",
+          "Order": "25",
+          "ARRTime": "13:44:00",
+          "DEPTime": "13:44:00"
+        },
+        {
+          "Route": "",
+          "Station": "7130",
+          "Order": "26",
+          "ARRTime": "13:50:00",
+          "DEPTime": "14:30:00"
+        },
+        {
+          "Route": "",
+          "Station": "7140",
+          "Order": "27",
+          "ARRTime": "14:32:00",
+          "DEPTime": "14:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "7150",
+          "Order": "28",
+          "ARRTime": "14:36:00",
+          "DEPTime": "14:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "7160",
+          "Order": "29",
+          "ARRTime": "14:45:00",
+          "DEPTime": "14:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "7170",
+          "Order": "30",
+          "ARRTime": "14:46:30",
+          "DEPTime": "14:46:30"
+        },
+        {
+          "Route": "",
+          "Station": "7180",
+          "Order": "31",
+          "ARRTime": "14:47:30",
+          "DEPTime": "14:47:30"
+        },
+        {
+          "Route": "",
+          "Station": "7190",
+          "Order": "32",
+          "ARRTime": "14:53:00",
+          "DEPTime": "14:53:00"
+        }
+      ]
+    },
+    {
+      "Type": "1",
+      "Train": "6775A",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "Y",
+      "Note": "",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "1",
+          "ARRTime": "07:40:00",
+          "DEPTime": "07:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "6250",
+          "Order": "2",
+          "ARRTime": "07:46:00",
+          "DEPTime": "07:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "6240",
+          "Order": "3",
+          "ARRTime": "07:57:00",
+          "DEPTime": "07:57:00"
+        },
+        {
+          "Route": "",
+          "Station": "6230",
+          "Order": "4",
+          "ARRTime": "07:59:00",
+          "DEPTime": "07:59:00"
+        },
+        {
+          "Route": "",
+          "Station": "6220",
+          "Order": "5",
+          "ARRTime": "08:01:00",
+          "DEPTime": "08:01:00"
+        },
+        {
+          "Route": "",
+          "Station": "6210",
+          "Order": "6",
+          "ARRTime": "08:03:00",
+          "DEPTime": "08:03:00"
+        },
+        {
+          "Route": "",
+          "Station": "6200",
+          "Order": "7",
+          "ARRTime": "08:07:00",
+          "DEPTime": "08:07:00"
+        },
+        {
+          "Route": "",
+          "Station": "6190",
+          "Order": "8",
+          "ARRTime": "08:09:00",
+          "DEPTime": "08:09:00"
+        },
+        {
+          "Route": "",
+          "Station": "6180",
+          "Order": "9",
+          "ARRTime": "08:13:00",
+          "DEPTime": "08:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "6170",
+          "Order": "10",
+          "ARRTime": "08:17:00",
+          "DEPTime": "08:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "6160",
+          "Order": "11",
+          "ARRTime": "08:21:00",
+          "DEPTime": "08:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "6150",
+          "Order": "12",
+          "ARRTime": "08:27:00",
+          "DEPTime": "08:27:00"
+        },
+        {
+          "Route": "",
+          "Station": "6140",
+          "Order": "13",
+          "ARRTime": "08:29:00",
+          "DEPTime": "08:29:00"
+        },
+        {
+          "Route": "",
+          "Station": "6130",
+          "Order": "14",
+          "ARRTime": "08:37:00",
+          "DEPTime": "08:37:00"
+        }
+      ]
+    },
+    {
+      "Type": "4",
+      "Train": "6002",
+      "BreastFeed": "Y",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1106",
+      "Bike": "N",
+      "ExtraTrain": "N",
+      "Everyday": "N",
+      "Note": "民國115年10月23日行駛。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "1",
+          "DEPTime": "08:24:00",
+          "ARRTime": "08:24:00"
+        },
+        {
+          "Route": "",
+          "Station": "7000",
+          "Order": "2",
+          "DEPTime": "11:18:00",
+          "ARRTime": "11:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "6100",
+          "Order": "3",
+          "DEPTime": "13:15:00",
+          "ARRTime": "12:45:00"
+        },
+        {
+          "Route": "",
+          "Station": "6000",
+          "Order": "4",
+          "DEPTime": "14:40:00",
+          "ARRTime": "14:40:00"
         }
       ]
     }
