@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: '3.10'
 
+      # 👇 就是少了這一步！現在補回來了
+      - name: 🚀 執行文字公告解析腳本
+        run: python change/auto_update_from_text.py
+
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
           git config --global user.name "Text Parser Bot"
@@ -28,7 +32,7 @@ jobs:
           # 1. 追蹤時刻表資料夾
           git add data/ 
           
-          # 2. 追蹤並儲存被清空的文字檔 (改為 extratrain_data.txt)
+          # 2. 追蹤並儲存被清空的文字檔 (extratrain_data.txt)
           if [ -f extratrain_data.txt ]; then
             git add extratrain_data.txt
           fi
