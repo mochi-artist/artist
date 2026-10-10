@@ -1,0 +1,45 @@
+name: 🗑️ 手動刪除指定月份檔案
+
+# 觸發條件：只能在 GitHub 網頁上手動點擊執行
+on:
+  workflow_dispatch:
+    inputs:
+      target_month:
+        description: '請輸入要刪除的年月 (格式 YYYYMM，例如：202610)'
+        required: true
+        type: string
+
+permissions:
+  contents: write 
+
+jobs:
+  delete-files:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 檢出程式碼
+        uses: actions/checkout@v4
+
+      - name: 🗑️ 刪除指定月份的 JSON 檔案
+        run: |
+          echo "準備刪除 data/ 資料夾下所有開頭為 ${{ github.event.inputs.target_month }} 的 JSON 檔案..."
+          
+          # 使用 rm 指令刪除檔案，|| echo 確保找不到檔案時不會報錯中斷流程
+          rm -v data/${{ github.event.inputs.target_month }}*.json || echo "找不到符合的檔案，可能已經刪除了。"
+
+      - name: 💾 提交並推播變更 (Commit & Push)
+        run: |
+          git config --global user.name "Cleaner Bot"
+          git config --global user.email "bot@github.com"
+          
+          # 將 data 資料夾的變動 (刪除狀態) 加入追蹤
+          git add data/
+          
+          # 檢查是否有檔案被刪除
+          if git diff-index --quiet HEAD --; then
+            echo "⚠️ 沒有檔案變動，略過提交。"
+          else
+            git commit -m "🗑️ 手動清空 ${{ github.event.inputs.target_month }} 月份的時刻表檔案 [skip ci]"
+            git push
+            echo "✅ 成功刪除並更新 GitHub 倉庫！"
+          fi
