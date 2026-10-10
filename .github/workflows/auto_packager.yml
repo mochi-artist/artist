@@ -1,0 +1,43 @@
+name: 每日時刻表打包器
+
+# 觸發時間：
+# 1. 只要總表 final_train_diagram.json 被更新，立刻自動觸發打包！
+# 2. 每天台灣時間凌晨 12:15 (UTC 16:15)，排在偵察兵之後執行
+on:
+  push:
+    paths:
+      - 'final_train_diagram.json'
+  schedule:
+    - cron: '15 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write 
+
+jobs:
+  monthly-pack:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 下載你的程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 執行每月打包器
+        run: python auto_monthly_packager.py
+
+      - name: 上傳每日 JSON 日期檔
+        run: |
+          git config --global user.name "Packager Bot"
+          git config --global user.email "bot@github.com"
+          
+          # 只限定更新 data 資料夾裡面的檔案，不汙染網頁程式碼
+          git add data/
+          
+          # 提交變更
+          git commit -m "📦 自動產出/更新當月時刻表 JSON 日期檔 [skip ci]" || exit 0
+          git push
