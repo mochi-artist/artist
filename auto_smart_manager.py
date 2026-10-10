@@ -8,11 +8,10 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 # ================= 設定區 =================
-# 🌟 修正：對應 GitHub 儲存庫上的資料夾名稱
 TARGET_DIR = "data"
 MASTER_FILE_PATH = "final_train_diagram.json"
-PENDING_FILE = "pending_trains.json"
-PENDING_LOG = "pending_log.txt"
+PENDING_FILE = "pending_trains.json"  # 程式專用的暫存車次資料庫
+CATCH_LOG_FILE = "catch_log.txt"      # 📝 給你看的純文字抓取報告
 STATION_DB_PATH = "SVG_Y_Axis.json"
 CAR_KIND_DB_PATH = "CarKind.json"
 TRAIN_ID_KEY = "Train"
@@ -33,7 +32,6 @@ CHINESE_NAME_MAP = {
 }
 # =========================================
 
-# ----------------- 跨日處理區 -----------------
 def find_4am_cutoff_index(time_infos):
     has_early_morning = False
     for i, info in enumerate(time_infos):
@@ -70,7 +68,6 @@ def split_cross_day_trains(train_list):
         else:
             current_day_trains.append(train)
     return current_day_trains, next_day_trains
-# ---------------------------------------------
 
 def get_filename_date(filename):
     try: return int(filename.replace(".json", ""))
@@ -105,7 +102,6 @@ def load_master_ids():
                 data = extract_train_list(json.load(f))
                 for t in data:
                     if isinstance(t, dict): ids.add(str(t.get(TRAIN_ID_KEY, "")))
-            print(f"📖 已讀取總檔，排除 {len(ids)} 筆已知車次。")
         except: pass
     return ids
 
@@ -134,34 +130,60 @@ def train_sort_key(train_obj):
     if match: return (int(match.group(1)), match.group(2)) 
     return (float('inf'), tid)
 
-def generate_pending_log(pending_data, s_map, c_map):
+# 🌟 新增的綜合報告產出功能
+def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
     lines = []
-    lines.append(f"最後更新時間: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    lines.append(f"【暫存清單】等待合併中 (已隱藏總檔內車次)\n")
-    for date_str in sorted(pending_data.keys()):
-        trains = pending_data[date_str]
-        if not trains: continue
-        trains.sort(key=train_sort_key)
-        lines.append(f"📅 日期: {date_str}")
-        for t in trains:
-            tid = str(t.get(TRAIN_ID_KEY, "?"))
-            code = str(t.get("CarClass", t.get("Type", "?")))
-            eng = c_map.get(code, "others")
-            chi = CHINESE_NAME_MAP.get(eng, eng)
-            st_name, end_name = "?", "?"
-            tts = t.get("TimeInfos", t.get("Timetables", []))
-            if tts:
-                st_code = str(tts[0].get("Station", "?"))
-                end_code = str(tts[-1].get("Station", "?"))
-                st_name = s_map.get(st_code, st_code)
-                end_name = s_map.get(end_code, end_code)
-            lines.append(f"  ➜ [{tid}] {chi} {code} ({st_name} ➝ {end_name})")
-        lines.append("")
+    lines.append(f"====== 自動抓取報告 ({time.strftime('%Y-%m-%d %H:%M:%S')}) ======\n")
+
+    # 紀錄成功合併的車次
+    if ready_to_patch:
+        lines.append("✅ 【成功寫入的車次】")
+        for d in sorted(ready_to_patch.keys()):
+            items = ready_to_patch[d]
+            items.sort(key=train_sort_key)
+            lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
+            for t in items:
+                tid = str(t.get(TRAIN_ID_KEY, "?"))
+                code = str(t.get("CarClass", t.get("Type", "?")))
+                eng = c_map.get(code, "others")
+                chi = CHINESE_NAME_MAP.get(eng, eng)
+                st_name, end_name = "?", "?"
+                tts = t.get("TimeInfos", t.get("Timetables", []))
+                if tts:
+                    st_name = s_map.get(str(tts[0].get("Station", "?")), "?")
+                    end_name = s_map.get(str(tts[-1].get("Station", "?")), "?")
+                lines.append(f"  ➜ [{tid}] {chi} {code} ({st_name} ➝ {end_name})")
+            lines.append("")
+    
+    # 紀錄暫存等待中的車次
+    if keep_in_pending:
+        lines.append("🟡 【暫存等待中的車次 (目標日期檔尚未產出)】")
+        for d in sorted(keep_in_pending.keys()):
+            items = keep_in_pending[d]
+            items.sort(key=train_sort_key)
+            lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
+            for t in items:
+                tid = str(t.get(TRAIN_ID_KEY, "?"))
+                code = str(t.get("CarClass", t.get("Type", "?")))
+                eng = c_map.get(code, "others")
+                chi = CHINESE_NAME_MAP.get(eng, eng)
+                st_name, end_name = "?", "?"
+                tts = t.get("TimeInfos", t.get("Timetables", []))
+                if tts:
+                    st_name = s_map.get(str(tts[0].get("Station", "?")), "?")
+                    end_name = s_map.get(str(tts[-1].get("Station", "?")), "?")
+                lines.append(f"  ➜ [{tid}] {chi} {code} ({st_name} ➝ {end_name})")
+            lines.append("")
+
+    if not ready_to_patch and not keep_in_pending:
+        lines.append("⚪ 今日無任何外部新車次。")
+
     try:
-        with open(PENDING_LOG, 'w', encoding='utf-8') as f:
+        with open(CATCH_LOG_FILE, 'w', encoding='utf-8') as f:
             f.write("\n".join(lines))
-        print(f"📝 已更新暫存日誌: {PENDING_LOG}")
+        print(f"📝 已更新詳細抓取報告: {CATCH_LOG_FILE}")
     except: pass
+
 
 def main():
     if os.path.dirname(os.path.abspath(__file__)):
@@ -186,7 +208,6 @@ def main():
         except: pass
 
     for user, repo, path in TARGETS:
-        print(f"📡 連線 {user} ...")
         try:
             res = requests.get(f"https://api.github.com/repos/{user}/{repo}/contents/{path}")
             files = res.json() if res.status_code == 200 else []
@@ -211,7 +232,6 @@ def main():
                     all_data_pool[str(fdate)].append(t)
             time.sleep(0.05)
 
-    print("\n✂️ 正在執行跨日車次分割檢查...")
     final_data_pool = defaultdict(list)
     pending_next_day_trains = defaultdict(list)
 
@@ -238,7 +258,6 @@ def main():
     ready_to_patch = {}
     keep_in_pending = {}
 
-    print("\n🔍 正在分類...")
     os.makedirs(TARGET_DIR, exist_ok=True)
     
     for date_str, candidates in all_data_pool.items():
@@ -253,21 +272,8 @@ def main():
             new_stuff = [t for t in unique if str(t.get(TRAIN_ID_KEY)) not in exist]
             if new_stuff: ready_to_patch[date_str] = new_stuff
 
-    print("\n" + "="*50)
-    
-    if keep_in_pending:
-        count = sum(len(x) for x in keep_in_pending.values())
-        print(f"🟡 [暫存倉庫] 有 {len(keep_in_pending)} 個日期 ({count} 班車) 等待中。")
-        generate_pending_log(keep_in_pending, s_map, c_map) 
-    else:
-        print("⚪ [暫存倉庫] 目前是空的。")
-        if os.path.exists(PENDING_LOG): os.remove(PENDING_LOG)
-
+    # 自動寫入配對成功的車次
     if ready_to_patch:
-        print("-" * 50)
-        print(f"🟢 [配對成功] 發現 {len(ready_to_patch)} 個日期，準備自動寫入！")
-        
-        # 🌟 修正：拔除 input 互動，改為全自動寫入
         for date_str, new_trains in ready_to_patch.items():
             target_path = os.path.join(TARGET_DIR, f"{date_str}.json")
             try:
@@ -277,11 +283,12 @@ def main():
                 final_output = {"TrainInfos": data}
                 with open(target_path, 'w', encoding='utf-8') as f:
                     json.dump(final_output, f, ensure_ascii=False, indent=2)
-                print(f"  💾 已自動合併寫入 {date_str}.json ({len(new_trains)} 筆新車次)")
-            except Exception as e: 
-                print(f"  ❌ 寫入 {date_str}.json 發生錯誤: {e}")
+            except: pass
 
-    # 更新暫存檔
+    # 輸出統整報告 (.txt) 給使用者看
+    generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map)
+
+    # 儲存暫存資料庫 (.json) 給程式自己下次看
     if keep_in_pending:
         with open(PENDING_FILE, 'w', encoding='utf-8') as f:
             json.dump(keep_in_pending, f, ensure_ascii=False, indent=2)
