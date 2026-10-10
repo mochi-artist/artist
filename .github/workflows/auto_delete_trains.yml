@@ -1,0 +1,54 @@
+name: 🗑️ 手動刪除特定車次 (跨日掃描)
+
+# 觸發條件：只限手動點擊 (workflow_dispatch)
+on:
+  workflow_dispatch:
+    inputs:
+      target_trains:
+        description: '🔍 要刪除的車次 (可多筆，如 6631, 6632。填 ALL 為全選規則專車)'
+        required: true
+        type: string
+        default: 'ALL'
+      target_months:
+        description: '📅 目標月份 (可多月，如 10, 11。填 ALL 為掃描全部月份)'
+        required: true
+        type: string
+        default: 'ALL'
+
+permissions:
+  contents: write
+
+jobs:
+  delete-trains:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 檢出程式碼
+        uses: actions/checkout@v4
+
+      - name: 🐍 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 🚀 執行跨日掃描與刪除
+        env:
+          # 將網頁上的輸入框內容，傳遞給 Python 腳本
+          TARGET_TRAINS: ${{ inputs.target_trains }}
+          TARGET_MONTHS: ${{ inputs.target_months }}
+        run: python change/auto_delete_trains.py
+
+      - name: 💾 自動提交並推播 (Commit & Push)
+        run: |
+          git config --global user.name "Cleaner Bot"
+          git config --global user.email "bot@github.com"
+          
+          # 只追蹤資料夾內的異動
+          git add data/
+          
+          if git diff-index --quiet HEAD --; then
+            echo "沒有檔案變動，略過提交。"
+          else
+            git commit -m "🗑️ 批次刪除指定車次資料 [skip ci]"
+            git push
+          fi
