@@ -210,8 +210,7 @@ def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
     except: pass
 
 def main():
-    if os.path.dirname(os.path.abspath(__file__)):
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    
 
     print("🚀 智慧管理員啟動！...")
     s_map, c_map = load_dicts()
