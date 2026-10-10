@@ -24,7 +24,6 @@ HOLIDAYS_LIST = {
 }
 # ==========================================
 
-# 🌟 參數新增 start_day，決定從哪一天開始「存檔」
 def generate_for_month(target_month, train_infos, start_day=1):
     days_count = calendar.monthrange(YEAR, target_month)[1]
     start_weekday_idx = calendar.monthrange(YEAR, target_month)[0]
@@ -35,7 +34,6 @@ def generate_for_month(target_month, train_infos, start_day=1):
 
     print(f"\n⏳ 運算 {YEAR} 年 {target_month:02d} 月份資料 (將從 {start_day} 號開始寫入檔案)...")
 
-    # 💡 迴圈依然從 1 號開始跑，確保昨天的跨夜車能順利傳遞給今天
     for d in range(1, days_count + 1):
         date_str = f"{YEAR}{target_month:02d}{d:02d}"
         current_weekday = (start_weekday_idx + (d - 1)) % 7
@@ -109,7 +107,6 @@ def generate_for_month(target_month, train_infos, start_day=1):
                     filtered_daily_trains.append(t_info)
             daily_trains = filtered_daily_trains
 
-        # 🌟 核心修改：只有當天日期 >= 設定的起點 (當日) 時，才執行存檔動作！
         if d >= start_day:
             output_path = os.path.join(OUTPUT_DIR, f"{date_str}.json")
             with open(output_path, 'w', encoding='utf-8') as f:
@@ -158,12 +155,20 @@ def main():
         if current_month == 12:
             print("⚠️ 警告：今天已是 12/15 之後。暫停輸出明年 1 月資料！")
         else:
-            print(f"📅 15號觸發模式：產出下個月 ({current_month + 1} 月) 1 號到月底的資料。")
-            target_tasks.append((current_month + 1, 1))
+            next_month = current_month + 1
+            # 檢查下個月 1 號的檔案是否已經存在
+            check_file_path = os.path.join(OUTPUT_DIR, f"{YEAR}{next_month:02d}01.json")
+            
+            # 🌟 如果檔案存在，且不是手動測試，就跳過產出
+            if os.path.exists(check_file_path) and not sim_15:
+                print(f"⏩ 偵測到下個月 ({next_month} 月) 的檔案已存在，自動排程跳過重複產出！")
+            else:
+                print(f"📅 15號觸發模式：產出下個月 ({next_month} 月) 1 號到月底的資料。")
+                target_tasks.append((next_month, 1))
 
     # 如果兩個條件都沒達成，代表今天是平日且總表沒改，直接休息
     if not target_tasks:
-        print("💤 今天不是 15 號，總表也沒有更新，無需執行任何打包動作。")
+        print("💤 今日無任務：總表未更新，且無需自動產生新月份。")
         return
 
     print("==================================================")
