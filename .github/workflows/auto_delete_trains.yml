@@ -1,4 +1,4 @@
-name: 🗑️ 手動刪除特定車次 (跨日掃描)
+name: 🗑️ 手動刪除特定車次 (指定月份/全部)
 
 on:
   workflow_dispatch:
