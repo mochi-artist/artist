@@ -33,25 +33,26 @@ jobs:
           git config --global user.name "Smart Manager Bot"
           git config --global user.email "bot@github.com"
           
-          # 1. 追蹤 data 資料夾
+          # 1. 追蹤時刻表資料夾
           git add data/
           
-          # 2. 安全處理暫存檔 (存在就加入，不存在就告訴 Git 忽略或移除追蹤)
+          # 2. 安全處理「給程式看」的暫存 JSON 檔
           if [ -f pending_trains.json ]; then
             git add pending_trains.json
           else
             git rm --ignore-unmatch pending_trains.json
           fi
           
-          if [ -f pending_log.txt ]; then
-            git add pending_log.txt
+          # 3. 安全處理「給你看」的報告文字檔
+          if [ -f catch_log.txt ]; then
+            git add catch_log.txt
           else
-            git rm --ignore-unmatch pending_log.txt
+            git rm --ignore-unmatch catch_log.txt
           fi
           
-          # 3. 提交變更
+          # 4. 提交並更新
           if git diff-index --quiet HEAD --; then
-            echo "沒有抓到新車次，略過提交。"
+            echo "沒有檔案變動，略過提交。"
           else
             git commit -m "🤖 自動抓取與合併外部車次 [skip ci]"
             git push
