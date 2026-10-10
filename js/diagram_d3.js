@@ -144,7 +144,7 @@ if (!document.getElementById('d3-custom-styles')) {
 }
 
 // 智慧判定車種分類 (結合強制規則與 data all 總表動態過濾)
-function _getTrainCategoryId(style, train_no) {
+function _getTrainCategoryId(style, train_no, train_kind = null) { // 🌟 增加 train_kind 參數
     const base_no = train_no.replace(/-End\d*/g, '');
 
     // 🌟 核心修正 1：高鐵 (THSR) 專屬攔截機制
@@ -186,6 +186,10 @@ function _getTrainCategoryId(style, train_no) {
         
         return 'special'; // 防呆
     }
+
+    // 🌟 新增：海風號與山嵐號的絕對優先判定
+    if (train_kind === '0001') return 'haifeng';
+    if (train_kind === '0002') return 'shanlan';
 
     // 1. 最高優先級：寶可夢彩繪列車動態判定
     if (window._currentRenderDate && typeof TEMP_110F_RULES !== 'undefined') {
@@ -231,7 +235,8 @@ function _updateAllPathVisuals() {
         if (!baseData) return;
 
         const isSelected = _selectedPathIds.has(baseId);
-        const catId = _getTrainCategoryId(baseData.style, baseData.train_no);
+        // 🌟 這裡補上 baseData.train_kind 參數
+        const catId = _getTrainCategoryId(baseData.style, baseData.train_no, baseData.train_kind);
         const isFiltered = _activeFilters.size > 0 && _activeFilters.has(catId);
 
         if (isSelected) {
@@ -357,7 +362,8 @@ function _renderSearchResults(query, containerElement) {
 
     const matches = [];
     for (const [pathId, data] of _trainDataMap) {
-        const catId = _getTrainCategoryId(data.style, data.train_no);
+        // 🌟 這裡補上 data.train_kind 參數
+        const catId = _getTrainCategoryId(data.style, data.train_no, data.train_kind);
         if (_activeFilters.size > 0 && !_activeFilters.has(catId)) continue;
 
         const display_train_no = cleanTrainNoForDisplay(data.train_no);
@@ -407,6 +413,10 @@ function _renderSearchResults(query, containerElement) {
         // 🌟 獲取基礎標籤名稱
         const kindLabel_base = (typeof _carKindLabel !== 'undefined' && _carKindLabel[data.style]) ? _carKindLabel[data.style] : data.style;
         let finalKindLabel = kindLabel_base;
+
+        // 🌟 新增：海風號與山嵐號專屬標籤覆寫
+        if (data.train_kind === '0001') finalKindLabel = '海風號';
+        if (data.train_kind === '0002') finalKindLabel = '山嵐號';
 
         // 🌟 彩繪列車標籤文字動態覆寫
         const base_no = data.train_no.replace(/-End\d*/g, '');
@@ -979,11 +989,16 @@ function _init_ui_panels() {
     });
 
     // --- 左側：過濾區塊 ---
+    // --- 左側：過濾區塊 ---
     const filterSection = document.createElement('div');
-    filterSection.className = 'd3-filter-section d3-custom-scrollbar';
+    filterSection.className = 'd3-filter-section'; 
     Object.assign(filterSection.style, { 
-        padding: '12px', borderRight: '1px solid rgba(255,255,255,0.1)', 
-        maxHeight: '320px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' 
+        padding: '12px', // 🌟 關鍵：改回四邊都是 12px，讓左右恢復完美對稱
+        borderRight: '1px solid rgba(255,255,255,0.1)', 
+        maxHeight: '320px', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '2px' 
     });
 
     const filterTitle = document.createElement('div');
@@ -991,17 +1006,18 @@ function _init_ui_panels() {
     filterTitle.innerHTML = '🎛️ 此頁面車種過濾';
     Object.assign(filterTitle.style, { fontWeight: 'bold', color: '#8ab4f8', marginBottom: '8px', paddingBottom: '4px', borderBottom: '1px solid rgba(255,255,255,0.1)' });
 
+    // --- 1. 關閉面板保持線條加粗 ---
     const boldToggleContainer = document.createElement('div');
     Object.assign(boldToggleContainer.style, {
-        display: 'flex', alignItems: 'center', marginBottom: '4px',
-        fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
-        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+        display: 'flex', alignItems: 'center', marginBottom: '6px',
+        fontSize: '13px', color: '#e2e8f0', cursor: 'pointer',
+        padding: '6px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
     const boldToggleCb = document.createElement('input');
     boldToggleCb.type = 'checkbox';
     boldToggleCb.id = 'd3-bold-toggle';
     boldToggleCb.checked = _isBoldLocked;
-    Object.assign(boldToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    Object.assign(boldToggleCb.style, { marginRight: '8px', cursor: 'pointer' });
     const boldToggleLabel = document.createElement('label');
     boldToggleLabel.htmlFor = 'd3-bold-toggle';
     boldToggleLabel.textContent = '關閉面板保持線條加粗';
@@ -1013,17 +1029,18 @@ function _init_ui_panels() {
     boldToggleContainer.appendChild(boldToggleCb);
     boldToggleContainer.appendChild(boldToggleLabel);
 
+    // --- 2. 啟用多選功能 ---
     const multiToggleContainer = document.createElement('div');
     Object.assign(multiToggleContainer.style, {
-        display: 'flex', alignItems: 'center', marginBottom: '8px',
-        fontSize: '12px', color: '#e2e8f0', cursor: 'pointer',
-        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+        display: 'flex', alignItems: 'center', marginBottom: '6px',
+        fontSize: '13px', color: '#e2e8f0', cursor: 'pointer',
+        padding: '6px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
     const multiToggleCb = document.createElement('input');
     multiToggleCb.type = 'checkbox';
     multiToggleCb.id = 'd3-multi-toggle';
     multiToggleCb.checked = _isMultiSelectMode;
-    Object.assign(multiToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    Object.assign(multiToggleCb.style, { marginRight: '8px', cursor: 'pointer' });
     const multiToggleLabel = document.createElement('label');
     multiToggleLabel.htmlFor = 'd3-multi-toggle';
     multiToggleLabel.textContent = '啟用多選功能 (車種/車次)';
@@ -1040,17 +1057,18 @@ function _init_ui_panels() {
     multiToggleContainer.appendChild(multiToggleCb);
     multiToggleContainer.appendChild(multiToggleLabel);
 
+    // --- 3. 點擊車次顯示時刻表 ---
     const timetableToggleContainer = document.createElement('div');
     Object.assign(timetableToggleContainer.style, {
-        display: 'flex', alignItems: 'center', marginBottom: '8px',
-        fontSize: '12px', color: '#fbbc04', cursor: 'pointer',
-        padding: '4px 6px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
+        display: 'flex', alignItems: 'center', marginBottom: '10px', 
+        fontSize: '13px', color: '#fbbc04', cursor: 'pointer',       // 🌟 關鍵：把顏色改回專屬的黃色
+        padding: '6px 8px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px'
     });
     const timetableToggleCb = document.createElement('input');
     timetableToggleCb.type = 'checkbox';
     timetableToggleCb.id = 'd3-timetable-toggle';
     timetableToggleCb.checked = _isTimetableMode;
-    Object.assign(timetableToggleCb.style, { marginRight: '6px', cursor: 'pointer' });
+    Object.assign(timetableToggleCb.style, { marginRight: '8px', cursor: 'pointer' });
     const timetableToggleLabel = document.createElement('label');
     timetableToggleLabel.htmlFor = 'd3-timetable-toggle';
     timetableToggleLabel.textContent = '點擊車次顯示時刻表';
@@ -1066,11 +1084,20 @@ function _init_ui_panels() {
     timetableToggleContainer.appendChild(timetableToggleLabel);
 
     const filterList = document.createElement('div');
+    filterList.className = 'd3-custom-scrollbar'; 
+    Object.assign(filterList.style, {
+        maxHeight: '200px',  // 🌟 關鍵：加上絕對高度限制，跟右邊的搜尋清單一樣
+        overflowY: 'auto',   // 🌟 啟動獨立上下捲動
+        display: 'flex',
+        flexDirection: 'column',
+        paddingRight: '6px', // 預留捲軸空間
+        marginTop: '4px'     // 和上面的 checkbox 保持一點距離
+    });
     
     window._renderFilterList = function() {
         filterList.innerHTML = '';
         
-        let activeCategories = _filterCategories; // 預設使用台鐵菜單
+        let activeCategories = [..._filterCategories]; // 🌟 改用展開語法複製，避免污染原始陣列
         
         if (_currentLineKind === 'thsr') {
             activeCategories = [
@@ -1086,11 +1113,27 @@ function _init_ui_panels() {
                 { id: 'alishan', name: '阿里山號', styles: ['alishan'] },
                 { id: 'vivid', name: '栩悅號', styles: ['vivid'] },
                 { id: 'formosensis', name: '福森號', styles: ['formosensis'] },
-                // 🌟 核心修改：拆分祝客列車為沼平線與神木線
                 { id: 'chushan_zhaoping', name: '祝客列車(沼平線)', styles: ['chushan_zhaoping'] },
                 { id: 'chushan_shenmu', name: '祝客列車(神木線)', styles: ['chushan_shenmu'] },
                 { id: 'special', name: '特殊列車', styles: ['special'] }
             ];
+        }
+
+        // 🌟 動態偵測：今天是否有海風或山嵐號？
+        let hasHaifeng = false;
+        let hasShanlan = false;
+        if (_currentLineKind !== 'LINE_Alishan' && _currentLineKind !== 'thsr') {
+            for (const [pathId, data] of _trainDataMap) {
+                if (data.train_kind === '0001') hasHaifeng = true;
+                if (data.train_kind === '0002') hasShanlan = true;
+            }
+        }
+
+        // 🌟 若有，動態插入到「特殊列車」的下方 (呈現縮排子層級視覺)
+        const specialIndex = activeCategories.findIndex(c => c.id === 'special');
+        if (specialIndex !== -1) {
+            if (hasShanlan) activeCategories.splice(specialIndex + 1, 0, { id: 'shanlan', name: '山嵐號</span>', styles: [] });
+            if (hasHaifeng) activeCategories.splice(specialIndex + 1, 0, { id: 'haifeng', name: '海風號</span>', styles: [] });
         }
 
         const counts = {};
@@ -1100,7 +1143,8 @@ function _init_ui_panels() {
         for (const [pathId, data] of _trainDataMap) {
             if (data.train_no.endsWith('-End')) continue;
             
-            const catId = _getTrainCategoryId(data.style, data.train_no);
+            // 🌟 這裡補上 data.train_kind 參數
+            const catId = _getTrainCategoryId(data.style, data.train_no, data.train_kind);
             if (counts[catId] !== undefined) {
                 counts[catId]++;
             } else {
@@ -1109,6 +1153,8 @@ function _init_ui_panels() {
             total++;
         }
         counts['all'] = total;
+
+        // ... (保留下方的 activeCategories.forEach 迴圈與原本邏輯)
 
         activeCategories.forEach(cat => {
             if (counts[cat.id] === 0 && cat.id !== 'all' && cat.id !== 'special') return;
