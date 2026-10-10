@@ -1,4 +1,4 @@
-name: 📝 手動解析公告文字並匯入車次
+name: 📝 加班車資料匯入日期檔
 
 # 觸發條件：只限手動點擊 (workflow_dispatch)
 on:
