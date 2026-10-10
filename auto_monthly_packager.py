@@ -129,28 +129,42 @@ def main():
         print("❌ 錯誤：基準總表中沒有 TrainInfos 資料。")
         return
 
-    # 🌟 設定台灣時區，確保 GitHub 雲端執行時不會算錯日期
+    # 🌟 讀取 GitHub Actions 傳過來的手動輸入數值
+    force_month_env = os.environ.get('FORCE_MONTH', '').strip()
+
     tz_tw = timezone(timedelta(hours=8))
     now = datetime.now(tz_tw)
     current_month = now.month
     current_day = now.day
 
-    target_months = [current_month]
+    if force_month_env and force_month_env.isdigit():
+        # ==========================================
+        # 🔧 手動強制產出模式 (你從網頁按按鈕指定的月份)
+        # ==========================================
+        force_m = int(force_month_env)
+        print("==================================================")
+        print(f"🔧 手動強制模式觸發 | 指定產出月份：{force_m} 月")
+        print("==================================================")
+        generate_for_month(force_m, train_infos, start_day=1) # 強制產出一整個月
+    else:
+        # ==========================================
+        # 🤖 原本的自動排程模式 (每天自動跑的邏輯)
+        # ==========================================
+        target_months = [current_month]
 
-    if current_day >= 15:
-        if current_month == 12:
-            print("⚠️ 警告：今天已是 12/15 之後。暫停輸出明年 1 月資料！")
-        else:
-            target_months.append(current_month + 1)
+        if current_day >= 15:
+            if current_month == 12:
+                print("⚠️ 警告：今天已是 12/15 之後。暫停輸出明年 1 月資料！")
+            else:
+                target_months.append(current_month + 1)
 
-    print("==================================================")
-    print(f"🚀 自動打包開始 | 今日: {current_month}/{current_day} | 目標月份: {target_months}")
-    print("==================================================")
+        print("==================================================")
+        print(f"🚀 自動打包開始 | 今日: {current_month}/{current_day} | 目標月份: {target_months}")
+        print("==================================================")
 
-    for m in target_months:
-        # 如果是當月，從今天開始覆寫；如果是跨到下個月的預先產出，則從 1 號開始
-        start_d = current_day if m == current_month else 1
-        generate_for_month(m, train_infos, start_day=start_d)
+        for m in target_months:
+            start_d = current_day if m == current_month else 1
+            generate_for_month(m, train_infos, start_day=start_d)
 
     print("==================================================")
     print("🎉 打包更新作業已全數完成！")
