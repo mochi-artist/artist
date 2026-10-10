@@ -38,14 +38,14 @@ jobs:
           
           # 2. 安全處理「給程式看」的暫存 JSON 檔
           if [ -f pending_trains.json ]; then
-            git add pending_trains.json
+            git add -f pending_trains.json # ⬅️ 加上 -f 強制加入
           else
             git rm --ignore-unmatch pending_trains.json
           fi
           
           # 3. 安全處理「給你看」的報告文字檔
           if [ -f catch_log.txt ]; then
-            git add catch_log.txt
+            git add -f catch_log.txt # ⬅️ 加上 -f 強制加入，突破 .gitignore 限制
           else
             git rm --ignore-unmatch catch_log.txt
           fi
