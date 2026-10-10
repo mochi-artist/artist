@@ -29,13 +29,60 @@ CHINESE_NAME_MAP = {
     "ordinary": "普快", "theme": "主題", "special": "專車", "others": "其他"
 }
 
-# 內建備用車種對照表 (防呆用)
 FALLBACK_C_MAP = {
     "1100": "tze_chiang", "1101": "tze_chiang", "1102": "taroko", "1107": "puyuma", "1108": "tze_chiang", "110A": "tze_chiang",
     "1110": "chu_kuang", "1111": "chu_kuang", "1112": "chu_kuang", "1114": "chu_kuang", "1115": "chu_kuang",
     "1120": "fu_hsing", "1121": "fu_hsing", "1122": "fu_hsing",
     "1130": "local", "1131": "local", "1132": "local_express",
     "1140": "ordinary", "1141": "ordinary"
+}
+
+# 🌟 自動替換的車次規則清單
+RULE_CLASS_0001 = ['6652', '6655', '6629', '6630']
+RULE_CLASS_0002 = ['6631', '6632', '6633', '6676', '6677']
+
+# 🌟 110F 專車替換規則
+TEMP_110F_RULES = {
+    "20260925": ["2183", "3231"], "20260926": ["3010", "3035"],
+    "20260927": ["3001", "3018", "3021"], "20260928": ["3006", "1038"],
+    "20260929": ["2013", "2244"], "20260930": ["2123", "2184", "2223"],
+    "20261001": ["2128", "3177", "3228", "2257"], "20261002": ["2144", "2203", "2264"],
+    "20261003": ["6725A", "6725", "6725B"], "20261004": ["2183", "3231"],
+    "20261005": ["3010", "3035"], "20261006": ["3001", "3018", "3021"],
+    "20261007": ["3006", "1038"], "20261008": ["2013", "2244"],
+    "20261009": ["2183", "3231"], "20261010": ["3010", "3035"],
+    "20261011": ["3001", "3018", "3021"], "20261012": ["3006", "1038"],
+    "20261013": ["2013", "2244"], "20261014": ["2143", "2204", "2263"],
+    "20261015": ["2124", "2163", "2224"], "20261016": ["2143", "2204", "2263"],
+    "20261017": ["2124", "2163", "2224"], "20261018": ["6725A", "6725", "6725B"],
+    "20261019": ["2183", "3231"], "20261020": ["3010", "3035"],
+    "20261021": ["3001", "3018", "3021"], "20261022": ["3006", "1038"],
+    "20261023": ["2013", "2244"], "20261024": ["2183", "3231"],
+    "20261025": ["3010", "3035"], "20261026": ["3001", "3018", "3021"],
+    "20261027": ["3006", "1038"], "20261028": ["2013", "2244"],
+    "20261029": ["2143", "2204", "2263"], "20261030": ["2124", "2163", "2224"],
+    "20261031": ["6725A", "6725", "6725B"], "20261101": ["2183", "3231"],
+    "20261102": ["3010", "3035"], "20261103": ["3001", "3018", "3021"],
+    "20261104": ["3006", "1038"], "20261105": ["2013", "2244"],
+    "20261106": ["2183", "3231"], "20261107": ["3010", "3035"],
+    "20261108": ["3001", "3018", "3021"], "20261109": ["3006", "1038"],
+    "20261110": ["2013", "2244"], "20261111": ["2123", "2184", "2223"],
+    "20261112": ["2128", "3177", "3228", "2257"], "20261113": ["2144", "2203", "2264"],
+    "20261114": ["6725A", "6725", "6725B"], "20261115": ["2183", "3231"],
+    "20261116": ["3010", "3035"], "20261117": ["3001", "3018", "3021"],
+    "20261118": ["3006", "1038"], "20261119": ["2013", "2244"],
+    "20261120": ["2183", "3231"], "20261121": ["3010", "3035"],
+    "20261122": ["3001", "3018", "3021"], "20261123": ["3006", "1038"],
+    "20261124": ["2013", "2244"], "20261125": ["2143", "2204", "2263"],
+    "20261126": ["2124", "2163", "2224"], "20261127": ["2143", "2204", "2263"],
+    "20261128": ["2124", "2163", "2224"], "20261129": ["6725A", "6725", "6725B"],
+    "20261130": ["2183", "3231"], "20261201": ["3010", "3035"],
+    "20261202": ["3001", "3018", "3021"], "20261203": ["3006", "1038"],
+    "20261204": ["2013", "2244"], "20261205": ["6725A", "6725", "6725B"],
+    "20261206": ["2183", "3231"], "20261207": ["3010", "3035"],
+    "20261208": ["3001", "3018", "3021"], "20261209": ["3006", "1038"],
+    "20261210": ["2013", "2244"], "20261211": ["2123", "2184", "2223"],
+    "20261212": ["2128", "3177", "3228", "2257"], "20261213": ["2144", "2203", "2264"]
 }
 # =========================================
 
@@ -112,11 +159,8 @@ def load_master_ids():
         except: pass
     return ids
 
-# 🌟 全目錄自動掃描尋寶功能
 def load_dicts():
     s_map, c_map = {}, {}
-    
-    # 尋找 SVG_Y_Axis.json
     s_path = None
     for root, dirs, files in os.walk("."):
         if "SVG_Y_Axis.json" in files:
@@ -133,7 +177,6 @@ def load_dicts():
                                 s_map[str(st["ID"])] = st["DSC"]
         except: pass
 
-    # 尋找 CarKind.json
     c_path = None
     for root, dirs, files in os.walk("."):
         if "CarKind.json" in files:
@@ -145,7 +188,6 @@ def load_dicts():
                 data = json.load(f)
                 c_map = {str(k): v for k, v in data.items()}
         except: pass
-        
     return s_map, c_map
 
 def train_sort_key(train_obj):
@@ -154,64 +196,119 @@ def train_sort_key(train_obj):
     if match: return (int(match.group(1)), match.group(2)) 
     return (float('inf'), tid)
 
-# 🌟 格式化輸出的專屬函式
 def format_train_log(t, s_map, c_map):
     tid = str(t.get(TRAIN_ID_KEY, "?"))
     code = str(t.get("CarClass", t.get("Type", "?")))
-    
-    # 優先查字典，查不到就用內建防呆，再查不到才寫 others
     eng = c_map.get(code, FALLBACK_C_MAP.get(code, "others"))
     chi = CHINESE_NAME_MAP.get(eng, eng)
-    
     st_name, end_name = "?", "?"
     tts = t.get("TimeInfos", t.get("Timetables", []))
     if tts:
-        # 兼容不同格式的站名代碼
         st_code = str(tts[0].get("Station", tts[0].get("StationID", "?")))
         end_code = str(tts[-1].get("Station", tts[-1].get("StationID", "?")))
-        
-        # 查詢車站中文名，查不到就顯示代碼
         st_name = s_map.get(st_code, st_code)
         end_name = s_map.get(end_code, end_code)
-        
     return f"  ➜ [{tid}] {chi} {code} ({st_name} -> {end_name})"
 
 def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
     lines = []
     lines.append(f"====== 自動抓取報告 ({time.strftime('%Y-%m-%d %H:%M:%S')}) ======\n")
-
     if ready_to_patch:
         lines.append("✅ 【成功寫入的車次】")
         for d in sorted(ready_to_patch.keys()):
             items = ready_to_patch[d]
             items.sort(key=train_sort_key)
             lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
-            for t in items:
-                lines.append(format_train_log(t, s_map, c_map))
+            for t in items: lines.append(format_train_log(t, s_map, c_map))
             lines.append("")
-    
     if keep_in_pending:
         lines.append("🟡 【暫存等待中的車次 (目標日期檔尚未產出)】")
         for d in sorted(keep_in_pending.keys()):
             items = keep_in_pending[d]
             items.sort(key=train_sort_key)
             lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
-            for t in items:
-                lines.append(format_train_log(t, s_map, c_map))
+            for t in items: lines.append(format_train_log(t, s_map, c_map))
             lines.append("")
-
     if not ready_to_patch and not keep_in_pending:
         lines.append("⚪ 今日無任何外部新車次。")
-
     try:
-        with open(CATCH_LOG_FILE, 'w', encoding='utf-8') as f:
-            f.write("\n".join(lines))
-        print(f"📝 已更新詳細抓取報告: {CATCH_LOG_FILE}")
+        with open(CATCH_LOG_FILE, 'w', encoding='utf-8') as f: f.write("\n".join(lines))
     except: pass
 
-def main():
+# 🌟 新增：最終大檢查與強制覆寫功能
+def run_post_processing_corrections():
+    print("\n🔧 正在執行最終資料校正 (CarClass 自動替換與 110F 專車規則)...")
     
+    # 1. 修正 pending_trains.json 中的 0001/0002
+    if os.path.exists(PENDING_FILE):
+        try:
+            with open(PENDING_FILE, 'r', encoding='utf-8') as f:
+                pending_data = json.load(f)
+            changed = False
+            for d_str, trains in pending_data.items():
+                for t in trains:
+                    t_no = str(t.get("TrainNo", t.get(TRAIN_ID_KEY)))
+                    curr_class = str(t.get("CarClass", ""))
+                    if t_no in RULE_CLASS_0001 and curr_class != "0001":
+                        t["CarClass"] = "0001"
+                        changed = True
+                    elif t_no in RULE_CLASS_0002 and curr_class != "0002":
+                        t["CarClass"] = "0002"
+                        changed = True
+            if changed:
+                with open(PENDING_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(pending_data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"❌ 修正暫存檔時發生錯誤: {e}")
 
+    # 2. 修正 data/ 目錄下所有 JSON 檔的 110F 與 0001/0002
+    if not os.path.exists(TARGET_DIR):
+        return
+        
+    for filename in os.listdir(TARGET_DIR):
+        if not filename.endswith(".json"): continue
+        date_str = filename.replace(".json", "")
+        filepath = os.path.join(TARGET_DIR, filename)
+        
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                daily_data = json.load(f)
+                
+            train_list = []
+            if isinstance(daily_data, dict) and "TrainInfos" in daily_data:
+                train_list = daily_data["TrainInfos"]
+            elif isinstance(daily_data, list):
+                train_list = daily_data
+                
+            changed = False
+            target_110f_trains = TEMP_110F_RULES.get(date_str, [])
+            
+            for t in train_list:
+                t_no = str(t.get("TrainNo", t.get(TRAIN_ID_KEY)))
+                curr_class = str(t.get("CarClass", ""))
+                
+                # 規則 A: 110F 專車覆寫 (優先權最高)
+                if t_no in target_110f_trains:
+                    if curr_class != "110F":
+                        t["CarClass"] = "110F"
+                        changed = True
+                else:
+                    # 規則 B: 0001/0002 強制校正
+                    if t_no in RULE_CLASS_0001 and curr_class != "0001":
+                        t["CarClass"] = "0001"
+                        changed = True
+                    elif t_no in RULE_CLASS_0002 and curr_class != "0002":
+                        t["CarClass"] = "0002"
+                        changed = True
+                        
+            if changed:
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    json.dump(daily_data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"❌ 校正 {filename} 時發生錯誤: {e}")
+
+
+def main():
     print("🚀 智慧管理員啟動！...")
     s_map, c_map = load_dicts()
     master_ids = load_master_ids() 
@@ -314,6 +411,10 @@ def main():
             json.dump(keep_in_pending, f, ensure_ascii=False, indent=2)
     else:
         if os.path.exists(PENDING_FILE): os.remove(PENDING_FILE)
+        
+    # 🌟 程式結尾：呼叫最後的大掃除與校正
+    run_post_processing_corrections()
+    print("🎉 智慧管理員作業與校正全部完成！")
 
 if __name__ == "__main__":
     main()
