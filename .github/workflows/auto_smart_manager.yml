@@ -26,7 +26,7 @@ jobs:
         run: pip install requests
 
       - name: 🚀 執行智慧管理員 (抓取原作者車次)
-        run: python auto_smart_manager.py
+        run: python change/auto_smart_manager.py
 
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
