@@ -40,7 +40,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           SIMULATE_15TH: ${{ inputs.simulate_15th }}
           SIMULATE_PUSH: ${{ inputs.simulate_push }}
-        run: python auto_monthly_packager.py
+        run: python change/auto_monthly_packager.py
 
       - name: 上傳每日 JSON 日期檔
         run: |
