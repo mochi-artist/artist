@@ -10,10 +10,8 @@ from collections import defaultdict
 # ================= 設定區 =================
 TARGET_DIR = "data"
 MASTER_FILE_PATH = "final_train_diagram.json"
-PENDING_FILE = "pending_trains.json"  # 程式專用的暫存車次資料庫
-CATCH_LOG_FILE = "catch_log.txt"      # 📝 給你看的純文字抓取報告
-STATION_DB_PATH = "SVG_Y_Axis.json"
-CAR_KIND_DB_PATH = "CarKind.json"
+PENDING_FILE = "pending_trains.json"  
+CATCH_LOG_FILE = "catch_log.txt"      
 TRAIN_ID_KEY = "Train"
 START_DATE = 20260101
 EXCLUDE_PREFIXES = ["29", "47", "48", "49","6631", "6632", "6633"]
@@ -29,6 +27,15 @@ CHINESE_NAME_MAP = {
     "skip_stop": "跳站", "local": "區間", "alishan": "阿里山",
     "all_stop": "站站停", "local_express": "區快", "fu_hsing": "復興",
     "ordinary": "普快", "theme": "主題", "special": "專車", "others": "其他"
+}
+
+# 內建備用車種對照表 (防呆用)
+FALLBACK_C_MAP = {
+    "1100": "tze_chiang", "1101": "tze_chiang", "1102": "taroko", "1107": "puyuma", "1108": "tze_chiang", "110A": "tze_chiang",
+    "1110": "chu_kuang", "1111": "chu_kuang", "1112": "chu_kuang", "1114": "chu_kuang", "1115": "chu_kuang",
+    "1120": "fu_hsing", "1121": "fu_hsing", "1122": "fu_hsing",
+    "1130": "local", "1131": "local", "1132": "local_express",
+    "1140": "ordinary", "1141": "ordinary"
 }
 # =========================================
 
@@ -105,23 +112,40 @@ def load_master_ids():
         except: pass
     return ids
 
+# 🌟 全目錄自動掃描尋寶功能
 def load_dicts():
     s_map, c_map = {}, {}
-    if os.path.exists(STATION_DB_PATH):
+    
+    # 尋找 SVG_Y_Axis.json
+    s_path = None
+    for root, dirs, files in os.walk("."):
+        if "SVG_Y_Axis.json" in files:
+            s_path = os.path.join(root, "SVG_Y_Axis.json")
+            break
+    if s_path:
         try:
-            with open(STATION_DB_PATH, 'r', encoding='utf-8') as f:
+            with open(s_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 for line_key, stations in data.items():
                     if isinstance(stations, list):
                         for st in stations:
-                            if "ID" in st and "DSC" in st: s_map[str(st["ID"])] = st["DSC"]
+                            if "ID" in st and "DSC" in st: 
+                                s_map[str(st["ID"])] = st["DSC"]
         except: pass
-    if os.path.exists(CAR_KIND_DB_PATH):
+
+    # 尋找 CarKind.json
+    c_path = None
+    for root, dirs, files in os.walk("."):
+        if "CarKind.json" in files:
+            c_path = os.path.join(root, "CarKind.json")
+            break
+    if c_path:
         try:
-            with open(CAR_KIND_DB_PATH, 'r', encoding='utf-8') as f:
+            with open(c_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 c_map = {str(k): v for k, v in data.items()}
         except: pass
+        
     return s_map, c_map
 
 def train_sort_key(train_obj):
@@ -130,12 +154,32 @@ def train_sort_key(train_obj):
     if match: return (int(match.group(1)), match.group(2)) 
     return (float('inf'), tid)
 
-# 🌟 新增的綜合報告產出功能
+# 🌟 格式化輸出的專屬函式
+def format_train_log(t, s_map, c_map):
+    tid = str(t.get(TRAIN_ID_KEY, "?"))
+    code = str(t.get("CarClass", t.get("Type", "?")))
+    
+    # 優先查字典，查不到就用內建防呆，再查不到才寫 others
+    eng = c_map.get(code, FALLBACK_C_MAP.get(code, "others"))
+    chi = CHINESE_NAME_MAP.get(eng, eng)
+    
+    st_name, end_name = "?", "?"
+    tts = t.get("TimeInfos", t.get("Timetables", []))
+    if tts:
+        # 兼容不同格式的站名代碼
+        st_code = str(tts[0].get("Station", tts[0].get("StationID", "?")))
+        end_code = str(tts[-1].get("Station", tts[-1].get("StationID", "?")))
+        
+        # 查詢車站中文名，查不到就顯示代碼
+        st_name = s_map.get(st_code, st_code)
+        end_name = s_map.get(end_code, end_code)
+        
+    return f"  ➜ [{tid}] {chi} {code} ({st_name} -> {end_name})"
+
 def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
     lines = []
     lines.append(f"====== 自動抓取報告 ({time.strftime('%Y-%m-%d %H:%M:%S')}) ======\n")
 
-    # 紀錄成功合併的車次
     if ready_to_patch:
         lines.append("✅ 【成功寫入的車次】")
         for d in sorted(ready_to_patch.keys()):
@@ -143,19 +187,9 @@ def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
             items.sort(key=train_sort_key)
             lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
             for t in items:
-                tid = str(t.get(TRAIN_ID_KEY, "?"))
-                code = str(t.get("CarClass", t.get("Type", "?")))
-                eng = c_map.get(code, "others")
-                chi = CHINESE_NAME_MAP.get(eng, eng)
-                st_name, end_name = "?", "?"
-                tts = t.get("TimeInfos", t.get("Timetables", []))
-                if tts:
-                    st_name = s_map.get(str(tts[0].get("Station", "?")), "?")
-                    end_name = s_map.get(str(tts[-1].get("Station", "?")), "?")
-                lines.append(f"  ➜ [{tid}] {chi} {code} ({st_name} ➝ {end_name})")
+                lines.append(format_train_log(t, s_map, c_map))
             lines.append("")
     
-    # 紀錄暫存等待中的車次
     if keep_in_pending:
         lines.append("🟡 【暫存等待中的車次 (目標日期檔尚未產出)】")
         for d in sorted(keep_in_pending.keys()):
@@ -163,16 +197,7 @@ def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
             items.sort(key=train_sort_key)
             lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
             for t in items:
-                tid = str(t.get(TRAIN_ID_KEY, "?"))
-                code = str(t.get("CarClass", t.get("Type", "?")))
-                eng = c_map.get(code, "others")
-                chi = CHINESE_NAME_MAP.get(eng, eng)
-                st_name, end_name = "?", "?"
-                tts = t.get("TimeInfos", t.get("Timetables", []))
-                if tts:
-                    st_name = s_map.get(str(tts[0].get("Station", "?")), "?")
-                    end_name = s_map.get(str(tts[-1].get("Station", "?")), "?")
-                lines.append(f"  ➜ [{tid}] {chi} {code} ({st_name} ➝ {end_name})")
+                lines.append(format_train_log(t, s_map, c_map))
             lines.append("")
 
     if not ready_to_patch and not keep_in_pending:
@@ -183,7 +208,6 @@ def generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map):
             f.write("\n".join(lines))
         print(f"📝 已更新詳細抓取報告: {CATCH_LOG_FILE}")
     except: pass
-
 
 def main():
     if os.path.dirname(os.path.abspath(__file__)):
@@ -272,7 +296,6 @@ def main():
             new_stuff = [t for t in unique if str(t.get(TRAIN_ID_KEY)) not in exist]
             if new_stuff: ready_to_patch[date_str] = new_stuff
 
-    # 自動寫入配對成功的車次
     if ready_to_patch:
         for date_str, new_trains in ready_to_patch.items():
             target_path = os.path.join(TARGET_DIR, f"{date_str}.json")
@@ -285,10 +308,8 @@ def main():
                     json.dump(final_output, f, ensure_ascii=False, indent=2)
             except: pass
 
-    # 輸出統整報告 (.txt) 給使用者看
     generate_catch_log(ready_to_patch, keep_in_pending, s_map, c_map)
 
-    # 儲存暫存資料庫 (.json) 給程式自己下次看
     if keep_in_pending:
         with open(PENDING_FILE, 'w', encoding='utf-8') as f:
             json.dump(keep_in_pending, f, ensure_ascii=False, indent=2)
