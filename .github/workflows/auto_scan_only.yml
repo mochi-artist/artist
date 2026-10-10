@@ -1,57 +1,43 @@
-name: 每日時刻表打包器
+name: 每日台鐵偵察兵 (純紀錄)
 
+# 觸發時間：每天台灣時間中午 12:00 (UTC 4:00)
 on:
-  push:
-    paths:
-      - 'final_train_diagram.json'
   schedule:
-    - cron: '15 16 * * *'
-  workflow_dispatch:
-    inputs:
-      simulate_15th:
-        description: '🧪 模擬 15 號 (純粹產出下個月的檔案)'
-        required: false
-        type: boolean
-        default: false
-      simulate_push:
-        description: '🔄 模擬總表更新 (強制更新 當日~月底 的檔案)'
-        required: false
-        type: boolean
-        default: false
+    - cron: '0 4 * * *'
+  workflow_dispatch: # 讓你可以手動按按鈕測試
 
 permissions:
-  contents: write 
+  contents: write # 給寫入權限
 
 jobs:
-  monthly-pack:
+  daily-scan:
     runs-on: ubuntu-latest
     
     steps:
       - name: 下載你的程式碼
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: 設定 Python 環境
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
-      - name: 執行每月打包器
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          SIMULATE_15TH: ${{ inputs.simulate_15th }}
-          SIMULATE_PUSH: ${{ inputs.simulate_push }}
-        run: python auto_monthly_packager.py
+      - name: 安裝套件
+        run: pip install requests
 
-      - name: 上傳每日 JSON 日期檔
+      - name: 執行偵查 (Scan Only)
+        # 這支程式會自動去雲端抓字典，並讀寫 scan_history.json 以及產出菜單
+        run: python auto_scan.py
+
+      - name: 上傳偵察日記、記憶與時空菜單
         run: |
-          git config --global user.name "Packager Bot"
+          git config --global user.name "Scout Bot"
           git config --global user.email "bot@github.com"
           
-          git add data/
+          # 🛡️ 絕對防禦修正：不使用 git add . 
+          # 嚴格規定機器人每次只能上傳這三個指定的檔案，杜絕一切意外！
+          git add scan_log.txt scan_history.json "data all/Revised_Epochs.json"
           
-          if git diff-index --quiet HEAD --; then
-            echo "沒有檔案變動，略過提交。"
-          else
-            git commit -m "📦 自動產出/更新時刻表 JSON 日期檔 [skip ci]"
-            git push
-          fi
+          # 提交變更 (如果沒新車、菜單也沒變，就不做任何事)
+          git commit -m "📝 更新偵察日記、記憶與時空菜單 [skip ci]" || exit 0
+          git push
