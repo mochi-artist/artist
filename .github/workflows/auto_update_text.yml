@@ -20,20 +20,23 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 🚀 執行文字公告解析腳本
-        run: python change/auto_update_from_text.py
-
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
           git config --global user.name "Text Parser Bot"
           git config --global user.email "bot@github.com"
           
-          # 追蹤資料夾與被清空的文字檔
-          git add data/ train_data.txt
+          # 1. 追蹤時刻表資料夾
+          git add data/ 
           
+          # 2. 追蹤並儲存被清空的文字檔 (改為 extratrain_data.txt)
+          if [ -f extratrain_data.txt ]; then
+            git add extratrain_data.txt
+          fi
+          
+          # 3. 提交變更
           if git diff-index --quiet HEAD --; then
             echo "沒有檔案變動，略過提交。"
           else
-            git commit -m "📝 從 train_data.txt 解析並匯入加班車次 [skip ci]"
+            git commit -m "📝 從 extratrain_data.txt 解析並匯入加班車次 [skip ci]"
             git push
           fi
