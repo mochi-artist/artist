@@ -257,7 +257,7 @@ def process_text_update():
             print(log)
         print("-" * 80)
 
-    # 🌟 拔除 input() 詢問，直接全自動執行寫入
+    # 🌟 拔除 input() 詢問，直接全自動執行寫入>
     print("\n🚀 機器人自動確認，開始寫入檔案...")
     for task in tasks:
         path = task['path']
