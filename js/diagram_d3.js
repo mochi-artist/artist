@@ -117,177 +117,239 @@ if (!document.getElementById('d3-custom-styles')) {
         .d3-item-text { font-size: 14px; }
         .d3-item-badge { font-size: 11px; padding: 1px 8px; }
 
-        /* 📱 手機版 RWD (絕對 50/50 對稱，左側精緻微縮，滑動填滿無留白) */
+        /* ========================================= */
+        /* 💻 電腦版 (寬度大於 768px)：時刻表高度動態切換 */
+        /* ========================================= */
+        @media (min-width: 769px) {
+            .d3-top-section-container { 
+                height: 340px !important; 
+                transition: height 0.2s ease !important; 
+            }
+            .d3-top-section-container.timetable-open { 
+                height: 315px !important; 
+            }
+        }
+
+        /* ========================================= */
+        /* 📱 手機版 (寬度小於等於 768px)：排版大統一與高度切換 */
+        /* ========================================= */
         @media (max-width: 768px) {
             #d3-panel-body { width: calc(100vw - 25px) !important; max-width: 500px; }
             
-            /* 固定面板總高度，讓內部清單能夠正確觸發「滑動」 */
-            .d3-top-section-container { flex-direction: row !important; height: 340px !important; }
+            /* 🌟 高度動態切換 */
+            .d3-top-section-container { flex-direction: row !important; height: 340px !important; transition: height 0.2s ease; }
+            .d3-top-section-container.timetable-open { height: 345px !important; }
             
-            /* 🌟 1. 將最外層底部的 padding 設為 0，讓清單可以直接「貼到底部」 */
+            /* 🌟 1. 統一外層大容器留白 */
             .d3-filter-section { 
                 width: 50% !important; flex: 0 0 50% !important; max-width: 50% !important;
-                padding: 12px 4px 0px 10px !important; /* 👈 底部 padding 歸零 */
+                padding: 12px 4px 0px 10px !important; 
                 border-right: 1px solid rgba(255,255,255,0.1) !important; border-bottom: none !important;
                 box-sizing: border-box !important; overflow: visible !important;
                 display: flex !important; flex-direction: column !important; 
+                gap: 0px !important; 
             }
             .d3-search-section { 
                 width: 50% !important; flex: 0 0 50% !important; max-width: 50% !important;
-                padding: 12px 10px 0px 4px !important; /* 👈 底部 padding 歸零 */
+                padding: 12px 10px 0px 4px !important; 
                 box-sizing: border-box !important; overflow: visible !important;
                 display: flex !important; flex-direction: column !important; 
+                gap: 0px !important; 
             }
 
-            /* 標題保持原本大小，不參與變形 */
             .d3-panel-title { font-size: 13px !important; margin-bottom: 8px !important; padding-bottom: 6px !important; flex: 0 0 auto !important; }
             
-/* 只控制上方三個打勾按鈕的長度與位置 */
-            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar) {
-                width: 103% !important;       /* 👈 因為左邊沒那麼靠左了，寬度也要稍微調小，避免右邊超線 */
-                margin-left: -5px !important; /* 👈 把 -11px 改成 -5px 或 0px，左邊就會往右縮了！ */
-                
-            }
-
-            /* 🌟 2. 左邊整體標籤再縮小：高度從 32px 縮減到 28px，字體更精緻 */
-            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
-            .d3-filter-section .d3-custom-scrollbar > div { 
-                padding: 2px 8px !important; 
-                margin-bottom: 2px !important; 
-                height: 32px !important;       /* 👈 高度縮小為 32px */
-                min-height: 32px !important; 
-                max-height: 32px !important; 
-                box-sizing: border-box !important;
-                display: flex !important; 
-                align-items: center !important;
-            }
-            
-            /* 左側字型與勾選方塊同步縮小 */
-            .d3-filter-section div label { font-size: 11px !important; white-space: nowrap; margin: 0 !important; cursor: pointer; } 
-            .d3-filter-section input[type="checkbox"] { margin-right: 5px !important; margin-top: 0 !important; margin-bottom: 0 !important; width: 13px !important; height: 13px !important; transform: scale(1.1) !important; margin-left: -2px !important;} 
-            .d3-filter-section .d3-item-text { font-size: 11px !important; line-height: 1 !important; } 
-            .d3-item-badge { font-size: 11px !important; padding: 2px 4px !important; }
-            
-            /* 右側搜尋車次維持原本較大的 32px，並精準對齊左側按鈕高度 */
+            /* 右側搜尋框精準設定 */
             .d3-search-input-field { 
+                width: 100% !important;
                 font-size: 13px !important; 
                 padding: 6px 8px !important; 
-                
-                /* 👇 加上這行：利用負數把輸入框往上拉，對齊左邊第一個按鈕 */
-                margin-top: -6px !important;  
-                
-                margin-bottom: 3.5px !important; 
+                margin-top: 0px !important;    
+                margin-bottom: 2px !important; 
+                margin-left: 0px !important;
                 flex: 0 0 auto !important; 
                 height: 32px !important; 
                 box-sizing: border-box !important;
             }
-            .d3-search-section .d3-item-text { font-size: 13px !important; } 
             
             /* ========================================= */
-            /* 🌟 左側滑動容器：補回底部緩衝空間(留底)，避免字被圓角切掉 */
+            /* 🌟 排版大統一：徹底解決打架問題，按鈕與車種完美對齊！ */
             /* ========================================= */
-            .d3-filter-section .d3-custom-scrollbar {
-                /* 👈 關鍵修復：上、左右為 0，但底部補回 6px 的留白，讓它跟右邊一模一樣！ */
-                padding: 0 0 6px 0 !important; 
-                
-                /* 👇 這裡維持把整個滑動箱子往左移的設定 */
-                margin-left: -5px !important;  
-                width: 103% !important;      
-                margin-top: 0px !important; 
-                margin-bottom: 0px !important;
+            
+            /* 1. 共同基礎設定 (高度、圓角) */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
+            .d3-filter-section .d3-custom-scrollbar > div,
+            .d3-search-section #d3-search-results > div { 
+                height: 32px !important;       
+                min-height: 32px !important; 
+                max-height: 32px !important; 
+                overflow: hidden !important;   
+                border-radius: 6px !important; 
+                margin-top: 0px !important;
+                margin-bottom: 2px !important; 
+                border: none !important;       
+                box-sizing: border-box !important;
+                display: flex !important; 
+                align-items: center !important;
+                line-height: 1 !important;     
+            }
+
+            /* 2. 左側專屬 (按鈕+車種)：內距縮減為 6px，內容整體向左靠 */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
+            .d3-filter-section .d3-custom-scrollbar > div {
+                padding: 0 6px !important; 
+            }
+
+            /* 3. 右側專屬 (車次搜尋)：內距維持 10px，不跟著左邊縮 */
+            .d3-search-section #d3-search-results > div {
+                padding: 0 10px !important;
+                width: 100% !important;
+                margin-left: 0px !important;
+            }
+
+            /* 4. 左側按鈕寬度：最純粹的 100% */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar) {
+                width: calc(100% - 4px) !important;
+                margin-left: 0px !important;
                 margin-right: 0px !important;
-                
-                /* 👇 維持原有的捲動與隱藏捲軸設定 */
-                flex: 1 !important;          
+            }
+
+            /* 5. 左側車種寬度：完美抵銷隱形捲軸加寬的 5px，達成上下絕對齊平！ */
+            .d3-filter-section .d3-custom-scrollbar > div {
+                width: calc(100% - 8px) !important; 
+                margin-left: 0px !important;
+                margin-right: 0px !important;
+            }
+
+            /* 消除最後一個元素的底部間距 */
+            .d3-filter-section .d3-custom-scrollbar > div:last-child,
+            .d3-search-section #d3-search-results > div:last-child { 
+                margin-bottom: 0px !important; 
+            }
+            
+            /* 左邊字型細節與勾選方塊 */
+            .d3-filter-section div label { font-size: 11px !important; white-space: nowrap; margin: 0 !important; cursor: pointer; } 
+            .d3-filter-section input[type="checkbox"] { margin-right: 5px !important; margin-top: 0 !important; margin-bottom: 0 !important; width: 13px !important; height: 13px !important; transform: scale(1.1) !important; margin-left: -2px !important;} 
+            .d3-filter-section .d3-item-text { font-size: 11px !important; line-height: 1 !important; } 
+            .d3-item-badge { font-size: 10px !important; line-height: 1.1 !important; padding: 2px 4px !important; display: inline-block !important; text-align: center !important; }
+            .d3-search-section .d3-item-text { font-size: 11px !important; line-height: 1 !important; } 
+            
+            /* ========================================= */
+            /* 🌟 終極滑動容器與 5px 捲軸空間抵銷術 */
+            /* ========================================= */
+            .d3-filter-section .d3-custom-scrollbar,
+            .d3-search-section #d3-search-results {
+                flex: 1 1 0 !important;          
                 min-height: 0 !important;    
-                height: 100% !important; 
+                height: 0 !important; 
                 max-height: none !important; 
                 overflow-y: auto !important; 
                 overflow-x: hidden !important; 
-                scrollbar-width: none !important;    
-                -ms-overflow-style: none !important; 
+                box-sizing: border-box !important;
+                margin-bottom: 0px !important;
+                margin-top: 0px !important;      
+                gap: 0px !important;             
+
+                width: calc(100% + 5px) !important; 
+                margin-right: -5px !important;      
+                padding-right: 0px !important; 
+                margin-left: 0px !important; 
+            }
+
+            /* 👇 獨立控制左右兩邊的底部緩衝留白 */
+            .d3-filter-section .d3-custom-scrollbar {
+                padding-bottom: 12px !important; 
             }
             
-            /* ========================================= */
-            /* 4. 讓下方標籤乖乖待在已經移好位置的箱子裡 */
-            /* ========================================= */
-            .d3-filter-section .d3-custom-scrollbar > div {
-                margin-bottom: 2px !important;
-                
-                /* 👇 因為箱子已經往左移了，標籤只要 0px 跟 100% 填滿就好，圓角保證絕對安全！ */
-                margin-left: 0px !important;   
-                width: 100% !important;        
-                border-radius: 6px !important; 
-                box-sizing: border-box !important;
+            .d3-search-section #d3-search-results {
+                padding-bottom: 32px !important; 
             }
 
+            .d3-top-section-container.timetable-open .d3-search-section #d3-search-results {
+                padding-bottom: 36px !important; 
+            }
+
+            .d3-filter-section .d3-custom-scrollbar::-webkit-scrollbar,
+            .d3-search-section #d3-search-results::-webkit-scrollbar { display: none !important; }
+            .d3-filter-section .d3-custom-scrollbar,
+            .d3-search-section #d3-search-results { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+
             .d3-search-section::after {
-    content: "" !important;
-    position: absolute !important;
-    left: 4px !important;
-    right: 10px !important;
-    bottom: 0 !important;
-    height: 25px !important;
-    background: #141c2e !important;
-    border-radius: 0 0 8px 0 !important;
-    pointer-events: none !important;
-    z-index: 20 !important;
-}
-/* 📱 左右清單底部對齊，最後一筆保留完整顯示空間 */
+                content: "" !important;
+                position: absolute !important;
+                left: 4px !important;
+                right: 10px !important;
+                bottom: 0 !important;
+                height: 25px !important;
+                background: #141c2e !important;
+                border-radius: 0 0 8px 0 !important;
+                pointer-events: none !important;
+                z-index: 20 !important;
+            }
 
-.d3-filter-section .d3-custom-scrollbar,
-.d3-search-section #d3-search-results {
-    flex: 1 1 0 !important;
-    min-height: 0 !important;
-    height: 0 !important;
-    max-height: none !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    box-sizing: border-box !important;
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-}
+            /* ========================================= */
+            /* 🌟 時刻表比例 */
+            /* ========================================= */
+            #d3-timetable-section { 
+                flex: 1 1 auto !important;     
+                margin-top: -20px !important;  
+                margin-bottom: 0px !important; 
+                position: relative !important;
+                z-index: 50 !important;
+                background-color: #131b2d !important; 
+                border-top-left-radius: 12px !important;
+                border-top-right-radius: 12px !important;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.3) !important;
+                max-height: 300px !important;  
+            }
+            
+            #d3-timetable-section .d3-custom-scrollbar { 
+                max-height: none !important;     
+                flex: 1 1 auto !important;       
+            }
 
-/* 左右最後一筆都不額外增加外距 */
-.d3-filter-section .d3-custom-scrollbar > div:last-child,
-.d3-search-section #d3-search-results > div:last-child {
-    margin-bottom: 0 !important;
-}
+            /* ========================================= */
+            /* 🌟 最終微調：內容向左對齊標題的「🎛️」表情符號 */
+            /* ========================================= */
+            
+            /* 1. 將按鈕與車種的「左側內距」極度縮小至 2px，讓內容完美向左貼齊表情符號 */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
+            .d3-filter-section .d3-custom-scrollbar > div {
+                padding-left: 2px !important;   /* 👈 讓文字與打勾方塊向左靠 */
+                padding-right: 8px !important;  /* 👈 保持右側數字圓餅的呼吸空間，不要太貼邊 */
+            }
 
-/* 隱藏捲軸 */
-.d3-filter-section .d3-custom-scrollbar::-webkit-scrollbar,
-.d3-search-section #d3-search-results::-webkit-scrollbar {
-    display: none !important;
-}
+            /* 2. 修正打勾方塊原本被設定的負邊距，讓它乖乖切齊新的邊緣不亂跑 */
+            .d3-filter-section input[type="checkbox"] { 
+                margin-left: 0px !important; 
+            }
 
-.d3-filter-section .d3-custom-scrollbar,
-.d3-search-section #d3-search-results {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
+            /* ========================================= */
+            /* 🌟 最終邊界修復：找回被吃掉的左側圓角，並精準對齊表情符號 */
+            /* ========================================= */
+            
+            /* 1. 給予左側面板 8px 的安全距離，脫離最邊緣的裁切區，圓角瞬間回歸！ */
+            .d3-filter-section {
+                padding-left: 8px !important; 
+            }
 
-/\* 隱藏右側捲軸 \*/
-.d3-search-section #d3-search-results::-webkit-scrollbar {
-display: none !important;
-}
+            /* 2. 嚴格禁止負數外距，確保按鈕與車種的左側背景邊界絕對平齊 */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
+            .d3-filter-section .d3-custom-scrollbar > div {
+                margin-left: 0px !important; 
+            }
 
-/\* 4. 左側清單同樣填滿剩餘空間 \*/
-.d3-filter-section .d3-custom-scrollbar {
-flex: 1 1 0 !important;
-min-height: 0 !important;
-height: 0 !important;
-max-height: none !important;
-overflow-y: auto !important;
-overflow-x: hidden !important;
-}
-/* 📱 右側車次清單：新增底部滑動緩衝 */
-.d3-search-section #d3-search-results {
-
-margin-top: -9px !important;
-padding-bottom: 18px !important;
-box-sizing: content-box !important;
-}
-
+            /* 3. 內部留白微調，讓打勾方塊精準對齊上方的「🎛️」表情符號 */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar),
+            .d3-filter-section .d3-custom-scrollbar > div {
+                padding-left: 4px !important; 
+            }
+            
+            /* 4. 取消打勾方塊原本被設定的負邊距，讓它乖乖待在對齊線上 */
+            .d3-filter-section input[type="checkbox"] { 
+                margin-left: 0px !important; 
+            }
+        }
     `;
     document.head.appendChild(style);
 }
@@ -435,9 +497,17 @@ function _clearHighlight() {
     _updateAllPathVisuals();
     _refreshSearchResults();
     
-    // 🌟 新增：點擊畫布空白處時，連同快速時刻表一起隱藏
+    // 隱藏電腦版/未展開時的快速時刻表
     const qtc = document.getElementById('d3-quick-timetable-section');
     if (qtc) qtc.style.display = 'none';
+
+    // 🌟 加上這段：點擊空白處時，也連帶關閉主面板的時刻表，並且把打勾取消
+    const mainTs = document.getElementById('d3-timetable-section');
+    if (mainTs) mainTs.style.display = 'none'; // 這會自動觸發上面的監視器，把高度變回 340px！
+    
+    const toggleCb = document.getElementById('d3-timetable-toggle');
+    if (toggleCb) toggleCb.checked = false;
+    _isTimetableMode = false;
 }
 
 // ==========================================
@@ -907,7 +977,7 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 let diff = Math.abs(stop.loc + 50 - clickY);
                 if (diff < minDiff) { minDiff = diff; targetStopId = stop.id; }
             });
-        }
+        }0
 
         const isQuick = targetContainerId === 'd3-quick-timetable-section';
         const closeScript = isQuick
@@ -922,14 +992,14 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             </div>`;
             
 // 🌟 列表容器：將 background 改為 transparent，確保不會有死硬的黑底露出！
-let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 224px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
+let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 213px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
 
 // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
 // 🌟 表頭列：將 padding 統一改為 8px 16px，讓高度與資料列完全相同
         listHTML += `
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:6.5px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
                 <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
-                    <span style="display:inline-block; width: 28px;"></span><span>車站</span>
+                    <span style="display:inline-block; width: 27.9px;"></span><span>車站</span>
                 </span>
                 <span style="flex: 1; text-align: center;">到站</span>
                 <span style="flex: 1; text-align: center;">離站</span>
@@ -1391,18 +1461,33 @@ function _init_ui_panels() {
     Object.assign(timetableSection.style, {
         display: 'none', 
         flexDirection: 'column', 
-        padding: '0', // 👈 拔除底部的 12px 死角
+        padding: '0', 
         borderTop: '1px solid rgba(255,255,255,0.1)', 
-        background: 'transparent', // 👈 改為透明，自然融合主面板底色
-        borderBottomLeftRadius: '12px',  // 👈 強制加上左下圓角
-        borderBottomRightRadius: '12px', // 👈 強制加上右下圓角
-        overflow: 'hidden', // 👈 強制裁切內部超出圓角的資料列
+        background: 'transparent', 
+        borderBottomLeftRadius: '12px',  
+        borderBottomRightRadius: '12px', 
+        overflow: 'hidden', 
         flex: '1 1 auto',
         minHeight: '0'
     });
 
     panelBody.appendChild(topSectionContainer);
     panelBody.appendChild(timetableSection);
+
+    // 🌟🌟🌟 終極高度監視器：全平台通用版 (負責貼標籤)
+    const timetableObserver = new MutationObserver(() => {
+        // 確保先清除之前可能殘留的強制行內高度，把排版權還給 CSS
+        topSectionContainer.style.removeProperty('height'); 
+        
+        if (timetableSection.style.display === 'flex') {
+            // 時刻表打開時，加上通用標籤
+            topSectionContainer.classList.add('timetable-open');
+        } else {
+            // 時刻表關閉時，移除標籤
+            topSectionContainer.classList.remove('timetable-open');
+        }
+    });
+    timetableObserver.observe(timetableSection, { attributes: true, attributeFilter: ['style'] });
 
     // --- 觸發按鈕 ---
     const toggleBtn = document.createElement('button');
