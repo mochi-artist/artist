@@ -101,6 +101,7 @@ const _filterCategories = [
 ];
 
 // 注入美化捲軸與響應式 CSS
+// 注入美化捲軸與響應式 CSS
 if (!document.getElementById('d3-custom-styles')) {
     const style = document.createElement('style');
     style.id = 'd3-custom-styles';
@@ -122,12 +123,77 @@ if (!document.getElementById('d3-custom-styles')) {
         /* ========================================= */
         @media (min-width: 769px) {
             .d3-top-section-container { 
-                height: 340px !important; 
+                height: 365px !important; 
                 transition: height 0.2s ease !important; 
             }
             .d3-top-section-container.timetable-open { 
                 height: 315px !important; 
             }
+
+            /* ========================================= */
+            /* 🌟 電腦版對齊魔法：左右完美「水平切齊」與「等高」 */
+            /* ========================================= */
+            
+            /* 1. 讓右側(搜尋區)的區塊間距與左側(過濾區)一模一樣，徹底解決高低落差 */
+            .d3-search-section {
+                gap: 2px !important;
+            }
+
+            /* 2. 左側按鈕高度鎖死 32px */
+            .d3-filter-section > div:not(.d3-panel-title):not(.d3-custom-scrollbar) {
+                height: 32px !important;
+                box-sizing: border-box !important;
+            }
+
+            /* 3. 右側搜尋框高度鎖死 32px，並將偏移量「歸零」，讓系統自動完美對齊！ */
+            .d3-search-input-field {
+                height: 32px !important;
+                box-sizing: border-box !important;
+                margin-top: 0px !important; 
+            }
+            /* ========================================= */
+            /* 🧽 電腦版專屬：左右隱形防撞海綿區 */
+            /* ========================================= */
+
+            /* 👇 左邊海綿 (車種過濾)：維持去底設定 */
+            .d3-filter-section .d3-custom-scrollbar {
+                padding-bottom: 0px !important; 
+            }
+
+            /* 👇 右邊海綿 (車次搜尋) */
+            .d3-search-section #d3-search-results {
+                padding-bottom: 0px !important; 
+                margin-top: 4px !important;          /* 👈 魔法 1：用這個把清單頂部往下推 */
+                max-height: 250px !important;        /* 👈 魔法 2：顯示數量的關鍵！238px 剛好完美容納 7 個車次！ */
+            }
+
+            /* ========================================= */
+            /* 📱 專屬魔法：只調「手機版 + 懸浮時刻表(圖1)」的文字位置 */
+            /* ========================================= */
+            
+            /* 1️⃣ 調整「車站」：改 width (數字變大👉往右推，變小👈往左縮) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(1) > span:first-child {
+                width: 42px !important; 
+            }
+
+            /* 2️⃣ 調整「到站」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(2) {
+                position: relative !important;
+                left: -7.5px !important; 
+            }
+
+            /* 3️⃣ 調整「離站」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(3) {
+                position: relative !important;
+                left: -14.5px !important; 
+            }
+
+            /* 4️⃣ 調整「備註」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(4) {
+                position: relative !important;
+                left: -8.8px !important; 
+            }
+
         }
 
         /* ========================================= */
@@ -300,7 +366,7 @@ if (!document.getElementById('d3-custom-styles')) {
                 border-top-left-radius: 12px !important;
                 border-top-right-radius: 12px !important;
                 box-shadow: 0 -4px 10px rgba(0,0,0,0.3) !important;
-                max-height: 300px !important;  
+                max-height: 289px !important;  
             }
             
             #d3-timetable-section .d3-custom-scrollbar { 
@@ -349,7 +415,35 @@ if (!document.getElementById('d3-custom-styles')) {
             .d3-filter-section input[type="checkbox"] { 
                 margin-left: 0px !important; 
             }
-        }
+
+            /* ========================================= */
+            /* 📱 專屬魔法：只調「手機版 + 懸浮時刻表(圖1)」的文字位置 */
+            /* ========================================= */
+            
+            /* 1️⃣ 調整「車站」：改 width (數字變大👉往右推，變小👈往左縮) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(1) > span:first-child {
+                width: 27px !important; 
+            }
+
+            /* 2️⃣ 調整「到站」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(2) {
+                position: relative !important;
+                left: -2.5px !important; 
+            }
+
+            /* 3️⃣ 調整「離站」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(3) {
+                position: relative !important;
+                left: -5.5px !important; 
+            }
+
+            /* 4️⃣ 調整「備註」：改 left (正數👉往右移，負數👈往左移) */
+            #d3-quick-timetable-section .d3-custom-scrollbar > div:first-child > span:nth-child(4) {
+                position: relative !important;
+                left: -3.8px !important; 
+            }
+
+        } /* 👈 這是原本 @media (max-width: 768px) 的結束大括號 */
     `;
     document.head.appendChild(style);
 }
@@ -741,7 +835,11 @@ function _ensureQuickTimetableContainer() {
             /* 手機版設定 (維持原樣) */
             @media (max-width: 768px) {
                 #d3-quick-timetable-section {
-                    width: 280px !important;
+                    width: 270px !important;
+                }
+                #d3-quick-timetable-section .d3-custom-scrollbar {
+                    /* 👇 這裡的數字越大，時刻表就越長、能顯示的車站就越多！ */
+                    max-height: 256px !important; 
                 }
             }
             
@@ -919,7 +1017,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             
             // 🌟 2. 只要有 _LOOP，就動態加上 (環島) 字樣
             if (String(id).endsWith('_LOOP')) {
-                // 先清除可能重複的字眼，再補上
                 stationName = stationName.replace('(環島)', '') + '(環島)'; 
             }
 
@@ -977,34 +1074,50 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 let diff = Math.abs(stop.loc + 50 - clickY);
                 if (diff < minDiff) { minDiff = diff; targetStopId = stop.id; }
             });
-        }0
+        }
 
         const isQuick = targetContainerId === 'd3-quick-timetable-section';
         const closeScript = isQuick
             ? `document.getElementById('d3-quick-timetable-section').style.display='none';`
             : `document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;`;
 
-        // 🌟 標題列：將 padding 統一改為 8px 16px，讓高度與下方對齊
+        // 🌟 標題列：拔除會干擾的 d3-panel-title，完全開放 px 給你手動微調
         const titleHTML = `
-            <div class="d3-panel-title" style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; margin-bottom:0px; padding:8px 16px; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: -1px; background: #131b2d; z-index: 10; transform: translateZ(0);">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: -1px; background: #131b2d; z-index: 10; transform: translateZ(0);
+                        font-size: 14px; 
+                        padding-top: 10px; 
+                        padding-bottom: 10px; 
+                        padding-left: 16px; 
+                        padding-right: 16px; 
+                        margin-bottom: 0px;">
                 <span style="pointer-events: none;">🕒 <b>${display_train_no}</b> 車次時刻表</span>
                 <button onclick="${closeScript}" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1; display:flex; align-items:center;">&times;</button>
             </div>`;
             
-// 🌟 列表容器：將 background 改為 transparent，確保不會有死硬的黑底露出！
-let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 213px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
+        // 🌟 列表容器：將 background 改為 transparent，確保不會有死硬的黑底露出！
+        let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 213px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
 
-// 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
-// 🌟 表頭列：將 padding 統一改為 8px 16px，讓高度與資料列完全相同
+        // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
+        // 🌟 表頭列：將 padding 統一改為 8px 16px，讓高度與資料列完全相同
         listHTML += `
-            <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:6.5px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#8ab4f8; padding:6.5px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
+                
+                <!-- 1️⃣ 調整「車站」：改 width 的數值 (數字變大👉往右移，數字變小👈往左移) -->
                 <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
-                    <span style="display:inline-block; width: 27.9px;"></span><span>車站</span>
+                    <span style="display:inline-block; width: 27.5px;"></span><span>車站</span>
                 </span>
-                <span style="flex: 1; text-align: center;">到站</span>
-                <span style="flex: 1; text-align: center;">離站</span>
-                <span style="flex: 1; text-align: center;">備註</span>
+                
+                <!-- 2️⃣ 調整「到站」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
+                <span style="flex: 1; text-align: center; position: relative; left: -4px;">到站</span>
+                
+                <!-- 3️⃣ 調整「離站」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
+                <span style="flex: 1; text-align: center; position: relative; left: -8px;">離站</span>
+            
+                <!-- 4️⃣ 調整「備註」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
+                <span style="flex: 0.8; text-align: center; position: relative; left: -5px;">備註</span>
+                
             </div>`;
+
         if (mergedStops.length === 0) {
             listHTML += `<div style="color:#888; text-align:center; padding:10px 0; font-size:12px;">此路線範圍內無停靠資料</div>`;
         } else {
@@ -1171,6 +1284,7 @@ let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container
 // 🌟 UI 控制中心 (時刻表填滿橫行 + 放大鏡連動關閉版)
 // ==========================================
 function _init_ui_panels() {
+    
     if (document.getElementById('d3-ui-wrapper')) return;
 
     const wrapper = document.createElement('div');
@@ -1671,12 +1785,24 @@ async function _fetchAndShowTimetable(pathId, display_train_no) {
                     <button onclick="document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1;">&times;</button>
                 </div>
                 
-                <!-- 第二排：欄位名稱 -->
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#8ab4f8; padding:0 8px 6px 8px; border-bottom:1px solid #334155; margin-bottom: 4px;">
-                    <span style="flex: 1.2; text-align: left; padding-left: 60px;">車站</span>
-                    <span style="flex: 1; text-align: center;">到站</span>
-                    <span style="flex: 1; text-align: center;">離站</span>
-                    <span style="flex: 0.8; text-align: center;">備註</span>
+                <!-- 第二排：欄位名稱 (已套用自由微調 px 魔法！) -->
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#8ab4f8; padding:0 8px 6px 8px; border-bottom:1px solid #334155; margin-bottom: 4px;">
+                    
+                    <!-- 1️⃣ 調整「車站」：改 left 的數字 (正數👉往右移，負數👈往左移) -->
+                    <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
+                        <span style="display:inline-block; width: 3000000px;"></span>
+                        <span style="position: relative; left: 0px;">車站</span>
+                    </span>
+                    
+                    <!-- 2️⃣ 調整「到站」：改 left 的數字 (正數👉往右移，負數👈往左移) -->
+                    <span style="flex: 1; text-align: center; position: relative; left: 0px;">到站</span>
+                    
+                    <!-- 3️⃣ 調整「離站」：改 left 的數字 (正數👉往右移，負數👈往左移) -->
+                    <span style="flex: 1; text-align: center; position: relative; left: 0px;">離站</span>
+                    
+                    <!-- 4️⃣ 調整「備註」：改 left 的數字 (正數👉往右移，負數👈往左移) -->
+                    <span style="flex: 0.8; text-align: center; position: relative; left: 0px;">備註</span>
+                    
                 </div>
                 
             </div>`;
