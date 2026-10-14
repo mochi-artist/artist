@@ -14,7 +14,8 @@ PENDING_FILE = "pending_trains.json"
 CATCH_LOG_FILE = "catch_log.txt"      
 MERGED_HISTORY_FILE = "merged_history.txt"  # 🌟 新增：永久保存已合併車次的歷史紀錄檔
 TRAIN_ID_KEY = "Train"
-START_DATE = 20260101
+# 🌟 自動取得台灣時間「今天」的 YYYYMMDD 數值 (例如 20261015)，只掃描今天以後的檔案
+START_DATE = int((datetime.utcnow() + timedelta(hours=8)).strftime("%Y%m%d"))
 EXCLUDE_PREFIXES = ["29", "47", "48", "49", "6631", "6632", "6633"]
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]
 
