@@ -929,7 +929,7 @@ function _ensureQuickTimetableContainer() {
 }
 
 // ==========================================
-// 🌟 產生時刻表內容與點擊跳轉 (完美橫向填滿 + 色調融合)
+// 🌟 產生時刻表內容與點擊跳轉 (嚴格依據 data 判定環島標籤)
 // ==========================================
 async function _showTimetable(pathId, display_train_no, clickY, targetContainerId = 'd3-timetable-section') {
     const container = document.getElementById(targetContainerId);
@@ -953,7 +953,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         const hasSpecialChars = /[a-zA-Z\u4e00-\u9fa5]/.test(display_train_no);
         const railyards = hasSpecialChars ? [] : ['1045', '1145', '5999'];
 
-        // 🌟 核心修正 1：提早取得 D3 原始資料，撈回帶有 (林) / (高) 的原始車次號碼
         const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
         if (!d3TrainData || !d3TrainData.rawData) throw new Error("無法取得該車次的繪圖原始資料");
         
@@ -963,8 +962,10 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         let trueOriginId = null;
         let trueDestId = null;
 
+        // 🌟 只看 data (trainInfo.TimeInfos)：記錄「同車次內出現兩次以上」或「Station 為 1001」的車站
+        const loopStationCleanIds = new Set();
+
         if (rawJsonData && rawJsonData.TrainInfos) {
-            // 🌟 核心修正 2：優先使用 original_train_no (例如 821(日)(林)) 去 JSON 裡精準尋找！
             const trainInfo = rawJsonData.TrainInfos.find(t => 
                 String(t.Train) === original_train_no || 
                 String(t.TrainNo) === original_train_no || 
@@ -975,18 +976,43 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             if (trainInfo && trainInfo.TimeInfos) {
                 const timeInfos = JSON.parse(JSON.stringify(trainInfo.TimeInfos));
                 
-                timeInfos.forEach((ti, index) => {
-                    // 🌟 無差別環島判定：只要最後一站等於第一站，強制加上 _LOOP
-                    if (timeInfos.length > 2 && index === timeInfos.length - 1 && ti.Station === timeInfos[0].Station) {
-                        ti.Station = ti.Station + '_LOOP';
+                // 1. 統計 data 內該車次各個 Station 出現的次數
+                const stCounts = {};
+                timeInfos.forEach(ti => {
+                    const rawSt = String(ti.Station);
+                    const cleanSt = (rawSt === '1001') ? '1000' : rawSt.replace('_LOOP', '');
+                    if (rawSt === '1001') {
+                        loopStationCleanIds.add('1000'); // 有 "Station": "1001"
                     }
-                    if (String(ti.Station) === '1001') {
-                        ti.Station = '1000_LOOP'; // 相容舊版資料
+                    stCounts[cleanSt] = (stCounts[cleanSt] || 0) + 1;
+                });
+
+                // 同一個車次內有兩個相同車站
+                Object.keys(stCounts).forEach(st => {
+                    if (stCounts[st] >= 2) {
+                        loopStationCleanIds.add(st);
                     }
+                });
+
+                // 2. 建立時間表：只有真正符合環島條件的第二個相同車站或 1001 才加上 _LOOP
+                const seenInData = new Set();
+                timeInfos.forEach((ti) => {
+                    const rawSt = String(ti.Station);
+                    const cleanSt = (rawSt === '1001') ? '1000' : rawSt.replace('_LOOP', '');
+
+                    if (rawSt === '1001') {
+                        ti.Station = '1000_LOOP';
+                    } else if (loopStationCleanIds.has(cleanSt) && seenInData.has(cleanSt)) {
+                        ti.Station = cleanSt + '_LOOP';
+                    } else {
+                        ti.Station = cleanSt;
+                    }
+
+                    seenInData.add(cleanSt);
                     exactTimes[String(ti.Station)] = { arr: ti.ARRTime, dep: ti.DEPTime };
                 });
 
-                const validJsonStops = timeInfos.filter(ti => !railyards.includes(String(ti.Station)));
+                const validJsonStops = timeInfos.filter(ti => !railyards.includes(String(ti.Station).replace('_LOOP', '')));
                 if (validJsonStops.length > 0) {
                     trueOriginId = String(validJsonStops[0].Station);
                     trueDestId = String(validJsonStops[validJsonStops.length - 1].Station);
@@ -999,56 +1025,59 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
         
         if (typeof LinesStationsForBackground !== 'undefined' && _currentLineKind) {
             const stationsOnPage = LinesStationsForBackground[_currentLineKind];
-            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID));
+            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID).replace('_LOOP', ''));
             if (validStationIds.includes('1000')) validStationIds.push('1001');
         }
 
         let allMergedStops = [];
+        const seenInMerged = new Set();
+
         rawData.forEach((stationPoint) => {
             let [stationName, id, time, loc, stop] = stationPoint;
-            
-            // 🌟 新增：清理站名，移除高鐵與林鐵專屬的 (高) / (林) 標籤 (兼容全形與半形括號)
-            stationName = stationName.replace(/[(（][高林][)）]/g, '');
-
-            // 🌟 1. 將舊版 1001 統一轉為標準的 _LOOP 格式，且【不要】把 _LOOP 刪除
-            if (String(id) === '1001') {
-                id = '1000_LOOP';
-            }
-            
-            // 🌟 2. 只要有 _LOOP，就動態加上 (環島) 字樣
-            if (String(id).endsWith('_LOOP')) {
-                stationName = stationName.replace('(環島)', '') + '(環島)'; 
-            }
-
             const isStop = parseInt(stop, 10) !== -1;
-            if (isStop) {
-                // 🌟 3. 帶著 _LOOP 存入陣列，這樣才不會跟起點站撞名！
-                if (allMergedStops.length > 0 && allMergedStops[allMergedStops.length - 1].id === String(id)) {
-                    allMergedStops[allMergedStops.length - 1].depTime = time;
-                } else {
-                    allMergedStops.push({ stationName, id: String(id), arrTime: time, depTime: time, loc });
-                }
+            if (!isStop) return;
+            
+            // 清理站名
+            stationName = stationName.replace(/[(（][高林][)）]/g, '').replace('(環島)', '');
+
+            const rawIdStr = String(id);
+            const cleanId = (rawIdStr === '1001') ? '1000' : rawIdStr.replace('_LOOP', '');
+
+            // 合併同一站的到站與離站時間
+            if (allMergedStops.length > 0 && allMergedStops[allMergedStops.length - 1].cleanId === cleanId) {
+                allMergedStops[allMergedStops.length - 1].depTime = time;
+                return;
             }
+
+            // 🌟 3. 嚴格依據 data 判定是否加上 (環島)：
+            // 必須是 data 中認證的 loopStationCleanIds，且為第二次出現 (或原始 ID 為 1001 / 第二段 _LOOP)
+            const isLoopStation = loopStationCleanIds.has(cleanId) && (
+                rawIdStr === '1001' ||
+                seenInMerged.has(cleanId) ||
+                (rawIdStr.endsWith('_LOOP') && pathId !== baseId)
+            );
+
+            seenInMerged.add(cleanId);
+
+            const finalId = isLoopStation ? `${cleanId}_LOOP` : cleanId;
+            if (isLoopStation) {
+                stationName = stationName + '(環島)';
+            }
+
+            allMergedStops.push({ stationName, id: finalId, cleanId, arrTime: time, depTime: time, loc });
         });
 
-       allMergedStops.forEach((stop, index) => {
-            // 先取得乾淨的車站代碼 (移除 _LOOP 後綴)，確保比對絕對精準
+        allMergedStops.forEach((stop) => {
             const cleanStopId = String(stop.id).replace('_LOOP', '');
 
             if (railyards.includes(stop.id) || railyards.includes(cleanStopId)) stop.remark = "調車場";
             else if (stop.id === trueOriginId) stop.remark = "起站";
             else if (stop.id === trueDestId) stop.remark = "終點";
             else {
-                // 判斷該站是否有停靠 (到站時間 !== 離站時間)
-                let isStopping = exactTimes[stop.id] ? (exactTimes[stop.id].arr !== exactTimes[stop.id].dep) : (stop.arrTime !== stop.depTime);
-                
-                // 取得當前車次號碼
+                let timeObj = exactTimes[stop.id] || exactTimes[cleanStopId];
+                let isStopping = timeObj ? (timeObj.arr !== timeObj.dep) : (stop.arrTime !== stop.depTime);
                 const baseTrainNo = original_train_no.replace(/-End$/, '');
-                
-                // 讀取該車次的客製化 OpStops 運轉停車名單
                 const myOpStops = window._opStopsData ? (window._opStopsData[baseTrainNo] || []) : [];
-                
-                // 🌟 真正修正：這些是「車站代碼」，只要火車在這些號誌站有停靠，就一定是運轉停車！
                 const specialOpStopStations = ['2115', '3355', '5170', '5175', '5180'];
                 
                 if (myOpStops.includes(String(stop.id)) || myOpStops.includes(cleanStopId) || (specialOpStopStations.includes(cleanStopId) && isStopping)) {
@@ -1059,7 +1088,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             }
         });
 
-        // 🌟 5. 篩選掉非本頁面的車站 (比對時才把 _LOOP 暫時拿掉)
         let mergedStops = allMergedStops.filter(stop => {
             if (validStationIds.length === 0) return true;
             let real_id = stop.id.replace('_LOOP', '');
@@ -1081,49 +1109,34 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             ? `document.getElementById('d3-quick-timetable-section').style.display='none';`
             : `document.getElementById('d3-timetable-section').style.display='none'; const cb = document.getElementById('d3-timetable-toggle'); if(cb) cb.checked=false; _isTimetableMode=false;`;
 
-        // 🌟 標題列：拔除會干擾的 d3-panel-title，完全開放 px 給你手動微調
         const titleHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; color:#fbbc04; border-bottom:1px solid rgba(255,255,255,0.1); position: sticky; top: -1px; background: #131b2d; z-index: 10; transform: translateZ(0);
-                        font-size: 14px; 
-                        padding-top: 10px; 
-                        padding-bottom: 10px; 
-                        padding-left: 16px; 
-                        padding-right: 16px; 
-                        margin-bottom: 0px;">
+                        font-size: 14px; padding-top: 10px; padding-bottom: 10px; padding-left: 16px; padding-right: 16px; margin-bottom: 0px;">
                 <span style="pointer-events: none;">🕒 <b>${display_train_no}</b> 車次時刻表</span>
                 <button onclick="${closeScript}" style="background:none; border:none; color:#94a3b8; font-size:22px; padding:0; cursor:pointer; line-height:1; display:flex; align-items:center;">&times;</button>
             </div>`;
             
-        // 🌟 列表容器：將 background 改為 transparent，確保不會有死硬的黑底露出！
         let listHTML = `<div class="d3-custom-scrollbar" id="d3-timetable-list-container-${targetContainerId}" style="max-height: 213px; overflow-y: auto; display:flex; flex-direction:column; position:relative; background: transparent;">`;
 
-        // 🌟 表頭列：加入 box-shadow 與 transform 強制硬體加速貼合
-        // 🌟 表頭列：將 padding 統一改為 8px 16px，讓高度與資料列完全相同
         listHTML += `
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#8ab4f8; padding:6.5px 16px; border-bottom:1px solid rgba(255,255,255,0.1); margin: 0; position:sticky; top: -1px; background: #131b2d; z-index:5; transform: translateZ(0); box-shadow: 0 -1px 0 #131b2d;">
-                
-                <!-- 1️⃣ 調整「車站」：改 width 的數值 (數字變大👉往右移，數字變小👈往左移) -->
                 <span style="flex: 1.2; text-align: left; display:flex; align-items:center;">
                     <span style="display:inline-block; width: 27.5px;"></span><span>車站</span>
                 </span>
-                
-                <!-- 2️⃣ 調整「到站」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
                 <span style="flex: 1; text-align: center; position: relative; left: -4px;">到站</span>
-                
-                <!-- 3️⃣ 調整「離站」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
                 <span style="flex: 1; text-align: center; position: relative; left: -8px;">離站</span>
-            
-                <!-- 4️⃣ 調整「備註」：改 left 的數值 (正數👉往右移，負數👈往左移) -->
                 <span style="flex: 0.8; text-align: center; position: relative; left: -5px;">備註</span>
-                
             </div>`;
 
         if (mergedStops.length === 0) {
             listHTML += `<div style="color:#888; text-align:center; padding:10px 0; font-size:12px;">此路線範圍內無停靠資料</div>`;
         } else {
             mergedStops.forEach((stop) => {
-                let arrDisplay = exactTimes[stop.id] && exactTimes[stop.id].arr ? exactTimes[stop.id].arr.substring(0, 8) : formatTime(stop.arrTime);
-                let depDisplay = exactTimes[stop.id] && exactTimes[stop.id].dep ? exactTimes[stop.id].dep.substring(0, 8) : formatTime(stop.depTime);
+                const cleanStopId = String(stop.id).replace('_LOOP', '');
+                const timeObj = exactTimes[stop.id] || exactTimes[cleanStopId];
+
+                let arrDisplay = timeObj && timeObj.arr ? timeObj.arr.substring(0, 8) : formatTime(stop.arrTime);
+                let depDisplay = timeObj && timeObj.dep ? timeObj.dep.substring(0, 8) : formatTime(stop.depTime);
                 
                 arrDisplay = arrDisplay.replace(/:00$/, '.0').replace(/:30$/, '.5');
                 depDisplay = depDisplay.replace(/:00$/, '.0').replace(/:30$/, '.5');
@@ -1131,7 +1144,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 let remarkDisplay = stop.remark; 
                 let isTarget = (stop.id === targetStopId);
                 
-                // 🌟 恢復為透明底色，只有目標車站有淡淡的高亮
                 let bgStyle = isTarget ? 'rgba(56, 189, 248, 0.25)' : 'transparent';
                 let borderStyle = isTarget ? 'border-left: 3px solid #38bdf8;' : 'border-left: 3px solid transparent;';
 
@@ -1140,11 +1152,9 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 else if (remarkDisplay === '調車場') remarkColor = '#94a3b8'; 
                 else if (remarkDisplay === '通過') remarkColor = '#fbbf24'; 
                 else if (remarkDisplay === '停靠') remarkColor = '#4ade80'; 
-                // 🌟 新增：設定「運轉停車」專屬的紫色 (或是你喜歡的其他顏色)
                 else if (remarkDisplay === '運轉停車') remarkColor = '#c084fc'; 
 
                 let timeColumnsHTML = '';
-                // 🌟 修正：只讓「通過」隱藏到站時間（變成 -），運轉停車則保留雙時間！
                 if (remarkDisplay === '通過') { 
                     timeColumnsHTML = `
                         <span style="flex: 1; text-align: center; color:#aaa; font-size:12px; pointer-events:none;">-</span>
@@ -1157,7 +1167,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                     `;
                 }
 
-                // 🌟 核心修正：移除 margin、border-radius 與獨立背景色，加上 border-bottom 與 8px 16px 的舒適內距
                 listHTML += `
                     <div class="timetable-row" id="d3-stop-row-${targetContainerId}-${stop.id}" data-time="${stop.arrTime}" data-loc="${stop.loc}" 
                          style="display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:8px 16px; cursor:pointer; transition: background 0.2s; border-bottom:1px solid rgba(255,255,255,0.05); background:${bgStyle}; ${borderStyle}"
@@ -1184,27 +1193,17 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 
                 if (targetRow && listContainer) {
                     let scrollPos = 0;
-                    
                     if (window.innerWidth > 768) {
-                        // 🌟 電腦版專屬：精準計算表頭真實高度，讓跳轉車站完美貼合在表頭正下方
                         const header = listContainer.firstElementChild;
                         const headerHeight = header ? header.offsetHeight : 0;
-                        // 計算：目標車站的相對頂部位置 - 表頭高度 + 1px(補償 top: -1px 的偏差)
                         scrollPos = targetRow.offsetTop - headerHeight + 1;
                     } else {
-                        // 🌟 手機版：維持原本推到上一站的設定 (不動手機版邏輯)
                         let prevRow = targetRow.previousElementSibling;
                         let targetElement = (prevRow && prevRow.classList.contains('timetable-row')) ? prevRow : targetRow;
                         scrollPos = targetElement.offsetTop;
                     }
-                    
-                    // 執行內部捲動
-                    listContainer.scrollTo({
-                        top: scrollPos, 
-                        behavior: 'smooth'
-                    });
+                    listContainer.scrollTo({ top: scrollPos, behavior: 'smooth' });
 
-                    // 維持原本的變色特效
                     setTimeout(() => {
                         targetRow.style.background = 'rgba(255,255,255,0.05)';
                         targetRow.style.borderLeft = '3px solid transparent';
@@ -1223,7 +1222,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 const rawLoc = parseFloat(this.getAttribute('data-loc'));
                 if (isNaN(rawTime) || isNaN(rawLoc)) return;
 
-                // 點擊後關閉時刻表面板
                 container.style.display = 'none'; 
                 if (!isQuick) {
                     const toggleCb = document.getElementById('d3-timetable-toggle');
@@ -1239,14 +1237,10 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 }
 
                 const startHour = (typeof DiagramHours !== 'undefined' && DiagramHours.length > 0) ? DiagramHours[0] : 4;
-                
                 const svgX = rawTime * 10 - 1200 * startHour + 50;
                 const svgY = rawLoc + 50;
-                
                 const targetX = offsetX + svgX;
                 const targetY = offsetY + svgY;
-
-                // 讓錨點往下移一點，目標點就會偏畫面上方，對手機版特別好用
                 const shiftY = window.innerWidth <= 768 ? (window.innerHeight * 0.15) : 0;
 
                 const anchor = document.createElement('div');
@@ -1262,7 +1256,6 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
                 document.body.appendChild(anchor);
 
                 setTimeout(() => { 
-                    // 🌟 關鍵修復：從 nearest 改回 center，把目標車站無情地拉回視野中心！
                     anchor.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' }); 
                     setTimeout(() => document.body.removeChild(anchor), 2000);
                 }, 50);
@@ -1730,48 +1723,131 @@ async function _fetchAndShowTimetable(pathId, display_train_no) {
 
         // 🌟 3. 建立精確時間字典
         let exactTimes = {};
+        let trueOriginId = null;
+        let trueDestId = null;
+        // 🌟 新增：用來記錄「同車次出現兩個同車站」或「代碼 1001」的真正環島站碼
+        let loopStationCleanIds = new Set(); 
+
         if (rawJsonData && rawJsonData.TrainInfos) {
+            // 🌟 核心修正 2：優先使用 original_train_no (例如 821(日)(林)) 去 JSON 裡精準尋找！
             const trainInfo = rawJsonData.TrainInfos.find(t => 
+                String(t.Train) === original_train_no || 
+                String(t.TrainNo) === original_train_no || 
                 String(t.Train) === display_train_no || 
-                String(t.TrainNo) === display_train_no || 
-                String(t.Train) === baseId ||
-                String(t.TrainNo) === baseId
+                String(t.TrainNo) === display_train_no
             );
             
             if (trainInfo && trainInfo.TimeInfos) {
-                trainInfo.TimeInfos.forEach(ti => {
+                const timeInfos = JSON.parse(JSON.stringify(trainInfo.TimeInfos));
+                
+                // 🌟 1. 先統計該車次內各車站出現的次數（僅同車次有 2 個以上同車站，或代碼為 1001 才算環島）
+                const stCounts = {};
+                let prevCleanSt = null;
+                timeInfos.forEach(ti => {
+                    const rawSt = String(ti.Station);
+                    const cleanSt = (rawSt === '1001') ? '1000' : rawSt.replace('_LOOP', '');
+                    if (rawSt === '1001') loopStationCleanIds.add('1000');
+                    if (cleanSt !== prevCleanSt) {
+                        stCounts[cleanSt] = (stCounts[cleanSt] || 0) + 1;
+                        prevCleanSt = cleanSt;
+                    }
+                });
+                Object.keys(stCounts).forEach(st => {
+                    if (stCounts[st] >= 2) loopStationCleanIds.add(st);
+                });
+
+                // 🌟 2. 建立精確時間表：只有真正環島車次的「第二次到訪」或「1001」才加上 _LOOP
+                const seenSt = new Set();
+                prevCleanSt = null;
+                timeInfos.forEach((ti) => {
+                    const rawSt = String(ti.Station);
+                    const cleanSt = (rawSt === '1001') ? '1000' : rawSt.replace('_LOOP', '');
+
+                    if (rawSt === '1001') {
+                        ti.Station = '1000_LOOP'; // 相容舊版 1001 資料
+                    } else if (loopStationCleanIds.has(cleanSt) && seenSt.has(cleanSt) && cleanSt !== prevCleanSt) {
+                        ti.Station = cleanSt + '_LOOP';
+                    } else {
+                        ti.Station = cleanSt; // 還原一般車次因雙端點畫布產生的 _LOOP
+                    }
+
+                    seenSt.add(cleanSt);
+                    prevCleanSt = cleanSt;
                     exactTimes[String(ti.Station)] = { arr: ti.ARRTime, dep: ti.DEPTime };
                 });
-            }
-        }
 
-        // 🌟 4. 從 D3 畫布抓取原始資料
-        const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
-        if (!d3TrainData || !d3TrainData.rawData) {
-            throw new Error("無法取得該車次的繪圖原始資料");
-        }
-        
-        const rawData = d3TrainData.rawData;
-        let validStationIds = [];
-        if (typeof LinesStationsForBackground !== 'undefined' && _currentLineKind) {
-            const stationsOnPage = LinesStationsForBackground[_currentLineKind];
-            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID));
-        }
-
-        // 🌟 5. 解析停靠站，合併到站與離站
-        let mergedStops = [];
-        rawData.forEach((stationPoint) => {
-            const [stationName, id, time, loc, stop] = stationPoint;
-            const isStop = parseInt(stop, 10) !== -1;
-            const isOnThisPage = validStationIds.length === 0 || validStationIds.includes(String(id));
-
-            if (isStop && isOnThisPage) {
-                if (mergedStops.length > 0 && mergedStops[mergedStops.length - 1].id === String(id)) {
-                    mergedStops[mergedStops.length - 1].depTime = time;
-                } else {
-                    mergedStops.push({ stationName: stationName, id: String(id), arrTime: time, depTime: time, loc: loc });
+                const validJsonStops = timeInfos.filter(ti => !railyards.includes(String(ti.Station).replace('_LOOP', '')));
+                if (validJsonStops.length > 0) {
+                    trueOriginId = String(validJsonStops[0].Station);
+                    trueDestId = String(validJsonStops[validJsonStops.length - 1].Station);
                 }
             }
+        }
+
+        const rawData = d3TrainData.rawData;
+        let validStationIds = [];
+        
+        if (typeof LinesStationsForBackground !== 'undefined' && _currentLineKind) {
+            const stationsOnPage = LinesStationsForBackground[_currentLineKind];
+            validStationIds = Object.values(stationsOnPage).map(s => String(s.ID).replace('_LOOP', ''));
+            if (validStationIds.includes('1000')) validStationIds.push('1001');
+        }
+
+        // 🌟 3. 檢查繪圖軌跡 rawData 是否在同一段內有重複經過同一站（或代碼 1001）
+        const rawStCounts = {};
+        let prevRawCleanSt = null;
+        rawData.forEach((stationPoint) => {
+            const [, rawId, , , stop] = stationPoint;
+            if (parseInt(stop, 10) === -1) return;
+            const rawIdStr = String(rawId);
+            const cleanSt = (rawIdStr === '1001') ? '1000' : rawIdStr.replace('_LOOP', '');
+            if (rawIdStr === '1001') loopStationCleanIds.add('1000');
+            if (cleanSt !== prevRawCleanSt) {
+                rawStCounts[cleanSt] = (rawStCounts[cleanSt] || 0) + 1;
+                prevRawCleanSt = cleanSt;
+            }
+        });
+        Object.keys(rawStCounts).forEach(st => {
+            if (rawStCounts[st] >= 2) loopStationCleanIds.add(st);
+        });
+
+        let allMergedStops = [];
+        const seenMergedCleanSt = new Set();
+
+        rawData.forEach((stationPoint) => {
+            let [stationName, id, time, loc, stop] = stationPoint;
+            const isStop = parseInt(stop, 10) !== -1;
+            if (!isStop) return;
+            
+            // 清理站名，移除高鐵與林鐵專屬的 (高) / (林) 標籤與預設殘留的 (環島)
+            stationName = stationName.replace(/[(（][高林][)）]/g, '').replace('(環島)', '');
+
+            const rawIdStr = String(id);
+            const cleanId = (rawIdStr === '1001') ? '1000' : rawIdStr.replace('_LOOP', '');
+
+            // 同站到離時間合併
+            if (allMergedStops.length > 0 && allMergedStops[allMergedStops.length - 1].cleanId === cleanId) {
+                allMergedStops[allMergedStops.length - 1].depTime = time;
+                return;
+            }
+
+            // 🌟 4. 嚴格判定 (環島) 標籤：
+            // 只有「代碼為 1001」或「該車次確實有兩個同個車站（且此為第二次出現）」才加上 (環島)
+            const isTrueLoopStation = (rawIdStr === '1001') || (
+                loopStationCleanIds.has(cleanId) && (
+                    seenMergedCleanSt.has(cleanId) ||
+                    (rawStCounts[cleanId] === 1 && pathId !== baseId)
+                )
+            );
+
+            seenMergedCleanSt.add(cleanId);
+
+            const finalId = isTrueLoopStation ? `${cleanId}_LOOP` : cleanId;
+            if (isTrueLoopStation) {
+                stationName = stationName + '(環島)';
+            }
+
+            allMergedStops.push({ stationName, id: finalId, cleanId, arrTime: time, depTime: time, loc });
         });
 
         // 🌟 1. 標題區塊 (實心背景、禁止縮放)
@@ -1909,15 +1985,16 @@ async function _fetchAndShowTimetable(pathId, display_train_no) {
     }
 }
 
-// 🌟 時間格式轉換工具
+// 🌟 時間格式轉換工具 (SVG_X_Axis 每分鐘為 2 單位)
 function formatTime(rawTime) {
     if (isNaN(rawTime)) return '--:--:--';
-    let hrs = Math.floor(rawTime / 60);
-    let mins = Math.floor(rawTime % 60);
-    let secs = Math.round((rawTime % 1) * 60);
+    const totalMinutes = rawTime / 2; // 將半分鐘單位轉為真實分鐘數
+    let hrs = Math.floor(totalMinutes / 60);
+    let mins = Math.floor(totalMinutes % 60);
+    let secs = Math.round((totalMinutes % 1) * 60);
     if (secs >= 60) { secs -= 60; mins += 1; }
     if (mins >= 60) { mins -= 60; hrs += 1; }
-    if (hrs >= 24) hrs -= 24;
+    if (hrs >= 24) hrs %= 24;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -1973,8 +2050,15 @@ const _carKindLabel = {
 
 function draw_diagram_background(line_kind, date) {
     _currentLineKind = line_kind;
+
+    // 🌟 新增這段：如果 LinesStationsForBackground 找不到該路線，自動從 LinesStations 同步過去！
+    if (typeof LinesStationsForBackground !== 'undefined' && !LinesStationsForBackground[line_kind] && typeof LinesStations !== 'undefined' && LinesStations[line_kind]) {
+        LinesStationsForBackground[line_kind] = LinesStations[line_kind];
+    }
+
     Object.entries(OperationLines).forEach(([key, value]) => {
         if (key !== line_kind) return;
+        // ... (以下維持原樣)
 
         const totalWidth = 1200 * (DiagramHours.length - 1) + 100;
         const totalHeight = value['MAX_X_AXIS'];
@@ -2052,15 +2136,26 @@ function draw_diagram_background(line_kind, date) {
             }
         }
 
-        const stations = LinesStationsForBackground[key];
-        Object.entries(stations).forEach(([, stn]) => {
-            const sy = stn['SVGYAXIS'] + 50;
-            const isServed = stn['ID'] !== 'NA';
-            add_line(g, 50, sy, totalWidth - 50, sy, isServed ? 'station_line' : 'station_noserv_line');
-            for (let i = 0; i < 31; i++) {
-                add_text(g, stn['DSC'], 5 + i * 1200, sy - 20, isServed ? 'station' : 'station_noserv');
-            }
-        });
+        // 🌟 自動從 LinesStationsForBackground / LinesStations / SVG_Y_Axis 三處尋找車站設定
+        const stations = (typeof LinesStationsForBackground !== 'undefined' && LinesStationsForBackground[key])
+            || (typeof LinesStations !== 'undefined' && LinesStations[key])
+            || (typeof SVG_Y_Axis !== 'undefined' && SVG_Y_Axis[key]);
+
+        if (!stations) {
+            console.error(`❌ 找不到 "${key}" 的車站 Y 軸設定！請檢查 SVG_Y_Axis.json 是否已新增 "${key}"，目前已載入的路線有：`, Object.keys(LinesStationsForBackground || {}));
+        } else {
+            if (typeof LinesStationsForBackground !== 'undefined') LinesStationsForBackground[key] = stations;
+            if (typeof LinesStations !== 'undefined') LinesStations[key] = stations;
+
+            Object.entries(stations).forEach(([, stn]) => {
+                const sy = stn['SVGYAXIS'] + 50;
+                const isServed = stn['ID'] !== 'NA';
+                add_line(g, 50, sy, totalWidth - 50, sy, isServed ? 'station_line' : 'station_noserv_line');
+                for (let i = 0; i < 31; i++) {
+                    add_text(g, stn['DSC'], 5 + i * 1200, sy - 20, isServed ? 'station' : 'station_noserv');
+                }
+            });
+        }
 
         diagram_objects[key] = g;
         add_line(g, now_time_x_axis, 50, now_time_x_axis, totalHeight + 50, 'now_time_line');
