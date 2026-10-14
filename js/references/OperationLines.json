@@ -21,13 +21,7 @@
         "NAME": "西部幹線南段(彰化-枋寮)",
         "FOLDER": "west_link_south",
         "PREFIX": "WESTSOUTH_",
-        "MAX_X_AXIS": 5465
-    },
-    "LINE_P": {
-        "NAME": "屏東線(高雄-枋寮)",
-        "FOLDER": "pingtung",
-        "PREFIX": "PINGTUNG_",
-        "MAX_X_AXIS": 1500
+        "MAX_X_AXIS": 5522
     },
     "LINE_S": {
         "NAME": "南迴線(枋寮-台東)",
@@ -94,5 +88,11 @@
         "FOLDER": "shalun",
         "PREFIX": "SHALUN_",
         "MAX_X_AXIS": 950
+    },
+    "LINE_Counterclockwise": {
+        "NAME": "逆環島",
+        "FOLDER": "Counterclockwise",
+        "PREFIX": "Counterclockwise_",
+        "MAX_X_AXIS": 17644
     }
 }
