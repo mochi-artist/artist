@@ -30,6 +30,7 @@ const dict_line = {
     'LINE_I': '宜蘭線',
     'LINE_N': '北迴線',
     'LINE_Alishan': '阿里山線',
+    'LINE_Counterclockwise': '逆環島',
     'thsr': '台灣高鐵'
 };
 

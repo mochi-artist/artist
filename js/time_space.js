@@ -275,6 +275,9 @@ function time_space_to_operation_lines(estimate_time_space, line_kind) {
         _operation_lines[key] = [];
     }
 
+    let offset = 0;
+    let prev_real_id = null;
+
     Object.entries(estimate_time_space).forEach(([key, value]) => {
         // 🌟 在對應背景 Y 軸時，暫時把 _LOOP 或 1001 轉成真實車站來抓座標
         let original_id = value[0];
@@ -284,8 +287,31 @@ function time_space_to_operation_lines(estimate_time_space, line_kind) {
         Object.entries(LinesStations).forEach(([key1, value1]) => {
             if (key1 === line_kind) {
                 if (real_id in value1) {
-                    // 🌟 存入資料時，依舊保留 original_id (帶有 _LOOP) 交給 D3
-                    _operation_lines[key1].push([value[1], original_id, value[3], LinesStations[key1][real_id]['SVGYAXIS'], value[4], parseInt(key)]);
+
+                    // ✂️ 指定頁面清單：如果是 "LINE_Counterclockwise" (或陣列內的其他頁面)
+                    if (['LINE_Counterclockwise', 'LINE_All', 'LINE_ALL'].includes(line_kind)) {
+                        
+                        // 判斷前後站是否為「八堵(0920) <-> 暖暖(7390)」（順逆行雙向皆攔截）
+                        if (
+                            (prev_real_id === '0920' && real_id === '7390') ||
+                            (prev_real_id === '7390' && real_id === '0920')
+                        ) {
+                            offset += 1000; // 強制讓編號跳號，取消兩站之間的連線
+                        }
+                    }
+
+                    // 記錄上一站代碼，供下一站比對
+                    prev_real_id = real_id;
+
+                    // 🌟 存入資料時，將最後的編號加上 offset 交給 D3
+                    _operation_lines[key1].push([
+                        value[1], 
+                        original_id, 
+                        value[3], 
+                        LinesStations[key1][real_id]['SVGYAXIS'], 
+                        value[4], 
+                        parseInt(key) + offset
+                    ]);
                 }
             }
         });
