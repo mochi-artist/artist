@@ -3,7 +3,7 @@ name: 抓原作者車次合併近日期檔內+指定車次變更carclass(每天�
 # 觸發時間：每天台灣時間中午 12:00 (UTC 4:00)
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 10,16 * * *'
   workflow_dispatch: # 允許手動點擊測試
 
 permissions:
