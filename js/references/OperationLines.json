@@ -93,6 +93,18 @@
         "NAME": "逆環島",
         "FOLDER": "Counterclockwise",
         "PREFIX": "Counterclockwise_",
-        "MAX_X_AXIS": 17644
+        "MAX_X_AXIS": 17689
+    },
+    "LINE_Clockwise": {
+        "NAME": "順環島",
+        "FOLDER": "Clockwise",
+        "PREFIX": "Clockwise_",
+        "MAX_X_AXIS": 17706
+    },
+    "LINE_CZ": {
+        "NAME": "順環島",
+        "FOLDER": "cz",
+        "PREFIX": "CZ_",
+        "MAX_X_AXIS": 3718
     }
 }
