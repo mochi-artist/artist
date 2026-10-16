@@ -267147,6 +267147,68 @@
           "ARRTime": "18:12:00"
         }
       ]
+    },
+    {
+      "Train": "6616",
+      "CarClass": "1104",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1000",
+          "ARRTime": "19:15:00",
+          "DEPTime": "19:20:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:26:00",
+          "DEPTime": "19:27:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "19:30:00",
+          "DEPTime": "19:31:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "19:37:00",
+          "DEPTime": "19:43:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0920",
+          "ARRTime": "19:52:00",
+          "DEPTime": "19:53:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7360",
+          "ARRTime": "20:01:00",
+          "DEPTime": "20:02:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7310",
+          "ARRTime": "20:15:00",
+          "DEPTime": "20:17:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7290",
+          "ARRTime": "20:24:00",
+          "DEPTime": "20:25:00",
+          "Order": "8"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "20:51:00",
+          "DEPTime": "20:51:00",
+          "Order": "9"
+        }
+      ]
     }
   ]
 }
