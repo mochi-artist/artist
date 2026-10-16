@@ -1,6 +1,6 @@
-name: 抓原作者車次合併近日期檔內+指定車次變更carclass(每天中午 12:00更新)
+name: 抓原作者車次合併近日期檔內+指定車次變更carclass(每天18:00與00:00更新)
 
-# 觸發時間：每天台灣時間中午 12:00 (UTC 4:00)
+# 觸發時間：每天台灣時間 18:00 (UTC 10:00) 與 00:00 (UTC 16:00)
 on:
   schedule:
     - cron: '0 10,16 * * *'
@@ -25,31 +25,39 @@ jobs:
       - name: 📦 安裝套件
         run: pip install requests
 
-      - name: 🚀 執行智慧管理員 (抓取原作者車次)
+      - name: 🚀 執行智慧管理員 (抓取朋友與原作者車次)
         run: python change/auto_smart_manager.py
 
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "Smart Manager Bot"
-          git add data/ pending_trains.json catch_log.txt merged_history.txt
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自動抓取與合併外部車次 [skip ci]" && git push)
+          
+          # 1. 加入 data/ 資料夾內的日期檔變動
+          git add data/
           
           # 2. 安全處理「給程式看」的暫存 JSON 檔
           if [ -f pending_trains.json ]; then
-            git add -f pending_trains.json # ⬅️ 加上 -f 強制加入
+            git add -f pending_trains.json
           else
             git rm --ignore-unmatch pending_trains.json
           fi
           
-          # 3. 安全處理「給你看」的報告文字檔
+          # 3. 安全處理「暫存等待車次」報告文字檔
           if [ -f catch_log.txt ]; then
-            git add -f catch_log.txt # ⬅️ 加上 -f 強制加入，突破 .gitignore 限制
+            git add -f catch_log.txt
           else
             git rm --ignore-unmatch catch_log.txt
           fi
+
+          # 4. 安全處理「已抓進 data/ 的加班車」歷史文字檔 (加上 -f 突破 .gitignore)
+          if [ -f merged_history.txt ]; then
+            git add -f merged_history.txt
+          else
+            git rm --ignore-unmatch merged_history.txt
+          fi
           
-          # 4. 提交並更新
+          # 5. 提交並更新
           if git diff-index --quiet HEAD --; then
             echo "沒有檔案變動，略過提交。"
           else
