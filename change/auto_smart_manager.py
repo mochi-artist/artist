@@ -20,18 +20,18 @@ else:
 TARGET_DIR = os.path.join(BASE_DIR, "data")
 MASTER_FILE_PATH = os.path.join(BASE_DIR, "final_train_diagram.json")
 PENDING_FILE = os.path.join(BASE_DIR, "pending_trains.json")
-CATCH_LOG_FILE = os.path.join(BASE_DIR, "catch_log.txt")            # 🌟 僅保留【四、暫存於 pending_trains.json 等待中的車次】
-MERGED_HISTORY_FILE = os.path.join(BASE_DIR, "merged_history.txt")  # 🌟 單獨記錄【二、成功合併寫入 data/ 的新車次】
+CATCH_LOG_FILE = os.path.join(BASE_DIR, "catch_log.txt")            # 僅顯示：預備等著抓的暫存車次 (pending_trains.json)
+MERGED_HISTORY_FILE = os.path.join(BASE_DIR, "merged_history.txt")  # 🌟 專門顯示：已經抓進 data/ 檔案內的所有加班車
 TRAIN_ID_KEY = "Train"
 
-# 🌟 自動取得台灣時間 (UTC+8)「今天」的 YYYYMMDD 數值，只掃描今天以後的檔案
+# 自動取得台灣時間 (UTC+8)「今天」的 YYYYMMDD 數值
 TW_NOW = datetime.now(timezone.utc) + timedelta(hours=8)
 START_DATE = int(TW_NOW.strftime("%Y%m%d"))
 
 EXCLUDE_PREFIXES = ["29", "47", "48", "49", "6631", "6632", "6633"]
 EXCLUDE_KEYWORDS = ["(林)", "(高)"]
 
-# 🌟 抓取順序：朋友倉庫優先抓取，原作者 (固定週一更新) 排第二
+# 抓取順序：朋友倉庫優先抓取，原作者排第二
 TARGETS = [
     ("朋友倉庫", "mochi-artist", "TRA-Timetable-Data", "Timetable-Json"),
     ("原作者倉庫", "billy1125", "billy1125.github.io", "data")
@@ -63,11 +63,9 @@ FALLBACK_C_MAP = {
     "1140": "ordinary", "1141": "ordinary"
 }
 
-# 🌟 自動替換的車次規則清單
 RULE_CLASS_0001 = ['6652', '6655', '6629', '6630']
 RULE_CLASS_0002 = ['6631', '6632', '6633', '6676', '6677']
 
-# 🌟 110F 專車替換規則
 TEMP_110F_RULES = {
     "20260925": ["2183", "3231"], "20260926": ["3010", "3035"],
     "20260927": ["3001", "3018", "3021"], "20260928": ["3006", "1038"],
@@ -274,7 +272,7 @@ def train_sort_key(train_obj):
     return (float('inf'), tid)
 
 def format_train_log(t, s_map, c_map):
-    tid = str(t.get(TRAIN_ID_KEY, "?"))
+    tid = str(t.get(TRAIN_ID_KEY, t.get("TrainNo", "?")))
     code = str(t.get("CarClass", t.get("Type", "?")))
     eng = c_map.get(code, FALLBACK_C_MAP.get(code, "others"))
     chi = CHINESE_NAME_MAP.get(eng, eng)
@@ -303,56 +301,60 @@ def print_source_detection_summary(source_reports):
         )
     print("=" * 60 + "\n")
 
-# 🌟 【二、本次成功合併寫入 data/ 的新車次】：單獨寫入 merged_history.txt
-def update_merged_history_txt(ready_to_patch, s_map, c_map):
+# 🌟 【二、已經抓進 data/ 檔案內的加班車】：完整掃描 data/ 並寫入 merged_history.txt
+def generate_merged_in_data_txt(master_ids, source_map_by_date, newly_patched_ids_by_date, s_map, c_map):
     now_str = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
-    placeholder_marker = "⚪ 目前尚無新合併寫入的車次。"
+    merged_in_data = defaultdict(list)
 
-    if ready_to_patch:
-        lines = []
-        lines.append(f"====== ✅ 本次成功合併寫入 data/ 的新車次 ({now_str}) ======\n")
-        for d in sorted(ready_to_patch.keys()):
-            items = sorted(ready_to_patch[d], key=train_sort_key)
+    if os.path.exists(TARGET_DIR):
+        for fname in sorted(os.listdir(TARGET_DIR)):
+            if not fname.endswith(".json"):
+                continue
+            fdate = get_filename_date(fname)
+            if fdate < START_DATE:
+                continue
+            date_str = str(fdate)
+            fpath = os.path.join(TARGET_DIR, fname)
+            local_trains = load_local_file(fpath) or []
+
+            for t in local_trains:
+                if not isinstance(t, dict):
+                    continue
+                tid = str(t.get(TRAIN_ID_KEY, t.get("TrainNo", "")))
+                if (not tid or tid in master_ids or
+                    any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or
+                    any(k in tid for k in EXCLUDE_KEYWORDS)):
+                    continue
+
+                t_copy = copy.deepcopy(t)
+                t_copy[TRAIN_ID_KEY] = tid
+                src = source_map_by_date.get(date_str, {}).get(tid, "已存在於 data/")
+                if tid in newly_patched_ids_by_date.get(date_str, set()):
+                    src += " | 本次新增寫入"
+                t_copy["_source"] = src
+                merged_in_data[date_str].append(t_copy)
+
+    lines = []
+    lines.append(f"====== ✅ 已抓進 data/ 檔案內的加班車清單 (更新時間: {now_str}) ======\n")
+
+    if merged_in_data:
+        for d in sorted(merged_in_data.keys()):
+            items = sorted(merged_in_data[d], key=train_sort_key)
             lines.append(f"📅 日期: {d} (共 {len(items)} 筆)")
             for t in items:
                 lines.append(format_train_log(t, s_map, c_map))
             lines.append("")
-        lines.append("-" * 60 + "\n")
-        new_block = "\n".join(lines)
-
-        old_content = ""
-        if os.path.exists(MERGED_HISTORY_FILE):
-            try:
-                with open(MERGED_HISTORY_FILE, 'r', encoding='utf-8') as f:
-                    old_content = f.read()
-                if placeholder_marker in old_content:
-                    old_content = ""
-            except:
-                old_content = ""
-
-        # 將最新合併的車次放在最上方，舊紀錄保留在下方
-        final_content = new_block + ("\n" + old_content if old_content else "")
-        try:
-            with open(MERGED_HISTORY_FILE, 'w', encoding='utf-8') as f:
-                f.write(final_content)
-            print(f"📝 已將【成功合併寫入 data/ 的新車次】寫入獨立檔案：{MERGED_HISTORY_FILE}")
-        except Exception as e:
-            print(f"❌ 寫入 {MERGED_HISTORY_FILE} 失敗: {e}")
     else:
-        # 若檔案尚未存在，先建立初始檔案讓 Git 能追蹤推播；若已有歷史紀錄則保留不動
-        if not os.path.exists(MERGED_HISTORY_FILE):
-            init_text = (
-                f"====== ✅ 成功合併寫入 data/ 的新車次紀錄 ({now_str}) ======\n\n"
-                f"{placeholder_marker}\n"
-            )
-            try:
-                with open(MERGED_HISTORY_FILE, 'w', encoding='utf-8') as f:
-                    f.write(init_text)
-                print(f"📝 已建立初始合併紀錄檔：{MERGED_HISTORY_FILE}")
-            except Exception as e:
-                print(f"❌ 建立 {MERGED_HISTORY_FILE} 失敗: {e}")
+        lines.append("⚪ 目前 data/ 檔案內無任何外部加班車。")
 
-# 🌟 【四、暫存於 pending_trains.json 等待中的車次】：單獨保留在 catch_log.txt (隱藏第三項)
+    try:
+        with open(MERGED_HISTORY_FILE, 'w', encoding='utf-8') as f:
+            f.write("\n".join(lines) + "\n")
+        print(f"📝 已產生【已抓進 data/ 的加班車清單】：{MERGED_HISTORY_FILE}")
+    except Exception as e:
+        print(f"❌ 寫入 {MERGED_HISTORY_FILE} 失敗: {e}")
+
+# 🌟 【四、暫存於 pending_trains.json 等待中的車次】：單獨保留在 catch_log.txt
 def generate_catch_log_txt(keep_in_pending, s_map, c_map):
     now_str = (datetime.now(timezone.utc) + timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
     lines = []
@@ -454,6 +456,7 @@ def main():
 
     all_data_pool = defaultdict(list)
     seen_trains_by_date = defaultdict(set)
+    source_map_by_date = defaultdict(dict)
     source_reports = []
 
     # 1. 優先依序偵測並抓取外部倉庫：先抓朋友 (mochi-artist)，再抓原作者 (billy1125)
@@ -524,9 +527,11 @@ def main():
                         file_skipped += 1
                         continue
 
+                    src_label = f"{label}({user})"
                     t[TRAIN_ID_KEY] = tid
-                    t["_source"] = f"{label}({user})"
+                    t["_source"] = src_label
                     seen_trains_by_date[date_str].add(tid)
+                    source_map_by_date[date_str][tid] = src_label
                     all_data_pool[date_str].append(t)
                     rep_info["captured_trains"] += 1
                     file_captured += 1
@@ -573,6 +578,10 @@ def main():
             try:
                 curr_date_obj = datetime.strptime(date_str, "%Y%m%d")
                 next_date_str = (curr_date_obj + timedelta(days=1)).strftime("%Y%m%d")
+                for nt in next_trains:
+                    nt_id = str(nt.get(TRAIN_ID_KEY, ""))
+                    if nt_id and nt_id not in source_map_by_date[next_date_str]:
+                        source_map_by_date[next_date_str][nt_id] = nt.get("_source", "跨日切分")
                 pending_next_day_trains[next_date_str].extend(next_trains)
             except ValueError:
                 pass
@@ -583,6 +592,7 @@ def main():
             
     all_data_pool = final_data_pool
     ready_to_patch = {}
+    newly_patched_ids_by_date = defaultdict(set)
     keep_in_pending = {}
 
     os.makedirs(TARGET_DIR, exist_ok=True)
@@ -603,19 +613,12 @@ def main():
         else:
             exist = set(str(t.get(TRAIN_ID_KEY, t.get("TrainNo", ""))) for t in local_trains)
             new_stuff = [t for t in unique if str(t.get(TRAIN_ID_KEY)) not in exist]
-            if new_stuff: ready_to_patch[date_str] = new_stuff
+            if new_stuff:
+                ready_to_patch[date_str] = new_stuff
+                for nt in new_stuff:
+                    newly_patched_ids_by_date[date_str].add(str(nt.get(TRAIN_ID_KEY)))
 
-    # 🌟 4. 輸出分流：
-    # (1) 第一項：只印在終端機 (供 GitHub Actions 檢視)
-    print_source_detection_summary(source_reports)
-
-    if any(r["connected"] for r in source_reports):
-        # (2) 第二項：單獨寫入 merged_history.txt
-        update_merged_history_txt(ready_to_patch, s_map, c_map)
-        # (3) 第四項：保留在 catch_log.txt (第三項已完全隱藏)
-        generate_catch_log_txt(keep_in_pending, s_map, c_map)
-
-    # 5. 將新車次寫入 data/YYYYMMDD.json
+    # 4. 先將新車次寫入 data/YYYYMMDD.json 並執行 CarClass 校正
     if ready_to_patch:
         for date_str, new_trains in ready_to_patch.items():
             target_path = os.path.join(TARGET_DIR, f"{date_str}.json")
@@ -647,8 +650,19 @@ def main():
     else:
         if os.path.exists(PENDING_FILE): os.remove(PENDING_FILE)
         
-    # 🌟 程式結尾：呼叫最後的大掃除與校正
+    # 執行 110F 與 0001/0002 校正，讓輸出到 TXT 的車種也是校正後的最新狀態
     run_post_processing_corrections()
+
+    # 🌟 5. 輸出分流：
+    # (1) 來源偵測狀態：只印在終端機 (Action 執行紀錄)
+    print_source_detection_summary(source_reports)
+
+    # (2) 已經抓進 data/ 檔案內的加班車：寫入 merged_history.txt
+    generate_merged_in_data_txt(master_ids, source_map_by_date, newly_patched_ids_by_date, s_map, c_map)
+
+    # (3) 預備等著抓的暫存車次 (pending_trains.json)：寫入 catch_log.txt
+    generate_catch_log_txt(keep_in_pending, s_map, c_map)
+
     print("🎉 智慧管理員作業與校正全部完成！")
 
 if __name__ == "__main__":
