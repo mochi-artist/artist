@@ -30,11 +30,10 @@ jobs:
 
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
-          git config --global user.name "Smart Manager Bot"
-          git config --global user.email "bot@github.com"
-          
-          # 1. 追蹤時刻表資料夾
-          git add data/
+          git config --local user.email "actions@github.com"
+          git config --local user.name "Smart Manager Bot"
+          git add data/ pending_trains.json catch_log.txt merged_history.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自動抓取與合併外部車次 [skip ci]" && git push)
           
           # 2. 安全處理「給程式看」的暫存 JSON 檔
           if [ -f pending_trains.json ]; then
