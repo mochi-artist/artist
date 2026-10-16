@@ -174186,7 +174186,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -176013,7 +176013,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -176314,7 +176314,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -259382,6 +259382,2484 @@
           "Order": "2",
           "ARRTime": "09:02:00",
           "DEPTime": "09:02:00"
+        }
+      ]
+    },
+    {
+      "Train": "5105",
+      "CarClass": "1108",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0930",
+          "ARRTime": "07:09:00",
+          "DEPTime": "07:09:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "07:17:00",
+          "DEPTime": "07:19:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "07:29:00",
+          "DEPTime": "07:30:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "07:37:00",
+          "DEPTime": "07:40:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "07:48:00",
+          "DEPTime": "07:50:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "08:10:00",
+          "DEPTime": "08:12:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "08:21:00",
+          "DEPTime": "08:23:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "08:51:00",
+          "DEPTime": "08:54:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "09:10:00",
+          "DEPTime": "09:15:00",
+          "Order": "9"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "09:25:00",
+          "DEPTime": "09:27:00",
+          "Order": "10"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "09:51:00",
+          "DEPTime": "09:53:00",
+          "Order": "11"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "10:03:00",
+          "DEPTime": "10:05:00",
+          "Order": "12"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "10:19:00",
+          "DEPTime": "10:21:00",
+          "Order": "13"
+        },
+        {
+          "Station": "3390",
+          "ARRTime": "10:35:00",
+          "DEPTime": "10:37:00",
+          "Order": "14"
+        },
+        {
+          "Station": "3470",
+          "ARRTime": "10:58:00",
+          "DEPTime": "11:00:00",
+          "Order": "15"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "11:19:00",
+          "DEPTime": "11:22:00",
+          "Order": "16"
+        },
+        {
+          "Station": "4120",
+          "ARRTime": "11:36:00",
+          "DEPTime": "11:38:00",
+          "Order": "17"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "12:03:00",
+          "DEPTime": "12:05:00",
+          "Order": "18"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "12:31:00",
+          "DEPTime": "12:33:00",
+          "Order": "19"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "12:42:00",
+          "DEPTime": "12:45:00",
+          "Order": "20"
+        },
+        {
+          "Station": "4440",
+          "ARRTime": "12:52:00",
+          "DEPTime": "12:52:00",
+          "Order": "21"
+        }
+      ]
+    },
+    {
+      "Train": "5109",
+      "CarClass": "110G",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0930",
+          "ARRTime": "08:15:00",
+          "DEPTime": "08:15:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "08:23:00",
+          "DEPTime": "08:24:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "08:32:00",
+          "DEPTime": "08:33:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "08:37:00",
+          "DEPTime": "08:38:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "08:45:00",
+          "DEPTime": "08:48:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "08:55:00",
+          "DEPTime": "08:57:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "09:16:00",
+          "DEPTime": "09:18:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "09:27:00",
+          "DEPTime": "09:30:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "09:58:00",
+          "DEPTime": "10:01:00",
+          "Order": "9"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "10:45:00",
+          "DEPTime": "10:46:00",
+          "Order": "10"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "10:55:00",
+          "DEPTime": "10:58:00",
+          "Order": "11"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "11:11:00",
+          "DEPTime": "11:13:00",
+          "Order": "12"
+        },
+        {
+          "Station": "3470",
+          "ARRTime": "11:43:00",
+          "DEPTime": "11:44:00",
+          "Order": "13"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "12:03:00",
+          "DEPTime": "12:05:00",
+          "Order": "14"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "12:45:00",
+          "DEPTime": "12:46:00",
+          "Order": "15"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "13:11:00",
+          "DEPTime": "13:13:00",
+          "Order": "16"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "13:21:00",
+          "DEPTime": "13:23:00",
+          "Order": "17"
+        },
+        {
+          "Station": "4440",
+          "ARRTime": "13:28:00",
+          "DEPTime": "13:29:00",
+          "Order": "18"
+        },
+        {
+          "Station": "5000",
+          "ARRTime": "13:40:00",
+          "DEPTime": "13:41:00",
+          "Order": "19"
+        },
+        {
+          "Station": "5050",
+          "ARRTime": "13:52:00",
+          "DEPTime": "13:55:00",
+          "Order": "20"
+        }
+      ]
+    },
+    {
+      "Train": "5115",
+      "CarClass": "1107",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0990",
+          "ARRTime": "10:05:00",
+          "DEPTime": "10:05:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "10:12:00",
+          "DEPTime": "10:16:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "10:23:00",
+          "DEPTime": "10:25:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "10:41:00",
+          "DEPTime": "10:42:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "11:10:00",
+          "DEPTime": "11:11:00",
+          "Order": "5"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "11:51:00",
+          "DEPTime": "11:53:00",
+          "Order": "6"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "12:03:00",
+          "DEPTime": "12:05:00",
+          "Order": "7"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "12:19:00",
+          "DEPTime": "12:21:00",
+          "Order": "8"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "13:10:00",
+          "DEPTime": "13:12:00",
+          "Order": "9"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "13:45:00",
+          "DEPTime": "13:48:00",
+          "Order": "10"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "14:17:00",
+          "DEPTime": "14:17:00",
+          "Order": "11"
+        }
+      ]
+    },
+    {
+      "Train": "5119",
+      "CarClass": "1108",
+      "Line": "2",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0930",
+          "ARRTime": "10:07:00",
+          "DEPTime": "10:07:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "10:15:00",
+          "DEPTime": "10:18:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "10:28:00",
+          "DEPTime": "10:29:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "10:36:00",
+          "DEPTime": "10:40:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "10:48:00",
+          "DEPTime": "10:50:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "11:10:00",
+          "DEPTime": "11:12:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "11:21:00",
+          "DEPTime": "11:23:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "11:50:00",
+          "DEPTime": "11:55:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "12:10:00",
+          "DEPTime": "12:12:00",
+          "Order": "9"
+        },
+        {
+          "Station": "2130",
+          "ARRTime": "12:29:00",
+          "DEPTime": "12:30:00",
+          "Order": "10"
+        },
+        {
+          "Station": "2170",
+          "ARRTime": "12:45:00",
+          "DEPTime": "12:46:00",
+          "Order": "11"
+        },
+        {
+          "Station": "2180",
+          "ARRTime": "12:53:00",
+          "DEPTime": "12:54:00",
+          "Order": "12"
+        },
+        {
+          "Station": "2200",
+          "ARRTime": "13:03:00",
+          "DEPTime": "13:05:00",
+          "Order": "13"
+        },
+        {
+          "Station": "2220",
+          "ARRTime": "13:14:00",
+          "DEPTime": "13:15:00",
+          "Order": "14"
+        },
+        {
+          "Station": "2230",
+          "ARRTime": "13:18:00",
+          "DEPTime": "13:21:00",
+          "Order": "15"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "13:41:00",
+          "DEPTime": "13:41:00",
+          "Order": "16"
+        }
+      ]
+    },
+    {
+      "Train": "5120",
+      "CarClass": "1108",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "4440",
+          "ARRTime": "13:56:00",
+          "DEPTime": "13:56:00",
+          "Order": "1"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "14:03:00",
+          "DEPTime": "14:06:00",
+          "Order": "2"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "14:15:00",
+          "DEPTime": "14:20:00",
+          "Order": "3"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "14:46:00",
+          "DEPTime": "14:48:00",
+          "Order": "4"
+        },
+        {
+          "Station": "4120",
+          "ARRTime": "15:11:00",
+          "DEPTime": "15:13:00",
+          "Order": "5"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "15:29:00",
+          "DEPTime": "15:31:00",
+          "Order": "6"
+        },
+        {
+          "Station": "3470",
+          "ARRTime": "15:51:00",
+          "DEPTime": "15:53:00",
+          "Order": "7"
+        },
+        {
+          "Station": "3390",
+          "ARRTime": "16:16:00",
+          "DEPTime": "16:18:00",
+          "Order": "8"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "16:31:00",
+          "DEPTime": "16:33:00",
+          "Order": "9"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "16:47:00",
+          "DEPTime": "16:49:00",
+          "Order": "10"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "16:59:00",
+          "DEPTime": "17:00:00",
+          "Order": "11"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "17:25:00",
+          "DEPTime": "17:26:00",
+          "Order": "12"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "17:36:00",
+          "DEPTime": "17:38:00",
+          "Order": "13"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "17:52:00",
+          "DEPTime": "17:54:00",
+          "Order": "14"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "18:21:00",
+          "DEPTime": "18:23:00",
+          "Order": "15"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "18:31:00",
+          "DEPTime": "18:33:00",
+          "Order": "16"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "18:54:00",
+          "DEPTime": "18:56:00",
+          "Order": "17"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:06:00",
+          "DEPTime": "19:08:00",
+          "Order": "18"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:15:00",
+          "DEPTime": "19:16:00",
+          "Order": "19"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "19:25:00",
+          "DEPTime": "19:26:00",
+          "Order": "20"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "19:36:00",
+          "DEPTime": "19:36:00",
+          "Order": "21"
+        }
+      ]
+    },
+    {
+      "Train": "5127",
+      "CarClass": "1107",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0990",
+          "ARRTime": "11:28:00",
+          "DEPTime": "11:28:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "11:35:00",
+          "DEPTime": "11:38:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "11:44:00",
+          "DEPTime": "11:46:00",
+          "Order": "3"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "13:07:00",
+          "DEPTime": "13:09:00",
+          "Order": "4"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "13:18:00",
+          "DEPTime": "13:20:00",
+          "Order": "5"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "13:37:00",
+          "DEPTime": "13:37:00",
+          "Order": "6"
+        }
+      ]
+    },
+    {
+      "Train": "5148",
+      "CarClass": "1107",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "3360",
+          "ARRTime": "14:05:00",
+          "DEPTime": "14:05:00",
+          "Order": "1"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "14:18:00",
+          "DEPTime": "14:26:00",
+          "Order": "2"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "14:34:00",
+          "DEPTime": "14:36:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "15:59:00",
+          "DEPTime": "16:01:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "16:09:00",
+          "DEPTime": "16:12:00",
+          "Order": "5"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "16:19:00",
+          "DEPTime": "16:20:00",
+          "Order": "6"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "16:24:00",
+          "DEPTime": "16:24:00",
+          "Order": "7"
+        }
+      ]
+    },
+    {
+      "Train": "5150",
+      "CarClass": "110G",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "5050",
+          "ARRTime": "17:25:00",
+          "DEPTime": "17:33:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5000",
+          "ARRTime": "17:44:00",
+          "DEPTime": "17:45:00",
+          "Order": "2"
+        },
+        {
+          "Station": "4440",
+          "ARRTime": "17:55:00",
+          "DEPTime": "17:57:00",
+          "Order": "3"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "18:02:00",
+          "DEPTime": "18:04:00",
+          "Order": "4"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "18:11:00",
+          "DEPTime": "18:12:00",
+          "Order": "5"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "18:36:00",
+          "DEPTime": "18:39:00",
+          "Order": "6"
+        },
+        {
+          "Station": "4120",
+          "ARRTime": "19:01:00",
+          "DEPTime": "19:02:00",
+          "Order": "7"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "19:18:00",
+          "DEPTime": "19:20:00",
+          "Order": "8"
+        },
+        {
+          "Station": "3470",
+          "ARRTime": "19:38:00",
+          "DEPTime": "19:39:00",
+          "Order": "9"
+        },
+        {
+          "Station": "3390",
+          "ARRTime": "19:59:00",
+          "DEPTime": "20:01:00",
+          "Order": "10"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "20:13:00",
+          "DEPTime": "20:16:00",
+          "Order": "11"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "20:29:00",
+          "DEPTime": "20:32:00",
+          "Order": "12"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "20:41:00",
+          "DEPTime": "20:43:00",
+          "Order": "13"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "21:06:00",
+          "DEPTime": "21:07:00",
+          "Order": "14"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "21:30:00",
+          "DEPTime": "21:31:00",
+          "Order": "15"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "21:58:00",
+          "DEPTime": "22:00:00",
+          "Order": "16"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "22:08:00",
+          "DEPTime": "22:10:00",
+          "Order": "17"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "22:30:00",
+          "DEPTime": "22:31:00",
+          "Order": "18"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "22:39:00",
+          "DEPTime": "22:42:00",
+          "Order": "19"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "22:48:00",
+          "DEPTime": "22:49:00",
+          "Order": "20"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "23:07:00",
+          "DEPTime": "23:07:00",
+          "Order": "21"
+        }
+      ]
+    },
+    {
+      "Train": "5182",
+      "CarClass": "1108",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "3360",
+          "ARRTime": "16:30:00",
+          "DEPTime": "16:30:00",
+          "Order": "1"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "16:46:00",
+          "DEPTime": "16:55:00",
+          "Order": "2"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "17:05:00",
+          "DEPTime": "17:07:00",
+          "Order": "3"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "17:32:00",
+          "DEPTime": "17:33:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "17:43:00",
+          "DEPTime": "17:45:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "17:59:00",
+          "DEPTime": "18:01:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "18:36:00",
+          "DEPTime": "18:38:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "18:46:00",
+          "DEPTime": "18:48:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "19:03:00",
+          "DEPTime": "19:08:00",
+          "Order": "9"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "19:15:00",
+          "DEPTime": "19:17:00",
+          "Order": "10"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:26:00",
+          "DEPTime": "19:28:00",
+          "Order": "11"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:36:00",
+          "DEPTime": "19:37:00",
+          "Order": "12"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "19:47:00",
+          "DEPTime": "19:48:00",
+          "Order": "13"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "19:57:00",
+          "DEPTime": "19:57:00",
+          "Order": "14"
+        }
+      ]
+    },
+    {
+      "Train": "5214",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "08:43:00",
+          "DEPTime": "08:50:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "08:57:00",
+          "DEPTime": "08:59:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "09:07:00",
+          "DEPTime": "09:11:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "09:17:00",
+          "DEPTime": "09:18:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "09:21:00",
+          "DEPTime": "09:22:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7360",
+          "ARRTime": "09:43:00",
+          "DEPTime": "09:44:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7230",
+          "ARRTime": "10:20:00",
+          "DEPTime": "10:21:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7210",
+          "ARRTime": "10:26:00",
+          "DEPTime": "10:28:00",
+          "Order": "8"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "10:34:00",
+          "DEPTime": "10:36:00",
+          "Order": "9"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "10:42:00",
+          "DEPTime": "10:44:00",
+          "Order": "10"
+        },
+        {
+          "Station": "7130",
+          "ARRTime": "10:51:00",
+          "DEPTime": "10:52:00",
+          "Order": "11"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "11:44:00",
+          "DEPTime": "11:44:00",
+          "Order": "12"
+        }
+      ]
+    },
+    {
+      "Train": "5215",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "12:03:00",
+          "DEPTime": "12:03:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "13:00:00",
+          "DEPTime": "13:02:00",
+          "Order": "2"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "13:08:00",
+          "DEPTime": "13:10:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "14:16:00",
+          "DEPTime": "14:17:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "14:21:00",
+          "DEPTime": "14:22:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "14:29:00",
+          "DEPTime": "14:31:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "14:38:00",
+          "DEPTime": "14:39:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "14:46:00",
+          "DEPTime": "14:49:00",
+          "Order": "8"
+        }
+      ]
+    },
+    {
+      "Train": "5219",
+      "CarClass": "1101",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "14:37:00",
+          "DEPTime": "14:37:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "15:33:00",
+          "DEPTime": "15:35:00",
+          "Order": "2"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "15:41:00",
+          "DEPTime": "15:43:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "16:51:00",
+          "DEPTime": "16:52:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "16:59:00",
+          "DEPTime": "17:02:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "17:10:00",
+          "DEPTime": "17:12:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "17:19:00",
+          "DEPTime": "17:24:00",
+          "Order": "7"
+        }
+      ]
+    },
+    {
+      "Train": "5223",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "14:51:00",
+          "DEPTime": "14:51:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "17:01:00",
+          "DEPTime": "17:03:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "17:07:00",
+          "DEPTime": "17:08:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "17:15:00",
+          "DEPTime": "17:18:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "17:25:00",
+          "DEPTime": "17:27:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "17:33:00",
+          "DEPTime": "17:45:00",
+          "Order": "6"
+        }
+      ]
+    },
+    {
+      "Train": "5241",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "13:38:00",
+          "DEPTime": "13:38:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6020",
+          "ARRTime": "13:51:00",
+          "DEPTime": "13:52:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "14:04:00",
+          "DEPTime": "14:05:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "14:14:00",
+          "DEPTime": "14:15:00",
+          "Order": "4"
+        },
+        {
+          "Station": "6080",
+          "ARRTime": "14:21:00",
+          "DEPTime": "14:22:00",
+          "Order": "5"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "14:34:00",
+          "DEPTime": "14:36:00",
+          "Order": "6"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "14:49:00",
+          "DEPTime": "14:50:00",
+          "Order": "7"
+        },
+        {
+          "Station": "6160",
+          "ARRTime": "15:02:00",
+          "DEPTime": "15:03:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6180",
+          "ARRTime": "15:11:00",
+          "DEPTime": "15:12:00",
+          "Order": "9"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "15:33:00",
+          "DEPTime": "15:36:00",
+          "Order": "10"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "17:52:00",
+          "DEPTime": "17:53:00",
+          "Order": "11"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "17:57:00",
+          "DEPTime": "17:58:00",
+          "Order": "12"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "18:05:00",
+          "DEPTime": "18:08:00",
+          "Order": "13"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "18:15:00",
+          "DEPTime": "18:16:00",
+          "Order": "14"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "18:23:00",
+          "DEPTime": "18:26:00",
+          "Order": "15"
+        }
+      ]
+    },
+    {
+      "Train": "5242",
+      "CarClass": "1108",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "08:00:00",
+          "DEPTime": "08:07:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "08:14:00",
+          "DEPTime": "08:15:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "08:24:00",
+          "DEPTime": "08:28:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "08:35:00",
+          "DEPTime": "08:36:00",
+          "Order": "4"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "10:57:00",
+          "DEPTime": "10:59:00",
+          "Order": "5"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "11:40:00",
+          "DEPTime": "11:41:00",
+          "Order": "6"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "11:56:00",
+          "DEPTime": "11:58:00",
+          "Order": "7"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "12:16:00",
+          "DEPTime": "12:17:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "12:28:00",
+          "DEPTime": "12:30:00",
+          "Order": "9"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "12:54:00",
+          "DEPTime": "12:54:00",
+          "Order": "10"
+        }
+      ]
+    },
+    {
+      "Train": "5243",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "15:25:00",
+          "DEPTime": "15:25:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "15:50:00",
+          "DEPTime": "15:54:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "16:12:00",
+          "DEPTime": "16:14:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "16:29:00",
+          "DEPTime": "16:31:00",
+          "Order": "4"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "16:43:00",
+          "DEPTime": "16:45:00",
+          "Order": "5"
+        },
+        {
+          "Station": "6180",
+          "ARRTime": "17:03:00",
+          "DEPTime": "17:04:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "17:25:00",
+          "DEPTime": "17:28:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "18:26:00",
+          "DEPTime": "18:27:00",
+          "Order": "8"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "18:33:00",
+          "DEPTime": "18:35:00",
+          "Order": "9"
+        },
+        {
+          "Station": "0920",
+          "ARRTime": "19:29:00",
+          "DEPTime": "19:30:00",
+          "Order": "10"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:47:00",
+          "DEPTime": "19:48:00",
+          "Order": "11"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:55:00",
+          "DEPTime": "19:58:00",
+          "Order": "12"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "20:05:00",
+          "DEPTime": "20:06:00",
+          "Order": "13"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "20:13:00",
+          "DEPTime": "20:26:00",
+          "Order": "14"
+        }
+      ]
+    },
+    {
+      "Train": "5249",
+      "CarClass": "1108",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "16:31:00",
+          "DEPTime": "16:31:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "16:53:00",
+          "DEPTime": "16:55:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "17:08:00",
+          "DEPTime": "17:20:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "17:39:00",
+          "DEPTime": "17:41:00",
+          "Order": "4"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "17:55:00",
+          "DEPTime": "17:56:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "18:43:00",
+          "DEPTime": "18:49:00",
+          "Order": "6"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "21:15:00",
+          "DEPTime": "21:16:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "21:23:00",
+          "DEPTime": "21:25:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "21:33:00",
+          "DEPTime": "21:34:00",
+          "Order": "9"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "21:41:00",
+          "DEPTime": "21:41:00",
+          "Order": "10"
+        }
+      ]
+    },
+    {
+      "Train": "5250",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "18:39:00",
+          "DEPTime": "18:44:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "18:51:00",
+          "DEPTime": "18:53:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:01:00",
+          "DEPTime": "19:05:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:11:00",
+          "DEPTime": "19:12:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "19:26:00",
+          "DEPTime": "19:29:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "20:24:00",
+          "DEPTime": "20:26:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "20:32:00",
+          "DEPTime": "20:34:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "21:32:00",
+          "DEPTime": "21:32:00",
+          "Order": "8"
+        }
+      ]
+    },
+    {
+      "Train": "5253",
+      "CarClass": "1107",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "4340",
+          "ARRTime": "15:12:00",
+          "DEPTime": "15:12:00",
+          "Order": "1"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "15:21:00",
+          "DEPTime": "15:25:00",
+          "Order": "2"
+        },
+        {
+          "Station": "4440",
+          "ARRTime": "15:30:00",
+          "DEPTime": "15:31:00",
+          "Order": "3"
+        },
+        {
+          "Station": "5000",
+          "ARRTime": "15:42:00",
+          "DEPTime": "15:44:00",
+          "Order": "4"
+        },
+        {
+          "Station": "5050",
+          "ARRTime": "15:54:00",
+          "DEPTime": "15:55:00",
+          "Order": "5"
+        },
+        {
+          "Station": "5120",
+          "ARRTime": "16:14:00",
+          "DEPTime": "16:17:00",
+          "Order": "6"
+        },
+        {
+          "Station": "5230",
+          "ARRTime": "17:36:00",
+          "DEPTime": "17:39:00",
+          "Order": "7"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "17:51:00",
+          "DEPTime": "17:54:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "18:50:00",
+          "DEPTime": "18:53:00",
+          "Order": "9"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "19:07:00",
+          "DEPTime": "19:11:00",
+          "Order": "10"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "20:07:00",
+          "DEPTime": "20:17:00",
+          "Order": "11"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "22:18:00",
+          "DEPTime": "22:20:00",
+          "Order": "12"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "22:30:00",
+          "DEPTime": "22:33:00",
+          "Order": "13"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "22:41:00",
+          "DEPTime": "22:42:00",
+          "Order": "14"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "22:48:00",
+          "DEPTime": "22:51:00",
+          "Order": "15"
+        }
+      ]
+    },
+    {
+      "Train": "5254",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "19:05:00",
+          "DEPTime": "19:10:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "19:17:00",
+          "DEPTime": "19:18:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:26:00",
+          "DEPTime": "19:29:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:35:00",
+          "DEPTime": "19:36:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "19:39:00",
+          "DEPTime": "19:40:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "21:47:00",
+          "DEPTime": "21:49:00",
+          "Order": "6"
+        },
+        {
+          "Station": "6180",
+          "ARRTime": "22:09:00",
+          "DEPTime": "22:10:00",
+          "Order": "7"
+        },
+        {
+          "Station": "6160",
+          "ARRTime": "22:18:00",
+          "DEPTime": "22:19:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "22:31:00",
+          "DEPTime": "22:32:00",
+          "Order": "9"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "22:45:00",
+          "DEPTime": "22:47:00",
+          "Order": "10"
+        },
+        {
+          "Station": "6080",
+          "ARRTime": "22:58:00",
+          "DEPTime": "22:59:00",
+          "Order": "11"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "23:05:00",
+          "DEPTime": "23:06:00",
+          "Order": "12"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "23:15:00",
+          "DEPTime": "23:16:00",
+          "Order": "13"
+        },
+        {
+          "Station": "6020",
+          "ARRTime": "23:27:00",
+          "DEPTime": "23:29:00",
+          "Order": "14"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "23:41:00",
+          "DEPTime": "23:41:00",
+          "Order": "15"
+        }
+      ]
+    },
+    {
+      "Train": "5281",
+      "CarClass": "1107",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "17:08:00",
+          "DEPTime": "17:08:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "18:04:00",
+          "DEPTime": "18:06:00",
+          "Order": "2"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "18:12:00",
+          "DEPTime": "18:14:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "19:11:00",
+          "DEPTime": "19:12:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:29:00",
+          "DEPTime": "19:31:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:38:00",
+          "DEPTime": "19:41:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "19:48:00",
+          "DEPTime": "19:50:00",
+          "Order": "7"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "21:24:00",
+          "DEPTime": "21:26:00",
+          "Order": "8"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "21:35:00",
+          "DEPTime": "21:38:00",
+          "Order": "9"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "21:56:00",
+          "DEPTime": "21:56:00",
+          "Order": "10"
+        }
+      ]
+    },
+    {
+      "Train": "5296",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "19:55:00",
+          "DEPTime": "20:04:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "20:11:00",
+          "DEPTime": "20:13:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "20:21:00",
+          "DEPTime": "20:25:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "20:31:00",
+          "DEPTime": "20:32:00",
+          "Order": "4"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "22:42:00",
+          "DEPTime": "22:45:00",
+          "Order": "5"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "23:34:00",
+          "DEPTime": "23:36:00",
+          "Order": "6"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "23:51:00",
+          "DEPTime": "23:52:00",
+          "Order": "7"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "00:00:00",
+          "DEPTime": "00:02:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "00:23:00",
+          "DEPTime": "00:23:00",
+          "Order": "9"
+        }
+      ]
+    },
+    {
+      "Train": "5297",
+      "CarClass": "110G",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "14:18:00",
+          "DEPTime": "14:18:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "14:38:00",
+          "DEPTime": "14:40:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "14:49:00",
+          "DEPTime": "14:51:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "15:07:00",
+          "DEPTime": "15:09:00",
+          "Order": "4"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "16:11:00",
+          "DEPTime": "16:15:00",
+          "Order": "5"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "18:33:00",
+          "DEPTime": "18:34:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "18:42:00",
+          "DEPTime": "18:44:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "18:52:00",
+          "DEPTime": "18:53:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "18:59:00",
+          "DEPTime": "19:02:00",
+          "Order": "9"
+        }
+      ]
+    },
+    {
+      "Train": "5316",
+      "CarClass": "1108",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "16:48:00",
+          "DEPTime": "16:48:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "17:57:00",
+          "DEPTime": "18:00:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "18:23:00",
+          "DEPTime": "18:29:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "18:41:00",
+          "DEPTime": "18:56:00",
+          "Order": "4"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "19:19:00",
+          "DEPTime": "19:25:00",
+          "Order": "5"
+        },
+        {
+          "Station": "5230",
+          "ARRTime": "19:37:00",
+          "DEPTime": "19:48:00",
+          "Order": "6"
+        },
+        {
+          "Station": "5050",
+          "ARRTime": "21:22:00",
+          "DEPTime": "21:23:00",
+          "Order": "7"
+        },
+        {
+          "Station": "5000",
+          "ARRTime": "21:35:00",
+          "DEPTime": "21:37:00",
+          "Order": "8"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "21:55:00",
+          "DEPTime": "21:58:00",
+          "Order": "9"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "22:08:00",
+          "DEPTime": "22:08:00",
+          "Order": "10"
+        }
+      ]
+    },
+    {
+      "Train": "5376",
+      "CarClass": "110G",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "13:03:00",
+          "DEPTime": "13:03:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5230",
+          "ARRTime": "13:18:00",
+          "DEPTime": "13:24:00",
+          "Order": "2"
+        },
+        {
+          "Station": "5220",
+          "ARRTime": "13:33:00",
+          "DEPTime": "13:34:00",
+          "Order": "3"
+        },
+        {
+          "Station": "5210",
+          "ARRTime": "13:43:00",
+          "DEPTime": "13:44:00",
+          "Order": "4"
+        },
+        {
+          "Station": "5190",
+          "ARRTime": "13:59:00",
+          "DEPTime": "14:00:00",
+          "Order": "5"
+        },
+        {
+          "Station": "5120",
+          "ARRTime": "14:32:00",
+          "DEPTime": "14:36:00",
+          "Order": "6"
+        },
+        {
+          "Station": "5050",
+          "ARRTime": "14:55:00",
+          "DEPTime": "14:56:00",
+          "Order": "7"
+        },
+        {
+          "Station": "5000",
+          "ARRTime": "15:06:00",
+          "DEPTime": "15:07:00",
+          "Order": "8"
+        },
+        {
+          "Station": "4440",
+          "ARRTime": "15:18:00",
+          "DEPTime": "15:19:00",
+          "Order": "9"
+        },
+        {
+          "Station": "4400",
+          "ARRTime": "15:24:00",
+          "DEPTime": "15:27:00",
+          "Order": "10"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "15:34:00",
+          "DEPTime": "15:35:00",
+          "Order": "11"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "16:00:00",
+          "DEPTime": "16:03:00",
+          "Order": "12"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "16:41:00",
+          "DEPTime": "16:43:00",
+          "Order": "13"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "17:33:00",
+          "DEPTime": "17:35:00",
+          "Order": "14"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "17:47:00",
+          "DEPTime": "17:50:00",
+          "Order": "15"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "17:59:00",
+          "DEPTime": "18:01:00",
+          "Order": "16"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "18:43:00",
+          "DEPTime": "18:45:00",
+          "Order": "17"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "19:11:00",
+          "DEPTime": "19:12:00",
+          "Order": "18"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "19:20:00",
+          "DEPTime": "19:22:00",
+          "Order": "19"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "19:43:00",
+          "DEPTime": "19:45:00",
+          "Order": "20"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "19:54:00",
+          "DEPTime": "19:58:00",
+          "Order": "21"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "20:04:00",
+          "DEPTime": "20:05:00",
+          "Order": "22"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "20:24:00",
+          "DEPTime": "20:24:00",
+          "Order": "23"
+        }
+      ]
+    },
+    {
+      "Train": "5429",
+      "CarClass": "1132",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0930",
+          "ARRTime": "11:24:00",
+          "DEPTime": "11:24:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "11:32:00",
+          "DEPTime": "11:32:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "11:39:00",
+          "DEPTime": "11:40:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "11:44:00",
+          "DEPTime": "11:45:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "11:52:00",
+          "DEPTime": "11:55:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "12:03:00",
+          "DEPTime": "12:05:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "12:21:00",
+          "DEPTime": "12:22:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "12:30:00",
+          "DEPTime": "12:32:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "12:59:00",
+          "DEPTime": "13:01:00",
+          "Order": "9"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "13:15:00",
+          "DEPTime": "13:16:00",
+          "Order": "10"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "13:27:00",
+          "DEPTime": "13:29:00",
+          "Order": "11"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "13:54:00",
+          "DEPTime": "13:55:00",
+          "Order": "12"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "14:06:00",
+          "DEPTime": "14:13:00",
+          "Order": "13"
+        },
+        {
+          "Station": "3340",
+          "ARRTime": "14:20:00",
+          "DEPTime": "14:21:00",
+          "Order": "14"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "14:30:00",
+          "DEPTime": "14:30:00",
+          "Order": "15"
+        }
+      ]
+    },
+    {
+      "Train": "5430",
+      "CarClass": "1132",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "3360",
+          "ARRTime": "14:51:00",
+          "DEPTime": "14:51:00",
+          "Order": "1"
+        },
+        {
+          "Station": "3340",
+          "ARRTime": "15:00:00",
+          "DEPTime": "15:02:00",
+          "Order": "2"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "15:10:00",
+          "DEPTime": "15:12:00",
+          "Order": "3"
+        },
+        {
+          "Station": "3230",
+          "ARRTime": "15:23:00",
+          "DEPTime": "15:25:00",
+          "Order": "4"
+        },
+        {
+          "Station": "3160",
+          "ARRTime": "15:48:00",
+          "DEPTime": "15:50:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "16:01:00",
+          "DEPTime": "16:02:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "16:16:00",
+          "DEPTime": "16:17:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "16:46:00",
+          "DEPTime": "16:47:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "16:56:00",
+          "DEPTime": "16:58:00",
+          "Order": "9"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "17:17:00",
+          "DEPTime": "17:19:00",
+          "Order": "10"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "17:28:00",
+          "DEPTime": "17:31:00",
+          "Order": "11"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "17:37:00",
+          "DEPTime": "17:38:00",
+          "Order": "12"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "17:41:00",
+          "DEPTime": "17:43:00",
+          "Order": "13"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "17:58:00",
+          "DEPTime": "17:58:00",
+          "Order": "14"
+        }
+      ]
+    },
+    {
+      "Train": "6035",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "09:32:00",
+          "DEPTime": "09:32:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6130",
+          "ARRTime": "11:15:00",
+          "DEPTime": "12:00:00",
+          "Order": "2"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "13:32:00",
+          "DEPTime": "13:35:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "17:09:00",
+          "DEPTime": "17:39:00",
+          "Order": "4"
+        }
+      ]
+    },
+    {
+      "Train": "6564",
+      "CarClass": "1104",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1180",
+          "ARRTime": "07:12:00",
+          "DEPTime": "07:12:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1160",
+          "ARRTime": "07:21:00",
+          "DEPTime": "07:23:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1130",
+          "ARRTime": "07:30:00",
+          "DEPTime": "07:32:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1120",
+          "ARRTime": "07:38:00",
+          "DEPTime": "07:39:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1110",
+          "ARRTime": "07:43:00",
+          "DEPTime": "07:44:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "07:51:00",
+          "DEPTime": "08:00:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1090",
+          "ARRTime": "08:05:00",
+          "DEPTime": "08:06:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "08:12:00",
+          "DEPTime": "08:13:00",
+          "Order": "8"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "08:26:00",
+          "DEPTime": "08:27:00",
+          "Order": "9"
+        },
+        {
+          "Station": "7150",
+          "ARRTime": "10:20:00",
+          "DEPTime": "10:37:00",
+          "Order": "10"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "11:33:00",
+          "DEPTime": "11:45:00",
+          "Order": "11"
+        },
+        {
+          "Station": "6100",
+          "ARRTime": "13:11:00",
+          "DEPTime": "13:23:00",
+          "Order": "12"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "13:44:00",
+          "DEPTime": "16:13:00",
+          "Order": "13"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "16:42:00",
+          "DEPTime": "16:42:00",
+          "Order": "14"
+        }
+      ]
+    },
+    {
+      "Train": "6616",
+      "CarClass": "1104",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1000",
+          "ARRTime": "19:15:00",
+          "DEPTime": "19:20:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "19:26:00",
+          "DEPTime": "19:27:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "19:30:00",
+          "DEPTime": "19:31:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0960",
+          "ARRTime": "19:37:00",
+          "DEPTime": "19:43:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0920",
+          "ARRTime": "19:52:00",
+          "DEPTime": "19:53:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7360",
+          "ARRTime": "20:01:00",
+          "DEPTime": "20:02:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7290",
+          "ARRTime": "20:24:00",
+          "DEPTime": "20:25:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "20:51:00",
+          "DEPTime": "20:51:00",
+          "Order": "8"
         }
       ]
     }
