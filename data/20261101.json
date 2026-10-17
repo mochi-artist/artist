@@ -269059,6 +269059,46 @@
           "Order": "3"
         }
       ]
+    },
+    {
+      "Train": "6044",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "0980",
+          "ARRTime": "10:00:00",
+          "DEPTime": "10:00:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7090",
+          "ARRTime": "13:27:00",
+          "DEPTime": "13:27:00",
+          "Order": "2"
+        }
+      ]
+    },
+    {
+      "Train": "6045",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7090",
+          "ARRTime": "16:06:00",
+          "DEPTime": "16:06:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "18:36:00",
+          "DEPTime": "19:06:00",
+          "Order": "2"
+        }
+      ]
     }
   ]
 }
