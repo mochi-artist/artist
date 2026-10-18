@@ -116,4 +116,109 @@
     </div>
 </nav>
 
+<!-- 📱 手機版專屬優化：merged_history.txt 檢視視窗 -->
+<div id="mobile-txt-modal" onclick="if(event.target===this)window.closeMergedTxtMobile()" 
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:flex-end; justify-content:center; backdrop-filter:blur(2px);">
+    
+    <div style="background:#131b2d; color:#f1f5f9; width:100%; max-width:600px; height:86vh; border-radius:16px 16px 0 0; border-top:1px solid rgba(255,255,255,0.18); display:flex; flex-direction:column; overflow:hidden; box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
+        
+        <!-- 頂部標題與大顆關閉鈕 (方便手指點擊) -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <span style="font-weight:bold; color:#4ade80; font-size:15px;">📋 已合併加班車視察</span>
+            <button onclick="window.closeMergedTxtMobile()" 
+                    style="background:rgba(255,255,255,0.1); border:none; color:#f8fafc; font-size:14px; padding:4px 12px; border-radius:6px; cursor:pointer;">
+                關閉 ✕
+            </button>
+        </div>
 
+        <!-- 快速過濾列 (手機免狂滑 300 行) -->
+        <div style="padding:8px 14px; background:#162032; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <input type="search" id="mobile-txt-filter" oninput="window.filterMobileTxt()" 
+                   placeholder="🔍 輸入日期(如 1018)、車次或站名快速過濾..." 
+                   style="width:100%; background:#0b0f19; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:7px 10px; font-size:14px; outline:none;">
+        </div>
+
+        <!-- 文字內容區 (支援橫向捲動不亂斷行) -->
+        <pre id="mobile-txt-content" 
+             style="padding:12px 14px; margin:0; overflow-y:auto; overflow-x:auto; flex:1; font-size:13px; line-height:1.65; white-space:pre; font-family:Consolas, monospace; -webkit-overflow-scrolling:touch;"></pre>
+    </div>
+</div>
+
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none;" onload="
+(function() {
+    let rawMobileTxt = '';
+
+    // 精簡長文字，讓手機螢幕一行塞得下
+    function formatForMobile(text) {
+        return text
+            .replace(/\[來源:\s*朋友倉庫\([^)]+\)\]/g, '[朋友]')
+            .replace(/\[來源:\s*原作者倉庫\([^)]+\)\]/g, '[原作者]')
+            .replace(/HAIFENG/g, '海風號')
+            .replace(/SHANLAN/g, '山嵐號')
+            .replace(/^\s*➜\s*/gm, '➜ ');
+    }
+
+    window.viewMergedTxtMobile = async function() {
+        // 自動收起手機版 Bootstrap 漢堡選單
+        const navCollapse = document.querySelector('.navbar-collapse.show');
+        if (navCollapse) navCollapse.classList.remove('show');
+
+        const modal = document.getElementById('mobile-txt-modal');
+        const box = document.getElementById('mobile-txt-content');
+        const filterInput = document.getElementById('mobile-txt-filter');
+        if (filterInput) filterInput.value = '';
+
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // 鎖定背景網頁捲動
+        box.textContent = '⏳ 正在讀取最新加班車清單...';
+
+        try {
+            let res = await fetch('merged_history.txt?t=' + Date.now());
+            // 若本機測試找不到檔案，自動退回抓取 GitHub 雲端最新檔案
+            if (!res.ok) {
+                res = await fetch('https://raw.githubusercontent.com/mochi-artist/artist/main/merged_history.txt?t=' + Date.now());
+            }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+
+            rawMobileTxt = formatForMobile(await res.text());
+            box.textContent = rawMobileTxt;
+        } catch (e) {
+            box.textContent = '❌ 讀取失敗：' + e.message;
+        }
+    };
+
+    window.closeMergedTxtMobile = function() {
+        document.getElementById('mobile-txt-modal').style.display = 'none';
+        document.body.style.overflow = ''; // 恢復背景捲動
+    };
+
+    window.filterMobileTxt = function() {
+        const kw = (document.getElementById('mobile-txt-filter')?.value || '').trim().toLowerCase();
+        const box = document.getElementById('mobile-txt-content');
+        if (!kw) {
+            box.textContent = rawMobileTxt;
+            return;
+        }
+        // 以日期區塊為單位過濾
+        const blocks = rawMobileTxt.split(/\n(?=📅 日期:)/);
+        const result = [];
+        for (const b of blocks) {
+            if (b.startsWith('======')) {
+                result.push(b.split('\n')[0] + '\n');
+                continue;
+            }
+            const lines = b.split('\n');
+            const header = lines[0];
+            if (header.toLowerCase().includes(kw)) {
+                result.push(b);
+            } else {
+                const matched = lines.slice(1).filter(l => l.toLowerCase().includes(kw));
+                if (matched.length > 0) {
+                    result.push(header + '\n' + matched.join('\n') + '\n');
+                }
+            }
+        }
+        box.textContent = result.length > 1 ? result.join('\n') : '⚪ 找不到符合「' + kw + '」的車次或日期';
+    };
+})();
+">
