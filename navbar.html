@@ -116,7 +116,7 @@
     </div>
 </nav>
 
-<!-- 📱 手機版視覺優化：merged_history.txt 檢視視窗 (嚴格鎖定左右邊界) -->
+<!-- 📱 手機版視覺優化：merged_history.txt 檢視視窗 (含月份下拉選單 + 嚴格鎖定左右邊界) -->
 <div id="mobile-txt-modal" onclick="if(event.target===this)window.closeMergedTxtMobile()" 
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:10000; align-items:flex-end; justify-content:center; backdrop-filter:blur(3px);">
     
@@ -134,14 +134,18 @@
             </button>
         </div>
 
-        <!-- 快速搜尋過濾列 -->
-        <div style="padding:8px 12px; background:#131c31; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <!-- 🌟 月份下拉選單 + 快速搜尋過濾列 -->
+        <div style="padding:8px 12px; background:#131c31; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; gap:8px; align-items:center; width:100%; box-sizing:border-box;">
+            <select id="mobile-txt-month" onchange="window.filterMobileTxt()" 
+                    style="background:#090d16; color:#38bdf8; font-weight:bold; border:1px solid rgba(56,189,248,0.35); border-radius:8px; padding:7px 8px; font-size:13px; outline:none; flex-shrink:0; max-width:44%;">
+                <option value="ALL">📅 全部月份</option>
+            </select>
             <input type="search" id="mobile-txt-filter" oninput="window.filterMobileTxt()" 
-                   placeholder="🔍 輸入日期(如 1024)、車次或站名過濾..." 
-                   style="width:100%; box-sizing:border-box; background:#090d16; color:#fff; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:7px 10px; font-size:13px; outline:none;">
+                   placeholder="🔍 搜尋日期、車次或站名..." 
+                   style="flex:1; min-width:0; box-sizing:border-box; background:#090d16; color:#fff; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:7px 10px; font-size:13px; outline:none;">
         </div>
 
-        <!-- 內容顯示區 (嚴格限制在手機左右邊界內，不產生橫向卷軸) -->
+        <!-- 內容顯示區 (嚴格限制在手機左右邊界內) -->
         <div id="mobile-txt-content" 
              style="padding:10px 12px 24px 12px; margin:0; overflow-y:auto; overflow-x:hidden; flex:1; width:100%; box-sizing:border-box; -webkit-overflow-scrolling:touch;"></div>
     </div>
@@ -150,6 +154,29 @@
 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none;" onload="
 (function() {
     let rawMobileTxt = '';
+
+    // 🌟 自動掃描 TXT 內的所有月份，動態建立下拉選單
+    function populateMonthSelect(text) {
+        const selectEl = document.getElementById('mobile-txt-month');
+        if (!selectEl) return;
+
+        const monthCounts = {};
+        const regex = /📅\s*日期:\s*(\d{4})(\d{2})(\d{2})/g;
+        let match;
+        while ((match = regex.exec(text)) !== null) {
+            const ym = match[1] + match[2];
+            monthCounts[ym] = (monthCounts[ym] || 0) + 1;
+        }
+
+        const months = Object.keys(monthCounts).sort();
+        let optionsHtml = `<option value='ALL'>📅 全部月份 (${months.length}個月)</option>`;
+        for (const ym of months) {
+            const y = ym.slice(0, 4);
+            const m = ym.slice(4, 6);
+            optionsHtml += `<option value='${ym}'>📅 ${y}年${m}月 (${monthCounts[ym]}天)</option>`;
+        }
+        selectEl.innerHTML = optionsHtml;
+    }
 
     // 將單行文字轉換為不超出螢幕寬度的排版 HTML
     function renderLinesToHTML(text) {
@@ -182,7 +209,6 @@
                 const route = trainMatch[4].trim().replace(/\s*->\s*/g, ' → ');
                 const rawSrc = (trainMatch[5] || '').trim();
 
-                // 精簡來源標籤（若只是「已存在於 data/」則省略，避免佔用手機寬度）
                 let srcBadge = '';
                 if (rawSrc.includes('本次新增')) {
                     srcBadge = `<span style='font-size:10px; color:#4ade80; border:1px solid rgba(74,222,128,0.4); padding:0 4px; border-radius:3px; flex-shrink:0;'>新增</span>`;
@@ -205,7 +231,6 @@
                 continue;
             }
 
-            // 3. 其他文字行 (自動換行不超出邊界)
             html += `<div style='font-size:12px; color:#94a3b8; padding:4px 2px; word-break:break-word;'>${line}</div>`;
         }
 
@@ -235,12 +260,12 @@
 
             rawMobileTxt = await res.text();
 
-            // 擷取頂部更新時間放到副標題
             const timeMatch = rawMobileTxt.match(/更新時間:\s*([0-9\-:\s]+)/);
             if (timeBox) {
                 timeBox.textContent = timeMatch ? ('最後更新：' + timeMatch[1].trim()) : '已載入最新清單';
             }
 
+            populateMonthSelect(rawMobileTxt);
             box.innerHTML = renderLinesToHTML(rawMobileTxt);
         } catch (e) {
             box.innerHTML = `<div style='text-align:center; color:#f87171; padding:30px 0; font-size:13px;'>❌ 讀取失敗：${e.message}</div>`;
@@ -252,30 +277,47 @@
         document.body.style.overflow = '';
     };
 
+    // 🌟 同時根據「選取月份」與「搜尋關鍵字」進行過濾
     window.filterMobileTxt = function() {
+        const selectedMonth = document.getElementById('mobile-txt-month')?.value || 'ALL';
         const kw = (document.getElementById('mobile-txt-filter')?.value || '').trim().toLowerCase();
         const box = document.getElementById('mobile-txt-content');
-        if (!kw) {
+        if (!box) return;
+
+        if (selectedMonth === 'ALL' && !kw) {
             box.innerHTML = renderLinesToHTML(rawMobileTxt);
+            box.scrollTop = 0;
             return;
         }
 
         const blocks = rawMobileTxt.split(/\n(?=📅 日期:)/);
         const matchedBlocks = [];
+
         for (const b of blocks) {
             if (b.startsWith('======')) continue;
             const lines = b.split('\n');
             const header = lines[0];
-            if (header.toLowerCase().includes(kw)) {
+
+            // 1. 先檢查是否符合下拉選單指定的月份 (YYYYMM)
+            if (selectedMonth !== 'ALL') {
+                const mMatch = header.match(/📅\s*日期:\s*(\d{6})/);
+                if (!mMatch || mMatch[1] !== selectedMonth) continue;
+            }
+
+            // 2. 再檢查是否符合搜尋框關鍵字
+            if (!kw || header.toLowerCase().includes(kw)) {
                 matchedBlocks.push(b);
             } else {
                 const sub = lines.slice(1).filter(l => l.toLowerCase().includes(kw));
                 if (sub.length > 0) {
-                    matchedBlocks.push(header + '\n' + sub.join('\n'));
+                    const updatedHeader = header.replace(/\(共\s*\d+\s*筆\)/, `(符合 ${sub.length} 筆)`);
+                    matchedBlocks.push(updatedHeader + '\n' + sub.join('\n'));
                 }
             }
         }
+
         box.innerHTML = renderLinesToHTML(matchedBlocks.join('\n'));
+        box.scrollTop = 0;
     };
 })();
 ">
