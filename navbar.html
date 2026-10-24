@@ -116,31 +116,34 @@
     </div>
 </nav>
 
-<!-- 📱 手機版專屬優化：merged_history.txt 檢視視窗 -->
+<!-- 📱 手機版視覺優化：merged_history.txt 檢視視窗 (嚴格鎖定左右邊界) -->
 <div id="mobile-txt-modal" onclick="if(event.target===this)window.closeMergedTxtMobile()" 
-     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:flex-end; justify-content:center; backdrop-filter:blur(2px);">
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.82); z-index:10000; align-items:flex-end; justify-content:center; backdrop-filter:blur(3px);">
     
-    <div style="background:#131b2d; color:#f1f5f9; width:100%; max-width:600px; height:86vh; border-radius:16px 16px 0 0; border-top:1px solid rgba(255,255,255,0.18); display:flex; flex-direction:column; overflow:hidden; box-shadow:0 -10px 30px rgba(0,0,0,0.5);">
+    <div style="background:#0f172a; color:#f1f5f9; width:100%; max-width:100vw; height:86vh; border-radius:16px 16px 0 0; border-top:1px solid rgba(255,255,255,0.15); display:flex; flex-direction:column; overflow:hidden; box-sizing:border-box; box-shadow:0 -10px 30px rgba(0,0,0,0.6);">
         
-        <!-- 頂部標題與大顆關閉鈕 (方便手指點擊) -->
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0f172a; border-bottom:1px solid rgba(255,255,255,0.1);">
-            <span style="font-weight:bold; color:#4ade80; font-size:15px;">📋 已合併加班車視察</span>
+        <!-- 頂部標題與更新時間 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#0b1120; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <div style="min-width:0; flex:1;">
+                <div style="font-weight:bold; color:#4ade80; font-size:15px;">📋 已合併加班車視察</div>
+                <div id="mobile-txt-time" style="font-size:11px; color:#94a3b8; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">讀取中...</div>
+            </div>
             <button onclick="window.closeMergedTxtMobile()" 
-                    style="background:rgba(255,255,255,0.1); border:none; color:#f8fafc; font-size:14px; padding:4px 12px; border-radius:6px; cursor:pointer;">
+                    style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#f8fafc; font-size:13px; padding:5px 12px; border-radius:6px; cursor:pointer; flex-shrink:0; margin-left:8px;">
                 關閉 ✕
             </button>
         </div>
 
-        <!-- 快速過濾列 (手機免狂滑 300 行) -->
-        <div style="padding:8px 14px; background:#162032; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <!-- 快速搜尋過濾列 -->
+        <div style="padding:8px 12px; background:#131c31; border-bottom:1px solid rgba(255,255,255,0.08);">
             <input type="search" id="mobile-txt-filter" oninput="window.filterMobileTxt()" 
-                   placeholder="🔍 輸入日期(如 1018)、車次或站名快速過濾..." 
-                   style="width:100%; background:#0b0f19; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:7px 10px; font-size:14px; outline:none;">
+                   placeholder="🔍 輸入日期(如 1024)、車次或站名過濾..." 
+                   style="width:100%; box-sizing:border-box; background:#090d16; color:#fff; border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:7px 10px; font-size:13px; outline:none;">
         </div>
 
-        <!-- 文字內容區 (支援橫向捲動不亂斷行) -->
-        <pre id="mobile-txt-content" 
-             style="padding:12px 14px; margin:0; overflow-y:auto; overflow-x:auto; flex:1; font-size:13px; line-height:1.65; white-space:pre; font-family:Consolas, monospace; -webkit-overflow-scrolling:touch;"></pre>
+        <!-- 內容顯示區 (嚴格限制在手機左右邊界內，不產生橫向卷軸) -->
+        <div id="mobile-txt-content" 
+             style="padding:10px 12px 24px 12px; margin:0; overflow-y:auto; overflow-x:hidden; flex:1; width:100%; box-sizing:border-box; -webkit-overflow-scrolling:touch;"></div>
     </div>
 </div>
 
@@ -148,77 +151,131 @@
 (function() {
     let rawMobileTxt = '';
 
-    // 精簡長文字，讓手機螢幕一行塞得下
-    function formatForMobile(text) {
-        return text
-            .replace(/\[來源:\s*朋友倉庫\([^)]+\)\]/g, '[朋友]')
-            .replace(/\[來源:\s*原作者倉庫\([^)]+\)\]/g, '[原作者]')
-            .replace(/HAIFENG/g, '海風號')
-            .replace(/SHANLAN/g, '山嵐號')
-            .replace(/^\s*➜\s*/gm, '➜ ');
+    // 將單行文字轉換為不超出螢幕寬度的排版 HTML
+    function renderLinesToHTML(text) {
+        const lines = text.split(/\r?\n/);
+        let html = '';
+
+        for (let rawLine of lines) {
+            const line = rawLine.trim();
+            if (!line || line.startsWith('======') || line.startsWith('------')) continue;
+
+            // 1. 日期標題列：📅 日期: 20261024 (共 32 筆)
+            const dateMatch = line.match(/📅\s*日期:\s*(\d{4})(\d{2})(\d{2})\s*\(([^)]+)\)/);
+            if (dateMatch) {
+                const dateFmt = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3];
+                const countStr = dateMatch[4];
+                html += `
+                <div style='display:flex; justify-content:space-between; align-items:center; background:#1e293b; border-left:3px solid #38bdf8; padding:6px 10px; margin:12px 0 6px 0; border-radius:4px; font-size:13px;'>
+                    <span style='font-weight:bold; color:#38bdf8;'>📅 ${dateFmt}</span>
+                    <span style='font-size:11px; color:#fbbf24; background:rgba(251,191,36,0.12); padding:1px 7px; border-radius:10px;'>${countStr}</span>
+                </div>`;
+                continue;
+            }
+
+            // 2. 車次明細列：➜ [3039] 區快 1132 (屏東 -> 枋寮) [來源: ...]
+            const trainMatch = line.match(/➜\s*\[([^\]]+)\]\s*(\S+)\s+(\S+)\s*\(([^)]+)\)\s*(?:\[來源:\s*([^\]]+)\])?/);
+            if (trainMatch) {
+                const trainNo = trainMatch[1].trim();
+                const carName = trainMatch[2].replace('HAIFENG', '海風號').replace('SHANLAN', '山嵐號');
+                const carCode = trainMatch[3].trim();
+                const route = trainMatch[4].trim().replace(/\s*->\s*/g, ' → ');
+                const rawSrc = (trainMatch[5] || '').trim();
+
+                // 精簡來源標籤（若只是「已存在於 data/」則省略，避免佔用手機寬度）
+                let srcBadge = '';
+                if (rawSrc.includes('本次新增')) {
+                    srcBadge = `<span style='font-size:10px; color:#4ade80; border:1px solid rgba(74,222,128,0.4); padding:0 4px; border-radius:3px; flex-shrink:0;'>新增</span>`;
+                } else if (rawSrc.includes('朋友')) {
+                    srcBadge = `<span style='font-size:10px; color:#38bdf8; background:rgba(56,189,248,0.12); padding:1px 5px; border-radius:3px; flex-shrink:0;'>朋友</span>`;
+                } else if (rawSrc.includes('原作者')) {
+                    srcBadge = `<span style='font-size:10px; color:#c084fc; background:rgba(192,132,252,0.12); padding:1px 5px; border-radius:3px; flex-shrink:0;'>原作者</span>`;
+                }
+
+                html += `
+                <div style='display:flex; align-items:center; justify-content:space-between; gap:6px; padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12.5px; line-height:1.4; width:100%; box-sizing:border-box;'>
+                    <div style='display:flex; align-items:center; gap:6px; min-width:0; flex:1; flex-wrap:wrap;'>
+                        <span style='color:#fbbf24; font-weight:bold; font-family:Consolas,monospace; min-width:48px;'>[${trainNo}]</span>
+                        <span style='color:#4ade80; font-weight:bold;'>${carName}</span>
+                        <span style='color:#64748b; font-size:11px; font-family:Consolas,monospace;'>${carCode}</span>
+                        <span style='color:#e2e8f0; word-break:keep-all;'>(${route})</span>
+                    </div>
+                    ${srcBadge}
+                </div>`;
+                continue;
+            }
+
+            // 3. 其他文字行 (自動換行不超出邊界)
+            html += `<div style='font-size:12px; color:#94a3b8; padding:4px 2px; word-break:break-word;'>${line}</div>`;
+        }
+
+        return html || `<div style='text-align:center; color:#94a3b8; padding:24px 0; font-size:13px;'>⚪ 無符合條件的車次資料</div>`;
     }
 
     window.viewMergedTxtMobile = async function() {
-        // 自動收起手機版 Bootstrap 漢堡選單
         const navCollapse = document.querySelector('.navbar-collapse.show');
         if (navCollapse) navCollapse.classList.remove('show');
 
         const modal = document.getElementById('mobile-txt-modal');
         const box = document.getElementById('mobile-txt-content');
+        const timeBox = document.getElementById('mobile-txt-time');
         const filterInput = document.getElementById('mobile-txt-filter');
         if (filterInput) filterInput.value = '';
 
         modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden'; // 鎖定背景網頁捲動
-        box.textContent = '⏳ 正在讀取最新加班車清單...';
+        document.body.style.overflow = 'hidden';
+        box.innerHTML = `<div style='text-align:center; color:#94a3b8; padding:30px 0; font-size:13px;'>⏳ 正在讀取最新加班車清單...</div>`;
 
         try {
             let res = await fetch('merged_history.txt?t=' + Date.now());
-            // 若本機測試找不到檔案，自動退回抓取 GitHub 雲端最新檔案
             if (!res.ok) {
                 res = await fetch('https://raw.githubusercontent.com/mochi-artist/artist/main/merged_history.txt?t=' + Date.now());
             }
             if (!res.ok) throw new Error('HTTP ' + res.status);
 
-            rawMobileTxt = formatForMobile(await res.text());
-            box.textContent = rawMobileTxt;
+            rawMobileTxt = await res.text();
+
+            // 擷取頂部更新時間放到副標題
+            const timeMatch = rawMobileTxt.match(/更新時間:\s*([0-9\-:\s]+)/);
+            if (timeBox) {
+                timeBox.textContent = timeMatch ? ('最後更新：' + timeMatch[1].trim()) : '已載入最新清單';
+            }
+
+            box.innerHTML = renderLinesToHTML(rawMobileTxt);
         } catch (e) {
-            box.textContent = '❌ 讀取失敗：' + e.message;
+            box.innerHTML = `<div style='text-align:center; color:#f87171; padding:30px 0; font-size:13px;'>❌ 讀取失敗：${e.message}</div>`;
         }
     };
 
     window.closeMergedTxtMobile = function() {
         document.getElementById('mobile-txt-modal').style.display = 'none';
-        document.body.style.overflow = ''; // 恢復背景捲動
+        document.body.style.overflow = '';
     };
 
     window.filterMobileTxt = function() {
         const kw = (document.getElementById('mobile-txt-filter')?.value || '').trim().toLowerCase();
         const box = document.getElementById('mobile-txt-content');
         if (!kw) {
-            box.textContent = rawMobileTxt;
+            box.innerHTML = renderLinesToHTML(rawMobileTxt);
             return;
         }
-        // 以日期區塊為單位過濾
+
         const blocks = rawMobileTxt.split(/\n(?=📅 日期:)/);
-        const result = [];
+        const matchedBlocks = [];
         for (const b of blocks) {
-            if (b.startsWith('======')) {
-                result.push(b.split('\n')[0] + '\n');
-                continue;
-            }
+            if (b.startsWith('======')) continue;
             const lines = b.split('\n');
             const header = lines[0];
             if (header.toLowerCase().includes(kw)) {
-                result.push(b);
+                matchedBlocks.push(b);
             } else {
-                const matched = lines.slice(1).filter(l => l.toLowerCase().includes(kw));
-                if (matched.length > 0) {
-                    result.push(header + '\n' + matched.join('\n') + '\n');
+                const sub = lines.slice(1).filter(l => l.toLowerCase().includes(kw));
+                if (sub.length > 0) {
+                    matchedBlocks.push(header + '\n' + sub.join('\n'));
                 }
             }
         }
-        box.textContent = result.length > 1 ? result.join('\n') : '⚪ 找不到符合「' + kw + '」的車次或日期';
+        box.innerHTML = renderLinesToHTML(matchedBlocks.join('\n'));
     };
 })();
 ">
