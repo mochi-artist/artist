@@ -1097,6 +1097,26 @@
       ]
     },
     {
+      "Train": "6553",
+      "CarClass": "1130",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "09:11:00",
+          "DEPTime": "09:11:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7130",
+          "ARRTime": "10:12:00",
+          "DEPTime": "10:12:00",
+          "Order": "2"
+        }
+      ]
+    },
+    {
       "Train": "6629",
       "CarClass": "0001",
       "Line": "3",
@@ -1461,6 +1481,28 @@
           "ARRTime": "18:12:00",
           "DEPTime": "18:12:00",
           "Order": "4"
+        }
+      ]
+    }
+  ],
+  "20261214": [
+    {
+      "Train": "6554",
+      "CarClass": "1130",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "7130",
+          "ARRTime": "15:40:00",
+          "DEPTime": "15:40:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "16:43:00",
+          "DEPTime": "16:43:00",
+          "Order": "2"
         }
       ]
     }

@@ -262324,6 +262324,32 @@
           "DEPTime": "09:02:00"
         }
       ]
+    },
+    {
+      "Train": "6040",
+      "CarClass": "1106",
+      "Line": "2",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "3360",
+          "ARRTime": "15:58:00",
+          "DEPTime": "15:58:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "17:56:00",
+          "DEPTime": "18:15:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "19:40:00",
+          "DEPTime": "20:18:00",
+          "Order": "3"
+        }
+      ]
     }
   ]
 }

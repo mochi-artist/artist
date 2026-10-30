@@ -264851,6 +264851,32 @@
           "Order": "3"
         }
       ]
+    },
+    {
+      "Train": "6003",
+      "CarClass": "1106",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0980",
+          "ARRTime": "06:26:00",
+          "DEPTime": "07:57:00",
+          "Order": "1"
+        },
+        {
+          "Station": "4220",
+          "ARRTime": "12:21:00",
+          "DEPTime": "12:33:00",
+          "Order": "2"
+        },
+        {
+          "Station": "4340",
+          "ARRTime": "13:03:00",
+          "DEPTime": "13:36:00",
+          "Order": "3"
+        }
+      ]
     }
   ]
 }
