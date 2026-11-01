@@ -268642,6 +268642,44 @@
           "Order": "4"
         }
       ]
+    },
+    {
+      "Train": "6048",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "0980",
+          "ARRTime": "08:24:00",
+          "DEPTime": "08:24:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "11:15:00",
+          "DEPTime": "11:18:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6100",
+          "ARRTime": "12:45:00",
+          "DEPTime": "13:15:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6020",
+          "ARRTime": "14:27:00",
+          "DEPTime": "14:39:00",
+          "Order": "4"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "14:55:00",
+          "DEPTime": "14:55:00",
+          "Order": "5"
+        }
+      ]
     }
   ]
 }

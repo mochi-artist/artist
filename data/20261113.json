@@ -268752,6 +268752,46 @@
           "Order": "7"
         }
       ]
+    },
+    {
+      "Train": "6531",
+      "CarClass": "1104",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0980",
+          "ARRTime": "19:40:00",
+          "DEPTime": "19:57:00",
+          "Order": "1"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "22:18:00",
+          "DEPTime": "22:18:00",
+          "Order": "2"
+        }
+      ]
+    },
+    {
+      "Train": "6540",
+      "CarClass": "1104",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "3360",
+          "ARRTime": "05:16:00",
+          "DEPTime": "05:16:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "07:48:00",
+          "DEPTime": "07:56:00",
+          "Order": "2"
+        }
+      ]
     }
   ]
 }
