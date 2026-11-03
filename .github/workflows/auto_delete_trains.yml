@@ -46,6 +46,7 @@ jobs:
           if git diff-index --quiet HEAD --; then
             echo "沒有檔案變動，略過提交。"
           else
-            git commit -m "🗑️ 批次刪除指定車次資料 [skip ci]"
-            git push
+           git commit -m "🗑️ 批次刪除指定車次資料 [skip ci]"
+          git pull --rebase origin main
+          git push
           fi
