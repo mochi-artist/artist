@@ -1,46 +1,76 @@
-name: 📝 加班車資料匯入日期檔
+name: 公告文字檔自動匯入加班車 + 指定車次變更 CarClass
 
-# 觸發條件：只限手動點擊 (workflow_dispatch)
 on:
   workflow_dispatch:
+    inputs:
+      run_text_update:
+        description: '📖 是否執行 extratrain_data.txt 公告匯入'
+        required: false
+        type: boolean
+        default: true
+      enable_carclass_change:
+        description: '🎨 是否開啟「指定車次變更 CarClass」功能'
+        required: false
+        type: boolean
+        default: false
+      target_trains:
+        description: '🎯 目標車次 (如: 2183, 3231 或填 ALL 套用預設清單)'
+        required: false
+        type: string
+        default: ''
+      target_months:
+        description: '📅 目標時間 (支援 20261101 / 202611 / 1101 / 11 或 ALL)'
+        required: false
+        type: string
+        default: ''
+      target_carclass:
+        description: '🏷️ 要變更的 CarClass (如: 110F、1280、0001，填 AUTO 則依清單分流)'
+        required: false
+        type: string
+        default: '110F'
 
 permissions:
   contents: write
 
 jobs:
-  parse-and-update:
+  update-trains:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 檢出程式碼
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: 🐍 設定 Python 環境
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
-      # 👇 就是少了這一步！現在補回來了
-      - name: 🚀 執行文字公告解析腳本
+      - name: 🚀 執行公告匯入與 CarClass 變更
+        env:
+          RUN_TEXT_UPDATE: ${{ github.event.inputs.run_text_update }}
+          ENABLE_CARCLASS_CHANGE: ${{ github.event.inputs.enable_carclass_change }}
+          TARGET_TRAINS: ${{ github.event.inputs.target_trains }}
+          TARGET_MONTHS: ${{ github.event.inputs.target_months }}
+          TARGET_CARCLASS: ${{ github.event.inputs.target_carclass }}
         run: python change/auto_update_from_text.py
 
       - name: 💾 自動提交並推播 (Commit & Push)
         run: |
-          git config --global user.name "Text Parser Bot"
-          git config --global user.email "bot@github.com"
-          
-          # 1. 追蹤時刻表資料夾
-          git add data/ 
-          
-          # 2. 追蹤並儲存被清空的文字檔 (extratrain_data.txt)
-          if [ -f extratrain_data.txt ]; then
-            git add extratrain_data.txt
+          git config --global user.name "Train Updater Bot"
+          git config --global user.email "actions@github.com"
+
+          git add data/
+          if [ -f pending_trains.json ]; then
+            git add -f pending_trains.json
           fi
-          
-          # 3. 提交變更
+
           if git diff-index --quiet HEAD --; then
-            echo "沒有檔案變動，略過提交。"
+            echo "⚪ 沒有檔案變動，略過提交。"
           else
-            git commit -m "📝 從 extratrain_data.txt 解析並匯入加班車次 [skip ci]"
-            git push
+            git commit -m "🚆 自動更新加班車與變更指定 CarClass [skip ci]"
+            git pull --rebase -X theirs origin main
+            git push origin HEAD:main
           fi
