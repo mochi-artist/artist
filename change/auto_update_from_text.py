@@ -7,7 +7,10 @@ from datetime import datetime, timedelta
 # =================【使用者設定區】=================
 DEFAULT_YEAR = 2026                    
 INPUT_TXT = 'extratrain_data.txt'
-SOURCE_FILE = 'final_train_diagram_1151003.json'
+SOURCE_FILES = [
+    'final_train_diagram_1151003.json',
+    'extratrain_data.json'
+]
 FINAL_WHITELIST_FILE = 'final_train_diagram.json'
 TARGET_DIR = 'data' # 🌟 已修正為 GitHub 的相對路徑
 # =================================================
@@ -20,10 +23,51 @@ def load_whitelist(filename):
         trains = set()
         infos = data.get('TrainInfos', []) if isinstance(data, dict) else data
         for t in infos:
-            if 'Train' in t: trains.add(str(t['Train']))
+            if isinstance(t, dict) and 'Train' in t:
+                trains.add(str(t['Train']))
         print(f"🔒 白名單鎖定: {len(trains)} 筆")
         return trains
-    except: return set()
+    except:
+        return set()
+
+def load_sources(file_list):
+    """
+    載入多個來源 JSON 檔案（相容 {"TrainInfos": [...]} 與純陣列 [...] 格式）
+    回傳格式: { "車次": {"data": 車次物件, "sources": ["來源檔1", "來源檔2"]} }
+    若兩個檔案都有同一車次，後載入的 (extratrain_data.json) 會優先作為套用資料，並同時記錄兩個來源檔名。
+    """
+    source_map = {}
+    for filename in file_list:
+        if not os.path.exists(filename):
+            print(f"⚠️ 找不到來源檔 {filename}，已略過。")
+            continue
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            infos = data.get('TrainInfos', []) if isinstance(data, dict) else data
+            if not isinstance(infos, list):
+                print(f"⚠️ {filename} 格式不符（非陣列或無 TrainInfos），已略過。")
+                continue
+
+            count = 0
+            for t in infos:
+                if isinstance(t, dict) and 'Train' in t:
+                    tn = str(t['Train']).strip()
+                    if not tn:
+                        continue
+                    if tn not in source_map:
+                        source_map[tn] = {'data': t, 'sources': [filename]}
+                    else:
+                        source_map[tn]['data'] = t
+                        if filename not in source_map[tn]['sources']:
+                            source_map[tn]['sources'].append(filename)
+                    count += 1
+            print(f"📂 成功載入來源檔 [{filename}]: 共 {count} 筆車次")
+        except Exception as e:
+            print(f"❌ 讀取來源檔 {filename} 發生錯誤: {e}")
+            
+    return source_map
 
 def has_english_char(s):
     return bool(re.search(r'[a-zA-Z]', str(s)))
@@ -37,7 +81,8 @@ def get_train_summary(train_obj):
         dep_time = times[0].get('DEPTime', '??:??')
         arr_time = times[-1].get('ARRTime', '??:??')
         return f"{start_stn}({dep_time}) -> {end_stn}({arr_time})"
-    except: return "資料解析異常"
+    except:
+        return "資料解析異常"
 
 def is_valid_date(year, month, day):
     try:
@@ -56,7 +101,8 @@ def generate_date_range(start_date_str, end_date_str):
             date_list.append(curr.strftime("%Y%m%d"))
             curr += timedelta(days=1)
         return date_list
-    except ValueError: return []
+    except ValueError:
+        return []
 
 def parse_date(line):
     line = re.sub(r'(?<!\d)\d{3,5}[A-Z]*[\u4e00-\u9fa5]*次?', '', line)
@@ -138,15 +184,13 @@ def process_text_update():
     print(f"⚙️  目前年份設定: {DEFAULT_YEAR}")
     locked_trains = load_whitelist(FINAL_WHITELIST_FILE)
     
-    if not os.path.exists(SOURCE_FILE):
-        print(f"❌ 找不到來源檔 {SOURCE_FILE}")
+    source_map = load_sources(SOURCE_FILES)
+    if not source_map:
+        print(f"❌ 所有來源檔 {SOURCE_FILES} 皆無法讀取或無有效車次資料，任務終止。")
         return
 
-    with open(SOURCE_FILE, 'r', encoding='utf-8') as f:
-        source_data = json.load(f)
-    source_map = {str(t['Train']): t for t in source_data.get('TrainInfos', [])}
-
     updates = {} 
+    train_sources_log = {}
     
     print(f"\n📖 正在讀取並解析 {INPUT_TXT} ...")
     print("-" * 70)
@@ -179,10 +223,14 @@ def process_text_update():
                     print(f"   ↳ 🛡️ 跳過 [{train_no}] (已被白名單保護)")
                     continue
                 if train_no not in source_map:
-                    print(f"   ↳ ❌ 跳過 [{train_no}] (來源檔 {SOURCE_FILE} 中查無此車次)")
+                    print(f"   ↳ ❌ 跳過 [{train_no}] (於 {SOURCE_FILES} 中皆查無此車次)")
                     continue
 
-                proc_train = copy.deepcopy(source_map[train_no])
+                matched_info = source_map[train_no]
+                proc_train = copy.deepcopy(matched_info['data'])
+                matched_files = matched_info['sources']
+                matched_files_str = "、".join(matched_files)
+                train_sources_log[train_no] = matched_files_str
                 
                 if has_english_char(train_no):
                     proc_train['CarClass'] = "1280"
@@ -194,7 +242,7 @@ def process_text_update():
                         updates[d].append(proc_train)
                 
                 valid_count += 1
-                print(f"   ↳ ✅ 成功解析 [{train_no}]")
+                print(f"   ↳ ✅ 成功解析 [{train_no}] (成功偵測來源: {matched_files_str})")
                 
     print("-" * 70)
     print(f"✅ 解析完成！共產生 {valid_count} 筆有效指令。\n")
@@ -227,7 +275,6 @@ def process_text_update():
             except: pass
         
         t_trains = target_json.get('TrainInfos', [])
-        t_map = {str(t.get('Train', t.get('TrainNo'))): t for t in t_trains}
         
         logs = []
         preview_trains = copy.deepcopy(t_trains)
@@ -236,14 +283,15 @@ def process_text_update():
         for item in new_list:
             tn = str(item['Train'])
             info_str = get_train_summary(item)
+            src_label = train_sources_log.get(tn, "未知來源")
             
             if tn in preview_map:
                 preview_map[tn]['TimeInfos'] = item['TimeInfos']
-                logs.append(f"更新   | {tn:<6} | {info_str:<40} | 覆蓋時刻")
+                logs.append(f"更新   | {tn:<6} | {info_str:<35} | 覆蓋時刻 (來源: {src_label})")
             else:
-                note = "英->1280" if item.get('CarClass')=="1280" and has_english_char(tn) else ""
+                note = f"英->1280 (來源: {src_label})" if item.get('CarClass')=="1280" and has_english_char(tn) else f"來源: {src_label}"
                 preview_trains.append(item)
-                logs.append(f"新增   | {tn:<6} | {info_str:<40} | {note}")
+                logs.append(f"新增   | {tn:<6} | {info_str:<35} | {note}")
 
         tasks.append({
             'path': target_path,
@@ -257,7 +305,7 @@ def process_text_update():
             print(log)
         print("-" * 80)
 
-   # 🌟 拔除 input() 詢問，直接全自動執行寫入
+    # 🌟 拔除 input() 詢問，直接全自動執行寫入
     print("\n🚀 機器人自動確認，開始寫入檔案...")
     for task in tasks:
         path = task['path']
