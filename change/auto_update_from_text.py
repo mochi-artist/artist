@@ -12,7 +12,13 @@ SOURCE_FILES = [
     'extratrain_data.json'
 ]
 FINAL_WHITELIST_FILE = 'final_train_diagram.json'
-TARGET_DIR = 'data' # 🌟 已修正為 GitHub 的相對路徑
+TARGET_DIR = 'data'
+PENDING_FILE = 'pending_trains.json'
+
+# 預設規則車次清單 (與 auto_delete_trains.py 相同，當目標車次填 ALL 時使用)
+RULE_CLASS_0001 = ['6652', '6655', '6629', '6630']
+RULE_CLASS_0002 = ['6631', '6632', '6633', '6676', '6677']
+ALL_RULE_TRAINS = set(RULE_CLASS_0001 + RULE_CLASS_0002)
 # =================================================
 
 def load_whitelist(filename):
@@ -34,7 +40,6 @@ def load_sources(file_list):
     """
     載入多個來源 JSON 檔案（相容 {"TrainInfos": [...]} 與純陣列 [...] 格式）
     回傳格式: { "車次": {"data": 車次物件, "sources": ["來源檔1", "來源檔2"]} }
-    若兩個檔案都有同一車次，後載入的 (extratrain_data.json) 會優先作為套用資料，並同時記錄兩個來源檔名。
     """
     source_map = {}
     for filename in file_list:
@@ -176,7 +181,174 @@ def sort_trains_logic(train_list):
         return (999999, tn) 
     return sorted(train_list, key=key_func)
 
+# =====================================================================
+# 🌟 與 change/auto_delete_trains.py 相同的日期與車次比對機制
+# =====================================================================
+def is_date_matched(date_str, target_filters):
+    """
+    支援：
+    - ALL (空清單)：所有日期
+    - 8 碼指定單日 (YYYYMMDD，如 20261101)
+    - 6 碼指定年月 (YYYYMM，如 202611)
+    - 4 碼指定月日 (MMDD，如 1101)
+    - 1~2 碼指定月份 (MM，如 11 或 1)
+    """
+    if not target_filters:
+        return True
+    if len(date_str) != 8:
+        return False
+
+    for raw_f in target_filters:
+        f = raw_f.replace('-', '').replace('/', '').strip()
+        if len(f) == 8 and date_str == f:
+            return True
+        elif len(f) == 6 and date_str.startswith(f):
+            return True
+        elif len(f) == 4 and date_str[4:8] == f:
+            return True
+        elif len(f) <= 2 and f.isdigit() and date_str[4:6] == f.zfill(2):
+            return True
+    return False
+
+def resolve_new_carclass(train_no, target_carclass_input):
+    """
+    若指定具體 CarClass (如 110F、1280) 則直接使用；
+    若填 AUTO 且車次屬於 0001/0002 清單，則自動套用對應車種。
+    """
+    if target_carclass_input.upper() == 'AUTO':
+        if train_no in RULE_CLASS_0001:
+            return '0001'
+        elif train_no in RULE_CLASS_0002:
+            return '0002'
+        return None
+    return target_carclass_input
+
+def run_custom_carclass_update():
+    """
+    🌟 當 GitHub Actions 按鈕開啟時，依指定車次與日期/月份批次變更 CarClass
+    """
+    enable_flag = os.environ.get('ENABLE_CARCLASS_CHANGE', 'false').strip().lower()
+    target_trains_input = os.environ.get('TARGET_TRAINS', '').strip()
+    target_months_input = os.environ.get('TARGET_MONTHS', '').strip()
+    target_carclass_input = os.environ.get('TARGET_CARCLASS', '').strip()
+
+    # 若未勾選開啟，且未填寫車次參數，則直接略過
+    if enable_flag != 'true' and not (target_trains_input and target_months_input and target_carclass_input):
+        return
+
+    print("\n" + "=" * 70)
+    print("🎨 啟動【指定車次 CarClass 批次變更】功能")
+    print("=" * 70)
+
+    if not target_trains_input or not target_months_input or not target_carclass_input:
+        print("❌ 錯誤：已開啟 CarClass 變更功能，但未完整提供「目標車次」、「目標時間」或「目標 CarClass」參數。")
+        return
+
+    # 1️⃣ 解析「目標車次」 (與 auto_delete_trains.py 相同)
+    if target_trains_input.upper() == 'ALL':
+        target_trains = ALL_RULE_TRAINS
+    else:
+        target_trains = set([t.strip() for t in re.split(r'[,\s，、]+', target_trains_input) if t.strip()])
+
+    # 2️⃣ 解析「目標日期/月份/年月」 (與 auto_delete_trains.py 相同)
+    target_filters = []
+    if target_months_input.upper() != 'ALL':
+        target_filters = [m.strip() for m in re.split(r'[,\s，、]+', target_months_input) if m.strip()]
+
+    print(f"🎯 目標車次: {', '.join(sorted(target_trains))}")
+    print(f"📅 目標時間: {', '.join(target_filters) if target_filters else '所有時間 (ALL)'}")
+    print(f"🏷️ 目標 CarClass: {target_carclass_input}")
+    print("-" * 70)
+
+    total_updated = 0
+    modified_files = []
+
+    # 3️⃣ 掃描並變更 data/ 目錄下的 JSON 檔案
+    if os.path.exists(TARGET_DIR):
+        for filename in sorted(os.listdir(TARGET_DIR)):
+            if not filename.endswith('.json'):
+                continue
+
+            date_str = filename.replace('.json', '')
+            if not is_date_matched(date_str, target_filters):
+                continue
+
+            filepath = os.path.join(TARGET_DIR, filename)
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    daily_data = json.load(f)
+
+                train_list = []
+                if isinstance(daily_data, dict) and "TrainInfos" in daily_data:
+                    train_list = daily_data["TrainInfos"]
+                elif isinstance(daily_data, list):
+                    train_list = daily_data
+
+                affected = 0
+                for t in train_list:
+                    if not isinstance(t, dict):
+                        continue
+                    t_no = str(t.get("TrainNo", t.get("Train", ""))).strip()
+                    if t_no in target_trains:
+                        new_cls = resolve_new_carclass(t_no, target_carclass_input)
+                        if new_cls and str(t.get("CarClass", "")) != new_cls:
+                            old_cls = t.get("CarClass", "無")
+                            t["CarClass"] = new_cls
+                            affected += 1
+                            print(f"  🔄 [{date_str}.json] 車次 {t_no}: CarClass {old_cls} -> {new_cls}")
+
+                if affected > 0:
+                    with open(filepath, 'w', encoding='utf-8') as f:
+                        json.dump(daily_data, f, ensure_ascii=False, indent=2)
+                    total_updated += affected
+                    modified_files.append(date_str)
+
+            except Exception as e:
+                print(f"❌ 處理 {filename} 時發生錯誤: {e}")
+
+    # 4️⃣ 同步檢查並變更 pending_trains.json 內的暫存車次
+    if os.path.exists(PENDING_FILE):
+        try:
+            with open(PENDING_FILE, 'r', encoding='utf-8') as f:
+                pending_data = json.load(f)
+            pending_changed = False
+            for d_str, p_trains in pending_data.items():
+                if not is_date_matched(d_str, target_filters):
+                    continue
+                for t in p_trains:
+                    if not isinstance(t, dict):
+                        continue
+                    t_no = str(t.get("TrainNo", t.get("Train", ""))).strip()
+                    if t_no in target_trains:
+                        new_cls = resolve_new_carclass(t_no, target_carclass_input)
+                        if new_cls and str(t.get("CarClass", "")) != new_cls:
+                            old_cls = t.get("CarClass", "無")
+                            t["CarClass"] = new_cls
+                            total_updated += 1
+                            pending_changed = True
+                            print(f"  🔄 [pending_trains.json ({d_str})] 車次 {t_no}: CarClass {old_cls} -> {new_cls}")
+
+            if pending_changed:
+                modified_files.append("pending_trains.json")
+                with open(PENDING_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(pending_data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"❌ 處理 {PENDING_FILE} 時發生錯誤: {e}")
+
+    print("-" * 70)
+    if total_updated > 0:
+        print(f"✅ CarClass 變更完畢！共於 {len(modified_files)} 個檔案中，成功更新 {total_updated} 筆車次。")
+    else:
+        print("⚪ 掃描完畢，沒有找到需要變更 CarClass 的車次（或目標車次已是該 CarClass）。")
+
+
 def process_text_update():
+    # 允許透過環境變數控制是否跳過 TXT 解析
+    run_txt_flag = os.environ.get('RUN_TEXT_UPDATE', 'true').strip().lower()
+    if run_txt_flag == 'false':
+        print("⏩ 已略過 extratrain_data.txt 解析步驟。")
+        return
+
     if not os.path.exists(INPUT_TXT):
         print(f"❌ 找不到 {INPUT_TXT}，請確認是否已將公告貼入該檔案。")
         return
@@ -186,7 +358,7 @@ def process_text_update():
     
     source_map = load_sources(SOURCE_FILES)
     if not source_map:
-        print(f"❌ 所有來源檔 {SOURCE_FILES} 皆無法讀取或無有效車次資料，任務終止。")
+        print(f"❌ 所有來源檔 {SOURCE_FILES} 皆無法讀取或無有效車次資料，略過 TXT 匯入。")
         return
 
     updates = {} 
@@ -248,7 +420,7 @@ def process_text_update():
     print(f"✅ 解析完成！共產生 {valid_count} 筆有效指令。\n")
     
     if valid_count == 0:
-        print("⚠️ 提示: 沒有產生任何有效更新，任務結束。")
+        print("⚠️ 提示: extratrain_data.txt 沒有產生任何有效更新。")
         return
         
     print("="*80)
@@ -305,7 +477,6 @@ def process_text_update():
             print(log)
         print("-" * 80)
 
-    # 🌟 拔除 input() 詢問，直接全自動執行寫入
     print("\n🚀 機器人自動確認，開始寫入檔案...")
     for task in tasks:
         path = task['path']
@@ -313,11 +484,11 @@ def process_text_update():
             json.dump(task['json_data'], f, ensure_ascii=False, indent=2)
         print(f"✅ 已儲存 {task['date']}.json")
     
-    # 🔒 保留 extratrain_data.txt 內容不清空（已註解掉清空邏輯）
-    # with open(INPUT_TXT, 'w', encoding='utf-8') as f:
-    #     f.write("")
-        
-    print("\n🎉 全部任務完成！(已保留 extratrain_data.txt 內容)")
+    # 🔒 保留 extratrain_data.txt 內容不清空
+    print("\n🎉 extratrain_data.txt 匯入完成！(已保留 extratrain_data.txt 內容)")
 
 if __name__ == "__main__":
+    # 1. 先執行公告文字檔匯入
     process_text_update()
+    # 2. 若按鈕有開啟 CarClass 變更，接著針對指定日期與車次強制覆寫 CarClass
+    run_custom_carclass_update()
