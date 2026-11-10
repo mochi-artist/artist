@@ -269195,6 +269195,32 @@
           "Order": "3"
         }
       ]
+    },
+    {
+      "Train": "6049",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "7000",
+          "ARRTime": "16:08:00",
+          "DEPTime": "16:08:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "17:25:00",
+          "DEPTime": "17:28:00",
+          "Order": "2"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "18:53:00",
+          "DEPTime": "19:16:00",
+          "Order": "3"
+        }
+      ]
     }
   ]
 }
