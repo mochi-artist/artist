@@ -262606,6 +262606,50 @@
           "Order": "10"
         }
       ]
+    },
+    {
+      "Train": "6517",
+      "CarClass": "1104",
+      "Line": "1",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "1020",
+          "ARRTime": "08:50:00",
+          "DEPTime": "08:50:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "09:14:00",
+          "DEPTime": "09:16:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "09:50:00",
+          "DEPTime": "09:55:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "10:11:00",
+          "DEPTime": "10:17:00",
+          "Order": "4"
+        },
+        {
+          "Station": "3300",
+          "ARRTime": "11:05:00",
+          "DEPTime": "12:05:00",
+          "Order": "5"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "13:13:00",
+          "DEPTime": "13:13:00",
+          "Order": "6"
+        }
+      ]
     }
   ]
 }
