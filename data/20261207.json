@@ -177567,7 +177567,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -180857,7 +180857,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -262322,6 +262322,84 @@
           "Order": "2",
           "ARRTime": "09:02:00",
           "DEPTime": "09:02:00"
+        }
+      ]
+    },
+    {
+      "Train": "6026",
+      "CarClass": "1106",
+      "Line": "1",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "4340",
+          "ARRTime": "13:18:00",
+          "DEPTime": "14:00:00",
+          "Order": "1"
+        },
+        {
+          "Station": "4080",
+          "ARRTime": "15:31:00",
+          "DEPTime": "15:35:00",
+          "Order": "2"
+        },
+        {
+          "Station": "3340",
+          "ARRTime": "16:51:00",
+          "DEPTime": "16:53:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0980",
+          "ARRTime": "19:40:00",
+          "DEPTime": "20:17:00",
+          "Order": "4"
+        }
+      ]
+    },
+    {
+      "Train": "6664",
+      "CarClass": "1130",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "5210",
+          "ARRTime": "15:37:00",
+          "DEPTime": "15:37:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5090",
+          "ARRTime": "16:49:00",
+          "DEPTime": "17:15:00",
+          "Order": "2"
+        }
+      ]
+    },
+    {
+      "Train": "6681",
+      "CarClass": "1104",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "5130",
+          "ARRTime": "14:30:00",
+          "DEPTime": "14:30:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5210",
+          "ARRTime": "15:23:00",
+          "DEPTime": "16:33:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "16:59:00",
+          "DEPTime": "16:59:00",
+          "Order": "3"
         }
       ]
     }

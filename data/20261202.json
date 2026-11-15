@@ -172380,7 +172380,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -174207,7 +174207,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -174508,7 +174508,7 @@
       "Dinning": "N",
       "FoodSrv": "N",
       "Cripple": "N",
-      "CarClass": "1132",
+      "CarClass": "110F",
       "Bike": "N",
       "ExtraTrain": "N",
       "Everyday": "Y",
@@ -258416,6 +258416,38 @@
           "Order": "2",
           "ARRTime": "09:02:00",
           "DEPTime": "09:02:00"
+        }
+      ]
+    },
+    {
+      "Train": "6679",
+      "CarClass": "1104",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "4440",
+          "ARRTime": "13:09:00",
+          "DEPTime": "13:25:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5220",
+          "ARRTime": "15:25:00",
+          "DEPTime": "16:25:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6010",
+          "ARRTime": "17:11:00",
+          "DEPTime": "17:41:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "18:18:00",
+          "DEPTime": "18:18:00",
+          "Order": "4"
         }
       ]
     }
