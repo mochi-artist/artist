@@ -262402,6 +262402,26 @@
           "Order": "3"
         }
       ]
+    },
+    {
+      "Train": "6674",
+      "CarClass": "1112",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "5210",
+          "ARRTime": "15:28:00",
+          "DEPTime": "15:37:00",
+          "Order": "1"
+        },
+        {
+          "Station": "5090",
+          "ARRTime": "16:49:00",
+          "DEPTime": "17:13:00",
+          "Order": "2"
+        }
+      ]
     }
   ]
 }

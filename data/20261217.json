@@ -258860,6 +258860,64 @@
           "Order": "4"
         }
       ]
+    },
+    {
+      "Train": "6747",
+      "CarClass": "1130",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "19:06:00",
+          "DEPTime": "19:17:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "19:34:00",
+          "DEPTime": "19:50:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "20:00:00",
+          "DEPTime": "20:03:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1130",
+          "ARRTime": "20:19:00",
+          "DEPTime": "20:19:00",
+          "Order": "4"
+        }
+      ]
+    },
+    {
+      "Train": "6748",
+      "CarClass": "1130",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1130",
+          "ARRTime": "21:03:00",
+          "DEPTime": "21:03:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "21:32:00",
+          "DEPTime": "21:36:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1040",
+          "ARRTime": "21:53:00",
+          "DEPTime": "22:33:00",
+          "Order": "3"
+        }
+      ]
     }
   ]
 }

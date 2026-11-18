@@ -265315,92 +265315,394 @@
       ]
     },
     {
-        "Type": "1",
-        "Train": "6717",
-        "BreastFeed": "N",
-        "Route": "",
-        "Package": "N",
-        "OverNightStn": "",
-        "LineDir": "2",
-        "Line": "0",
-        "Dinning": "N",
-        "FoodSrv": "N",
-        "Cripple": "N",
-        "CarClass": "1150",
-        "Bike": "N",
-        "ExtraTrain": "Y",
-        "Everyday": "N",
-        "Note": "12月12、13日加開【普通車專列】(七堵=桃園間迴送)。",
-        "NoteEng": "",
-        "TimeInfos": [
-            { "Route": "", "Station": "0930", "Order": "1", "ARRTime": "07:41:00", "DEPTime": "07:41:00" },
-            { "Route": "", "Station": "0940", "Order": "2", "ARRTime": "07:44:30", "DEPTime": "07:44:30" },
-            { "Route": "", "Station": "0950", "Order": "3", "ARRTime": "07:47:30", "DEPTime": "07:47:30" },
-            { "Route": "", "Station": "0960", "Order": "4", "ARRTime": "07:49:00", "DEPTime": "07:49:00" },
-            { "Route": "", "Station": "0970", "Order": "5", "ARRTime": "07:50:30", "DEPTime": "07:50:30" },
-            { "Route": "", "Station": "0980", "Order": "6", "ARRTime": "07:55:30", "DEPTime": "07:55:30" },
-            { "Route": "", "Station": "0990", "Order": "7", "ARRTime": "08:00:00", "DEPTime": "08:06:00" },
-            { "Route": "", "Station": "1000", "Order": "8", "ARRTime": "08:15:00", "DEPTime": "08:17:00" },
-            { "Route": "", "Station": "1010", "Order": "9", "ARRTime": "08:21:00", "DEPTime": "08:21:00" },
-            { "Route": "", "Station": "1020", "Order": "10", "ARRTime": "08:26:30", "DEPTime": "08:26:30" },
-            { "Route": "", "Station": "1030", "Order": "11", "ARRTime": "08:29:30", "DEPTime": "08:29:30" },
-            { "Route": "", "Station": "1040", "Order": "12", "ARRTime": "08:32:30", "DEPTime": "08:32:30" },
-            { "Route": "", "Station": "1050", "Order": "13", "ARRTime": "08:35:00", "DEPTime": "08:35:00" },
-            { "Route": "", "Station": "1060", "Order": "14", "ARRTime": "08:37:30", "DEPTime": "08:37:30" },
-            { "Route": "", "Station": "1070", "Order": "15", "ARRTime": "08:43:00", "DEPTime": "08:43:00" },
-            { "Route": "", "Station": "1075", "Order": "16", "ARRTime": "08:48:30", "DEPTime": "08:48:30" },
-            { "Route": "", "Station": "1080", "Order": "17", "ARRTime": "08:54:00", "DEPTime": "09:40:00" },
-            { "Route": "", "Station": "1090", "Order": "18", "ARRTime": "09:48:00", "DEPTime": "09:48:00" },
-            { "Route": "", "Station": "1100", "Order": "19", "ARRTime": "09:52:00", "DEPTime": "09:52:00" },
-            { "Route": "", "Station": "1105", "Order": "20", "ARRTime": "09:53:30", "DEPTime": "09:53:30" },
-            { "Route": "", "Station": "1110", "Order": "21", "ARRTime": "09:58:00", "DEPTime": "09:58:00" },
-            { "Route": "", "Station": "1120", "Order": "22", "ARRTime": "10:02:00", "DEPTime": "10:02:00" },
-            { "Route": "", "Station": "1130", "Order": "23", "ARRTime": "10:11:00", "DEPTime": "10:11:00" }
-        ]
+      "Type": "1",
+      "Train": "6717",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "2",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1150",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "12月12、13日加開【普通車專列】(七堵=桃園間迴送)。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "1",
+          "ARRTime": "07:41:00",
+          "DEPTime": "07:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "0940",
+          "Order": "2",
+          "ARRTime": "07:44:30",
+          "DEPTime": "07:44:30"
+        },
+        {
+          "Route": "",
+          "Station": "0950",
+          "Order": "3",
+          "ARRTime": "07:47:30",
+          "DEPTime": "07:47:30"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "4",
+          "ARRTime": "07:49:00",
+          "DEPTime": "07:49:00"
+        },
+        {
+          "Route": "",
+          "Station": "0970",
+          "Order": "5",
+          "ARRTime": "07:50:30",
+          "DEPTime": "07:50:30"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "6",
+          "ARRTime": "07:55:30",
+          "DEPTime": "07:55:30"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "7",
+          "ARRTime": "08:00:00",
+          "DEPTime": "08:06:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "8",
+          "ARRTime": "08:15:00",
+          "DEPTime": "08:17:00"
+        },
+        {
+          "Route": "",
+          "Station": "1010",
+          "Order": "9",
+          "ARRTime": "08:21:00",
+          "DEPTime": "08:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "10",
+          "ARRTime": "08:26:30",
+          "DEPTime": "08:26:30"
+        },
+        {
+          "Route": "",
+          "Station": "1030",
+          "Order": "11",
+          "ARRTime": "08:29:30",
+          "DEPTime": "08:29:30"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "12",
+          "ARRTime": "08:32:30",
+          "DEPTime": "08:32:30"
+        },
+        {
+          "Route": "",
+          "Station": "1050",
+          "Order": "13",
+          "ARRTime": "08:35:00",
+          "DEPTime": "08:35:00"
+        },
+        {
+          "Route": "",
+          "Station": "1060",
+          "Order": "14",
+          "ARRTime": "08:37:30",
+          "DEPTime": "08:37:30"
+        },
+        {
+          "Route": "",
+          "Station": "1070",
+          "Order": "15",
+          "ARRTime": "08:43:00",
+          "DEPTime": "08:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "1075",
+          "Order": "16",
+          "ARRTime": "08:48:30",
+          "DEPTime": "08:48:30"
+        },
+        {
+          "Route": "",
+          "Station": "1080",
+          "Order": "17",
+          "ARRTime": "08:54:00",
+          "DEPTime": "09:40:00"
+        },
+        {
+          "Route": "",
+          "Station": "1090",
+          "Order": "18",
+          "ARRTime": "09:48:00",
+          "DEPTime": "09:48:00"
+        },
+        {
+          "Route": "",
+          "Station": "1100",
+          "Order": "19",
+          "ARRTime": "09:52:00",
+          "DEPTime": "09:52:00"
+        },
+        {
+          "Route": "",
+          "Station": "1105",
+          "Order": "20",
+          "ARRTime": "09:53:30",
+          "DEPTime": "09:53:30"
+        },
+        {
+          "Route": "",
+          "Station": "1110",
+          "Order": "21",
+          "ARRTime": "09:58:00",
+          "DEPTime": "09:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "1120",
+          "Order": "22",
+          "ARRTime": "10:02:00",
+          "DEPTime": "10:02:00"
+        },
+        {
+          "Route": "",
+          "Station": "1130",
+          "Order": "23",
+          "ARRTime": "10:11:00",
+          "DEPTime": "10:11:00"
+        }
+      ]
     },
     {
-        "Type": "1",
-        "Train": "6718",
-        "BreastFeed": "N",
-        "Route": "",
-        "Package": "N",
-        "OverNightStn": "",
-        "LineDir": "1",
-        "Line": "0",
-        "Dinning": "N",
-        "FoodSrv": "N",
-        "Cripple": "N",
-        "CarClass": "1150",
-        "Bike": "N",
-        "ExtraTrain": "Y",
-        "Everyday": "N",
-        "Note": "12月12、13日加開【普通車專列】(桃園=七堵間迴送)。",
-        "NoteEng": "",
-        "TimeInfos": [
-            { "Route": "", "Station": "1130", "Order": "1", "ARRTime": "13:43:00", "DEPTime": "13:43:00" },
-            { "Route": "", "Station": "1120", "Order": "2", "ARRTime": "13:53:00", "DEPTime": "14:15:00" },
-            { "Route": "", "Station": "1110", "Order": "3", "ARRTime": "14:21:00", "DEPTime": "14:21:00" },
-            { "Route": "", "Station": "1105", "Order": "4", "ARRTime": "14:26:00", "DEPTime": "14:26:00" },
-            { "Route": "", "Station": "1100", "Order": "5", "ARRTime": "14:28:00", "DEPTime": "14:28:00" },
-            { "Route": "", "Station": "1090", "Order": "6", "ARRTime": "14:32:00", "DEPTime": "14:32:00" },
-            { "Route": "", "Station": "1080", "Order": "7", "ARRTime": "14:39:00", "DEPTime": "14:53:00" },
-            { "Route": "", "Station": "1075", "Order": "8", "ARRTime": "14:58:00", "DEPTime": "14:58:00" },
-            { "Route": "", "Station": "1070", "Order": "9", "ARRTime": "15:03:30", "DEPTime": "15:03:30" },
-            { "Route": "", "Station": "1060", "Order": "10", "ARRTime": "15:08:00", "DEPTime": "15:08:00" },
-            { "Route": "", "Station": "1050", "Order": "11", "ARRTime": "15:10:30", "DEPTime": "15:10:30" },
-            { "Route": "", "Station": "1040", "Order": "12", "ARRTime": "15:13:00", "DEPTime": "15:13:00" },
-            { "Route": "", "Station": "1030", "Order": "13", "ARRTime": "15:16:00", "DEPTime": "15:16:00" },
-            { "Route": "", "Station": "1020", "Order": "14", "ARRTime": "15:20:00", "DEPTime": "15:20:00" },
-            { "Route": "", "Station": "1010", "Order": "15", "ARRTime": "15:26:00", "DEPTime": "15:26:00" },
-            { "Route": "", "Station": "1000", "Order": "16", "ARRTime": "15:31:00", "DEPTime": "15:33:00" },
-            { "Route": "", "Station": "0990", "Order": "17", "ARRTime": "15:41:00", "DEPTime": "15:41:00" },
-            { "Route": "", "Station": "0980", "Order": "18", "ARRTime": "15:44:30", "DEPTime": "15:44:30" },
-            { "Route": "", "Station": "0970", "Order": "19", "ARRTime": "15:50:00", "DEPTime": "15:50:00" },
-            { "Route": "", "Station": "0960", "Order": "20", "ARRTime": "15:51:30", "DEPTime": "15:51:30" },
-            { "Route": "", "Station": "0950", "Order": "21", "ARRTime": "15:53:00", "DEPTime": "15:53:00" },
-            { "Route": "", "Station": "0940", "Order": "22", "ARRTime": "15:57:00", "DEPTime": "15:57:00" },
-            { "Route": "", "Station": "0930", "Order": "23", "ARRTime": "16:01:00", "DEPTime": "16:01:00" }
-        ]
+      "Type": "1",
+      "Train": "6718",
+      "BreastFeed": "N",
+      "Route": "",
+      "Package": "N",
+      "OverNightStn": "",
+      "LineDir": "1",
+      "Line": "0",
+      "Dinning": "N",
+      "FoodSrv": "N",
+      "Cripple": "N",
+      "CarClass": "1150",
+      "Bike": "N",
+      "ExtraTrain": "Y",
+      "Everyday": "N",
+      "Note": "12月12、13日加開【普通車專列】(桃園=七堵間迴送)。",
+      "NoteEng": "",
+      "TimeInfos": [
+        {
+          "Route": "",
+          "Station": "1130",
+          "Order": "1",
+          "ARRTime": "13:43:00",
+          "DEPTime": "13:43:00"
+        },
+        {
+          "Route": "",
+          "Station": "1120",
+          "Order": "2",
+          "ARRTime": "13:53:00",
+          "DEPTime": "14:15:00"
+        },
+        {
+          "Route": "",
+          "Station": "1110",
+          "Order": "3",
+          "ARRTime": "14:21:00",
+          "DEPTime": "14:21:00"
+        },
+        {
+          "Route": "",
+          "Station": "1105",
+          "Order": "4",
+          "ARRTime": "14:26:00",
+          "DEPTime": "14:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1100",
+          "Order": "5",
+          "ARRTime": "14:28:00",
+          "DEPTime": "14:28:00"
+        },
+        {
+          "Route": "",
+          "Station": "1090",
+          "Order": "6",
+          "ARRTime": "14:32:00",
+          "DEPTime": "14:32:00"
+        },
+        {
+          "Route": "",
+          "Station": "1080",
+          "Order": "7",
+          "ARRTime": "14:39:00",
+          "DEPTime": "14:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "1075",
+          "Order": "8",
+          "ARRTime": "14:58:00",
+          "DEPTime": "14:58:00"
+        },
+        {
+          "Route": "",
+          "Station": "1070",
+          "Order": "9",
+          "ARRTime": "15:03:30",
+          "DEPTime": "15:03:30"
+        },
+        {
+          "Route": "",
+          "Station": "1060",
+          "Order": "10",
+          "ARRTime": "15:08:00",
+          "DEPTime": "15:08:00"
+        },
+        {
+          "Route": "",
+          "Station": "1050",
+          "Order": "11",
+          "ARRTime": "15:10:30",
+          "DEPTime": "15:10:30"
+        },
+        {
+          "Route": "",
+          "Station": "1040",
+          "Order": "12",
+          "ARRTime": "15:13:00",
+          "DEPTime": "15:13:00"
+        },
+        {
+          "Route": "",
+          "Station": "1030",
+          "Order": "13",
+          "ARRTime": "15:16:00",
+          "DEPTime": "15:16:00"
+        },
+        {
+          "Route": "",
+          "Station": "1020",
+          "Order": "14",
+          "ARRTime": "15:20:00",
+          "DEPTime": "15:20:00"
+        },
+        {
+          "Route": "",
+          "Station": "1010",
+          "Order": "15",
+          "ARRTime": "15:26:00",
+          "DEPTime": "15:26:00"
+        },
+        {
+          "Route": "",
+          "Station": "1000",
+          "Order": "16",
+          "ARRTime": "15:31:00",
+          "DEPTime": "15:33:00"
+        },
+        {
+          "Route": "",
+          "Station": "0990",
+          "Order": "17",
+          "ARRTime": "15:41:00",
+          "DEPTime": "15:41:00"
+        },
+        {
+          "Route": "",
+          "Station": "0980",
+          "Order": "18",
+          "ARRTime": "15:44:30",
+          "DEPTime": "15:44:30"
+        },
+        {
+          "Route": "",
+          "Station": "0970",
+          "Order": "19",
+          "ARRTime": "15:50:00",
+          "DEPTime": "15:50:00"
+        },
+        {
+          "Route": "",
+          "Station": "0960",
+          "Order": "20",
+          "ARRTime": "15:51:30",
+          "DEPTime": "15:51:30"
+        },
+        {
+          "Route": "",
+          "Station": "0950",
+          "Order": "21",
+          "ARRTime": "15:53:00",
+          "DEPTime": "15:53:00"
+        },
+        {
+          "Route": "",
+          "Station": "0940",
+          "Order": "22",
+          "ARRTime": "15:57:00",
+          "DEPTime": "15:57:00"
+        },
+        {
+          "Route": "",
+          "Station": "0930",
+          "Order": "23",
+          "ARRTime": "16:01:00",
+          "DEPTime": "16:01:00"
+        }
+      ]
+    },
+    {
+      "Train": "6071",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "6000",
+          "ARRTime": "14:12:00",
+          "DEPTime": "14:12:00",
+          "Order": "1"
+        },
+        {
+          "Station": "6020",
+          "ARRTime": "14:25:00",
+          "DEPTime": "14:27:00",
+          "Order": "2"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "16:55:00",
+          "DEPTime": "16:55:00",
+          "Order": "3"
+        }
+      ]
     }
   ]
 }

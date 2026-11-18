@@ -268922,6 +268922,38 @@
           "Order": "4"
         }
       ]
+    },
+    {
+      "Train": "6008",
+      "CarClass": "1106",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "0980",
+          "ARRTime": "08:24:00",
+          "DEPTime": "08:24:00",
+          "Order": "1"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "11:15:00",
+          "DEPTime": "11:18:00",
+          "Order": "2"
+        },
+        {
+          "Station": "6100",
+          "ARRTime": "12:45:00",
+          "DEPTime": "13:15:00",
+          "Order": "3"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "14:40:00",
+          "DEPTime": "14:40:00",
+          "Order": "4"
+        }
+      ]
     }
   ]
 }
