@@ -269588,6 +269588,104 @@
           "Order": "14"
         }
       ]
+    },
+    {
+      "Train": "5455",
+      "CarClass": "1132",
+      "Line": "2",
+      "LineDir": "1",
+      "TimeInfos": [
+        {
+          "Station": "0930",
+          "ARRTime": "18:18:00",
+          "DEPTime": "18:18:00",
+          "Order": "1"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "18:40:00",
+          "DEPTime": "18:42:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "18:49:00",
+          "DEPTime": "18:51:00",
+          "Order": "3"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "18:59:00",
+          "DEPTime": "19:00:00",
+          "Order": "4"
+        },
+        {
+          "Station": "1080",
+          "ARRTime": "19:23:00",
+          "DEPTime": "19:25:00",
+          "Order": "5"
+        },
+        {
+          "Station": "1100",
+          "ARRTime": "19:36:00",
+          "DEPTime": "19:45:00",
+          "Order": "6"
+        },
+        {
+          "Station": "1210",
+          "ARRTime": "20:13:00",
+          "DEPTime": "20:15:00",
+          "Order": "7"
+        },
+        {
+          "Station": "1250",
+          "ARRTime": "20:30:00",
+          "DEPTime": "20:32:00",
+          "Order": "8"
+        },
+        {
+          "Station": "2130",
+          "ARRTime": "20:44:00",
+          "DEPTime": "20:45:00",
+          "Order": "9"
+        },
+        {
+          "Station": "2170",
+          "ARRTime": "21:02:00",
+          "DEPTime": "21:04:00",
+          "Order": "10"
+        },
+        {
+          "Station": "2180",
+          "ARRTime": "21:10:00",
+          "DEPTime": "21:11:00",
+          "Order": "11"
+        },
+        {
+          "Station": "2200",
+          "ARRTime": "21:20:00",
+          "DEPTime": "21:21:00",
+          "Order": "12"
+        },
+        {
+          "Station": "2220",
+          "ARRTime": "21:30:00",
+          "DEPTime": "21:31:00",
+          "Order": "13"
+        },
+        {
+          "Station": "2230",
+          "ARRTime": "21:35:00",
+          "DEPTime": "21:37:00",
+          "Order": "14"
+        },
+        {
+          "Station": "3360",
+          "ARRTime": "21:55:00",
+          "DEPTime": "21:55:00",
+          "Order": "15"
+        }
+      ]
     }
   ]
 }
