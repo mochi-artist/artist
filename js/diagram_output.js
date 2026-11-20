@@ -7,7 +7,7 @@ const formattedDate = url.searchParams.get('formattedDate');
 const loadRealtimeParam = url.searchParams.get('realtime');
 const scrollToCurrentTimeParam = url.searchParams.get('scrollToCurrentTime');
 
-// 🌟 [新增] 抓取改點預覽的 JSON 檔案參數
+// 🌟 [新增] 抓取改點預覽的 JSON 檔案參數 
 const revisedJsonFile = url.searchParams.get('revisedJson');
 
 // 公用變數
