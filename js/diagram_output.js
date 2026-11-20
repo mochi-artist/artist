@@ -57,7 +57,7 @@ const staticSchedules = {
             file: "data/林鐵_20261001~20261031.json" 
         },
         { 
-            file: "data/林鐵_20261101~20261130.json" 
+            file: "data/林鐵_20261101~20261231.json" 
         }
     ],
     
