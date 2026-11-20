@@ -46,7 +46,7 @@
         border-radius: 4px !important;
         padding: 8px 0 !important; 
         font-size: 14px !important;
-        font-weight: bold !important; /* ✨ 確保所有數字都是粗體 */
+        font-weight: bold !important;
         border: none !important;
         text-align: center;
         display: block !important;
@@ -62,7 +62,7 @@
     }
 
     /* ==========================================
-       🌟 終極控制面板：淺灰色長方形與跳轉選單
+       🌟 終極控制面板：淺灰色長方形 + 兩段式年月 Bar
        ========================================== */
     .zabuto_calendar .calendar-month-header {
         display: none !important;
@@ -75,7 +75,7 @@
         background-color: #f1f5f9; 
         border-radius: 8px;        
         padding: 5px 10px;
-        margin-bottom: 12px;       
+        margin-bottom: 10px;       
     }
 
     .custom-calendar-header .nav-btn {
@@ -99,20 +99,136 @@
         font-weight: bold;
         color: #1e293b;
         text-align: center;
+        cursor: pointer;
+        user-select: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        transition: background-color 0.15s ease;
+    }
+
+    .custom-title-container:hover {
+        background-color: #e2e8f0;
     }
 
     .custom-title-container span i {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         margin-left: 6px;
         color: #64748b;
         vertical-align: middle;
+        transition: transform 0.2s ease;
     }
 
-    .custom-title-container select {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        opacity: 0; cursor: pointer;
-        appearance: none;
+    .custom-title-container.is-open span i {
+        transform: rotate(180deg);
+    }
+
+    /* 🌟 兩段式選擇面板 (先點年份 -> 展開該年 1~12 月 Bar) */
+    .ym-picker-panel {
+        display: none;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        text-align: left;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .ym-section-label {
+        font-size: 12px;
+        font-weight: bold;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .ym-year-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 2px 0;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ym-year-bar::-webkit-scrollbar,
+    .ym-month-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .ym-year-btn {
+        flex: 0 0 auto;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        color: #334155;
+        font-size: 14px;
+        font-weight: bold;
+        padding: 6px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .ym-year-btn:hover {
+        background-color: #e2e8f0;
+    }
+
+    .ym-year-btn.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+    }
+
+    .ym-month-bar-wrap {
+        display: none;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .ym-month-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 2px 0 4px 0;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ym-month-btn {
+        flex: 0 0 auto;
+        min-width: 50px;
+        border: 1px solid #f5d0a9;
+        background-color: #fff3e0;
+        color: #5d4037;
+        font-size: 13.5px;
+        font-weight: bold;
+        padding: 7px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.15s ease;
+    }
+
+    .ym-month-btn:hover:not(:disabled) {
+        background-color: #ffe0b2;
+    }
+
+    .ym-month-btn.active {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(13, 110, 253, 0.35);
+    }
+
+    .ym-month-btn:disabled {
+        background-color: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #94a3b8;
+        opacity: 0.6;
+        cursor: not-allowed;
     }
     </style>
 </head>
@@ -132,12 +248,22 @@
             <div class="col-xs-12 col-md-10 col-lg-8">
                 
                 <div class="custom-calendar-header" id="custom-header" style="display:none;">
-                    <button id="custom-prev" class="nav-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                    <div class="custom-title-container">
+                    <button id="custom-prev" class="nav-btn" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="custom-title-container" id="custom-title-trigger" title="點擊選擇年份與月份">
                         <span id="custom-title"></span>
-                        <select id="custom-month-select"></select>
                     </div>
-                    <button id="custom-next" class="nav-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button id="custom-next" class="nav-btn" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+
+                <!-- 🌟 先點年份、再顯示該年 1～12 月的 Bar -->
+                <div class="ym-picker-panel" id="ym-picker-panel">
+                    <div class="ym-section-label">請先選擇年份：</div>
+                    <div class="ym-year-bar" id="ym-year-bar"></div>
+
+                    <div class="ym-month-bar-wrap" id="ym-month-bar-wrap">
+                        <div class="ym-section-label" id="ym-month-label">選擇月份（左右滑動）：</div>
+                        <div class="ym-month-bar" id="ym-month-bar"></div>
+                    </div>
                 </div>
 
                 <div id="calendar-wrap">
@@ -163,7 +289,9 @@
         const line_kind = $.url('?lineKind');          
 
         let globalEvents = [];
+        let availableMonthsByYear = {}; // { 2025: Set([12]), 2026: Set([1..12]) }
         let currentYear, currentMonth;
+        let selectedPickerYear = null;
 
         async function getGitHubFileNames(owner, repo, path = '') {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
@@ -243,41 +371,131 @@
             $("navbar").load("navbar.html");
         });
 
+        function closeYmPicker() {
+            $('#ym-picker-panel').slideUp(160);
+            $('#custom-title-trigger').removeClass('is-open');
+        }
+
+        function renderYearBar() {
+            const yearBar = $('#ym-year-bar');
+            yearBar.empty();
+
+            const sortedYears = Object.keys(availableMonthsByYear)
+                .map(y => parseInt(y, 10))
+                .sort((a, b) => a - b);
+
+            sortedYears.forEach(yr => {
+                const isSelected = (yr === selectedPickerYear);
+                const btn = $('<button type="button" class="ym-year-btn"></button>')
+                    .text(`${yr}年`)
+                    .toggleClass('active', isSelected)
+                    .on('click', function () {
+                        selectedPickerYear = yr;
+                        renderYearBar();
+                        renderMonthBar(yr);
+                    });
+                yearBar.append(btn);
+            });
+        }
+
+        function renderMonthBar(year) {
+            const monthBarWrap = $('#ym-month-bar-wrap');
+            const monthBar = $('#ym-month-bar');
+            $('#ym-month-label').text(`${year}年 1～12 月（有底色代表有資料）：`);
+            monthBar.empty();
+
+            const validMonths = availableMonthsByYear[year] || new Set();
+            let activeBtnEl = null;
+
+            for (let m = 1; m <= 12; m++) {
+                const hasData = validMonths.has(m);
+                const isCurrent = (year === currentYear && m === currentMonth);
+
+                const btn = $('<button type="button" class="ym-month-btn"></button>')
+                    .text(`${m}月`)
+                    .toggleClass('active', isCurrent)
+                    .prop('disabled', !hasData);
+
+                if (hasData) {
+                    btn.on('click', function () {
+                        currentYear = year;
+                        currentMonth = m;
+                        renderCalendar(currentYear, currentMonth);
+                        closeYmPicker();
+                    });
+                }
+
+                if (isCurrent) activeBtnEl = btn[0];
+                monthBar.append(btn);
+            }
+
+            monthBarWrap.stop(true, true).slideDown(160, function () {
+                if (activeBtnEl) {
+                    activeBtnEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            });
+        }
+
         function initCustomHeader() {
             $('#custom-header').show();
-            const select = $('#custom-month-select');
-            select.empty();
 
-            const monthsSet = new Set();
-            globalEvents.forEach(e => monthsSet.add(e.date.substring(0, 7)));
-            const sortedMonths = Array.from(monthsSet).sort();
-            sortedMonths.forEach(ym => {
-                const [y, m] = ym.split('-');
-                select.append(new Option(`${y}年${m}月`, ym));
+            // 整理出各年份有哪些有資料的月份
+            availableMonthsByYear = {};
+            globalEvents.forEach(e => {
+                const y = parseInt(e.date.substring(0, 4), 10);
+                const m = parseInt(e.date.substring(5, 7), 10);
+                if (!availableMonthsByYear[y]) availableMonthsByYear[y] = new Set();
+                availableMonthsByYear[y].add(m);
             });
 
-            select.on('change', function() {
-                const [y, m] = $(this).val().split('-');
-                currentYear = parseInt(y, 10);
-                currentMonth = parseInt(m, 10);
-                renderCalendar(currentYear, currentMonth);
+            // 若 API 暫時無資料，至少保留當年避免空白
+            if (Object.keys(availableMonthsByYear).length === 0) {
+                availableMonthsByYear[currentYear] = new Set([currentMonth]);
+            }
+
+            // 點擊「YYYY年MM月 ▼」：先顯示年份列，等點選年份再展開 1～12 月 Bar
+            $('#custom-title-trigger').on('click', function (e) {
+                e.stopPropagation();
+                const panel = $('#ym-picker-panel');
+                if (panel.is(':visible')) {
+                    closeYmPicker();
+                } else {
+                    selectedPickerYear = null;
+                    $('#ym-month-bar-wrap').hide();
+                    renderYearBar();
+                    panel.stop(true, true).slideDown(160);
+                    $(this).addClass('is-open');
+                }
+            });
+
+            // 點擊面板內部不觸發外部關閉
+            $('#ym-picker-panel').on('click', function (e) {
+                e.stopPropagation();
+            });
+
+            // 點擊頁面其他空白處自動收合面板
+            $(document).on('click', function () {
+                if ($('#ym-picker-panel').is(':visible')) {
+                    closeYmPicker();
+                }
             });
 
             $('#custom-prev').on('click', () => {
                 currentMonth--; if (currentMonth < 1) { currentMonth = 12; currentYear--; }
                 renderCalendar(currentYear, currentMonth);
+                closeYmPicker();
             });
 
             $('#custom-next').on('click', () => {
                 currentMonth++; if (currentMonth > 12) { currentMonth = 1; currentYear++; }
                 renderCalendar(currentYear, currentMonth);
+                closeYmPicker();
             });
         }
 
         function renderCalendar(year, month) {
             const mStr = String(month).padStart(2, '0');
             $('#custom-title').html(`${year}年${mStr}月 <i class="fa-solid fa-caret-down"></i>`);
-            $('#custom-month-select').val(`${year}-${mStr}`);
 
             $('#calendar-wrap').html('<div id="my-calendar"></div>');
 
