@@ -8,20 +8,308 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>目前所有可讀取的台鐵時刻資料 TRA JSON Parser</title>
     <link rel="stylesheet" href="css/trains.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
-        /* 讓車次清單面板支援彈性排版以容納搜尋框 */
+        /* 關閉全站平滑捲動動畫，避免跳轉時產生往上滑動感 */
+        html, body, .panel-body, #file-list {
+            scroll-behavior: auto !important;
+        }
+
+        /* 側邊欄極細透明卷軸優化 */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(148, 163, 184, 0.25);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #f59e0b;
+        }
+
+        /* 讓日期檔案與車次清單面板支援縱向彈性排版，三層完全獨立不互相覆蓋 */
+        .panel-files,
         .panel-trains {
             display: flex !important;
             flex-direction: column !important;
         }
-        
+
+        /* 第三層 #file-list 歸零上間距，與第二層完全貼齊 */
+        .panel-files .panel-body {
+            position: relative !important;
+            flex: 1 !important;
+            height: auto !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+        }
+
+        .panel-files .panel-body.is-hidden {
+            display: none !important;
+        }
+
+        .panel-files .panel-body > *:first-child {
+            margin-top: 0 !important;
+        }
+
+        .panel-trains .panel-body {
+            position: relative !important;
+            flex: 1 !important;
+            height: auto !important;
+            min-height: 0 !important;
+        }
+
+        /* ==========================================
+           🌟 第一層：最上方固定「基準檔」
+           ========================================== */
+        .tr-base-slot {
+            flex-shrink: 0;
+            background-color: #0b1220;
+            border-bottom: 1px solid #1e293b;
+            padding: 5px 6px;
+            box-sizing: border-box;
+        }
+
+        .tr-base-slot.is-hidden {
+            display: none !important;
+        }
+
+        .tr-base-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+            background-color: #131e32;
+            color: #e2e8f0;
+            border: 1px solid #26354d;
+            border-left: 3px solid #475569;
+            border-radius: 5px;
+            padding: 7px 8px;
+            cursor: pointer;
+            box-sizing: border-box;
+            text-align: left;
+        }
+
+        .tr-base-btn:hover {
+            background-color: #182640;
+            border-color: #3b4f70;
+        }
+
+        .tr-base-btn.active {
+            background-color: rgba(245, 158, 11, 0.14);
+            border-color: rgba(245, 158, 11, 0.45);
+            border-left: 3px solid #f59e0b;
+            color: #ffffff;
+        }
+
+        .tr-base-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .tr-base-badge {
+            flex-shrink: 0;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 4px;
+            padding: 1px 5px;
+            line-height: 1.3;
+            white-space: nowrap;
+        }
+
+        /* ==========================================
+           🌟 第二層：平面摺疊「跳轉月份 Bar」
+           ========================================== */
+        .tr-ym-wrapper {
+            flex-shrink: 0;
+            background-color: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            padding: 5px 6px;
+            box-sizing: border-box;
+        }
+
+        /* 展開時第一層與第三層皆隱藏，第二層面板承接完整高度 */
+        .tr-ym-wrapper.is-expanded {
+            flex: 1 !important;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            border-bottom: none;
+        }
+
+        .tr-ym-trigger {
+            width: 100%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #162236;
+            color: #f8fafc;
+            border: 1px solid #2e405d;
+            border-radius: 5px;
+            padding: 6px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .tr-ym-trigger:hover {
+            border-color: #475569;
+            background-color: #1c2b45;
+        }
+
+        .tr-ym-trigger.is-open {
+            border-color: #f59e0b;
+            background-color: #1a2740;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .tr-ym-trigger-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .tr-ym-trigger-left i {
+            font-size: 0.72rem;
+            color: #f59e0b;
+            flex-shrink: 0;
+        }
+
+        .tr-ym-trigger-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tr-ym-arrow {
+            font-size: 10px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .tr-ym-trigger.is-open .tr-ym-arrow {
+            color: #f59e0b;
+        }
+
+        /* 展開的選擇面板 (純平面、無陰影、無過渡動畫) */
+        .tr-ym-panel {
+            display: none;
+            background-color: #0b1220;
+            border: 1px solid #f59e0b;
+            border-top: none;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            padding: 6px;
+            box-sizing: border-box;
+        }
+
+        .tr-ym-panel.show {
+            display: block;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .tr-ym-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        /* 年份列 */
+        .tr-ym-year-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .tr-ym-year-btn {
+            flex: 1 0 auto;
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .tr-ym-year-btn.active {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: #0b1120;
+        }
+
+        /* 該年 1~12 月 (平面 3x4 格子) */
+        .tr-ym-month-wrap {
+            display: none;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .tr-ym-month-wrap.show {
+            display: block;
+        }
+
+        .tr-ym-month-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3px;
+        }
+
+        .tr-ym-month-btn {
+            background-color: #162236;
+            color: #e2e8f0;
+            border: 1px solid #2e405d;
+            border-radius: 4px;
+            padding: 5px 0;
+            font-size: 11.5px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .tr-ym-month-btn.active {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: #0b1120;
+        }
+
+        .tr-ym-month-btn:disabled {
+            background-color: #0b1220;
+            border-color: #182233;
+            color: #475569;
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
         /* 搜尋框區塊樣式 */
         .panel-search {
             padding: 6px;
             background-color: #0f172a;
             border-bottom: 1px solid #1e293b;
-            flex-shrink: 0; /* 防止輸入框被擠壓變形 */
+            flex-shrink: 0;
         }
         
         .panel-search input {
@@ -34,17 +322,10 @@
             color: #f8fafc;
             font-size: 0.8rem;
             outline: none;
-            transition: border-color 0.2s;
         }
         
         .panel-search input:focus {
             border-color: #38bdf8;
-        }
-
-        /* 讓清單本體自動接管剩餘高度 */
-        .panel-trains .panel-body {
-            flex: 1 !important;
-            height: auto !important;
         }
 
         @media screen and (max-width: 768px) {
@@ -91,7 +372,6 @@
                 display: none !important; 
             }
             
-            .panel-files .panel-body,
             .panel-filter .panel-body {
                 height: calc(100% - 35px) !important;
                 overflow-x: hidden !important;
@@ -99,10 +379,50 @@
                 padding: 2px !important; 
             }
             
+            .panel-files .panel-body {
+                flex: 1 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                padding: 0 !important;
+            }
+
             .panel-trains .panel-body {
+                flex: 1 !important;
+                height: auto !important;
+                min-height: 0 !important;
                 overflow-x: hidden !important;
                 overflow-y: auto !important;
                 padding: 2px !important; 
+            }
+
+            /* 手機窄欄微調 */
+            .tr-base-slot {
+                padding: 4px;
+            }
+
+            .tr-base-btn {
+                padding: 6px 5px;
+            }
+
+            .tr-base-title {
+                font-size: 0.7rem;
+                letter-spacing: -0.4px;
+            }
+
+            .tr-base-badge {
+                font-size: 0.62rem;
+                padding: 1px 3px;
+            }
+
+            .tr-ym-wrapper {
+                padding: 4px;
+            }
+
+            .tr-ym-trigger {
+                font-size: 0.72rem;
+                padding: 5px 6px;
             }
 
             /* 下半部詳細資料區塊 (比例 6) */
@@ -145,395 +465,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-
-<style>
-  /* 側邊欄極細透明卷軸優化 (不擠壓右側天數與車次數字) */
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(148, 163, 184, 0.25);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #f59e0b;
-  }
-
-  /* 🌟 兩段式年月跳轉器容器 (吸頂且符合 trains.html 深色風格) */
-  .tr-ym-wrapper {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background-color: #0b1220;
-    padding: 4px 0 6px 0;
-  }
-
-  .tr-ym-trigger {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #131e32;
-    color: #e2e8f0;
-    border: 1px solid #26354d;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: border-color 0.15s ease, background-color 0.15s ease;
-    box-sizing: border-box;
-  }
-
-  .tr-ym-trigger:hover,
-  .tr-ym-trigger.is-open {
-    border-color: #f59e0b;
-    background-color: #182640;
-  }
-
-  .tr-ym-arrow {
-    font-size: 11px;
-    color: #94a3b8;
-    transition: transform 0.2s ease;
-  }
-
-  .tr-ym-trigger.is-open .tr-ym-arrow {
-    transform: rotate(180deg);
-    color: #f59e0b;
-  }
-
-  /* 展開的選擇面板 */
-  .tr-ym-panel {
-    display: none;
-    margin-top: 6px;
-    background-color: #0f172a;
-    border: 1px solid #2b3c57;
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
-  }
-
-  .tr-ym-panel.show {
-    display: block;
-  }
-
-  .tr-ym-label {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  /* 第一層：年份 Bar */
-  .tr-ym-year-bar {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .tr-ym-year-bar::-webkit-scrollbar,
-  .tr-ym-month-bar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .tr-ym-year-btn {
-    flex: 0 0 auto;
-    background-color: #1e293b;
-    color: #cbd5e1;
-    border: 1px solid #334155;
-    border-radius: 999px;
-    padding: 4px 11px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-
-  .tr-ym-year-btn:hover {
-    border-color: #f59e0b;
-    color: #ffffff;
-  }
-
-  .tr-ym-year-btn.active {
-    background-color: #f59e0b;
-    border-color: #f59e0b;
-    color: #0b1120;
-  }
-
-  /* 第二層：該年 1~12 月橫向 Bar */
-  .tr-ym-month-wrap {
-    display: none;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .tr-ym-month-wrap.show {
-    display: block;
-  }
-
-  .tr-ym-month-bar {
-    display: flex;
-    gap: 5px;
-    overflow-x: auto;
-    padding: 2px 0 3px 0;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .tr-ym-month-btn {
-    flex: 0 0 auto;
-    min-width: 40px;
-    background-color: #162236;
-    color: #e2e8f0;
-    border: 1px solid #2e405d;
-    border-radius: 6px;
-    padding: 5px 7px;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-
-  .tr-ym-month-btn:hover:not(:disabled) {
-    background-color: #233554;
-    border-color: #f59e0b;
-    color: #ffffff;
-  }
-
-  .tr-ym-month-btn.active {
-    background-color: #f59e0b;
-    border-color: #f59e0b;
-    color: #0b1120;
-  }
-
-  .tr-ym-month-btn:disabled {
-    background-color: #0d1524;
-    border-color: #1a2436;
-    color: #475569;
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-</style>
-
-<script>
-(function () {
-  // 自動尋找「跳轉月份...」下拉選單
-  function findJumpSelect() {
-    const selects = document.querySelectorAll('select');
-    for (const sel of selects) {
-      const opts = Array.from(sel.options);
-      const matched = opts.some(o =>
-        /跳轉月份/.test(o.textContent) ||
-        /\d{2,4}\s*年\s*\d{1,2}\s*月/.test(o.textContent)
-      );
-      if (matched) return sel;
-    }
-    return null;
-  }
-
-  // 解析年份與月份 (同時支援 26年04月、2026年04月、2026-04、202604)
-  function parseYearMonth(opt) {
-    const text = (opt.textContent || '').trim();
-    const val = String(opt.value || '').trim();
-    if (!val && /跳轉|請選擇|全部/.test(text)) return null;
-
-    let m = val.match(/(20\d{2})[-/_]?(\d{2})/);
-    if (m) return { year: m[1], month: parseInt(m[2], 10) };
-
-    m = text.match(/(\d{2,4})\s*年\s*(\d{1,2})\s*月/);
-    if (m) {
-      const yr = m[1].length === 2 ? '20' + m[1] : m[1];
-      return { year: yr, month: parseInt(m[2], 10) };
-    }
-    return null;
-  }
-
-  function mountTrainsYmBar(selectEl) {
-    if (!selectEl || selectEl.dataset.trYmMounted) return;
-    selectEl.dataset.trYmMounted = '1';
-    selectEl.style.display = 'none';
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'tr-ym-wrapper';
-
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'tr-ym-trigger';
-    trigger.innerHTML = `<span class="tr-ym-trigger-text">跳轉月份...</span><span class="tr-ym-arrow">▼</span>`;
-
-    const panel = document.createElement('div');
-    panel.className = 'tr-ym-panel';
-    panel.innerHTML = `
-      <div class="tr-ym-label"><span>先選擇年份</span></div>
-      <div class="tr-ym-year-bar"></div>
-      <div class="tr-ym-month-wrap">
-        <div class="tr-ym-label"><span class="tr-ym-month-title">選擇月份</span><span>左右滑動 ↔</span></div>
-        <div class="tr-ym-month-bar"></div>
-      </div>
-    `;
-
-    wrapper.appendChild(trigger);
-    wrapper.appendChild(panel);
-    selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
-
-    const triggerText = trigger.querySelector('.tr-ym-trigger-text');
-    const yearBar = panel.querySelector('.tr-ym-year-bar');
-    const monthWrap = panel.querySelector('.tr-ym-month-wrap');
-    const monthTitle = panel.querySelector('.tr-ym-month-title');
-    const monthBar = panel.querySelector('.tr-ym-month-bar');
-
-    // 電腦版滾輪移到 1~12 月 Bar 上可直接橫向捲動
-    monthBar.addEventListener('wheel', function (e) {
-      if (e.deltaY !== 0) {
-        e.preventDefault();
-        monthBar.scrollLeft += e.deltaY;
-      }
-    }, { passive: false });
-
-    let dataMap = {}; // { "2026": { 4: optionValue, ... } }
-    let viewingYear = null;
-    let activeYear = null;
-    let activeMonth = null;
-
-    function syncData() {
-      dataMap = {};
-      Array.from(selectEl.options).forEach(opt => {
-        const ym = parseYearMonth(opt);
-        if (!ym || ym.month < 1 || ym.month > 12) return;
-        if (!dataMap[ym.year]) dataMap[ym.year] = {};
-        dataMap[ym.year][ym.month] = opt.value;
-      });
-    }
-
-    function closePanel() {
-      panel.classList.remove('show');
-      trigger.classList.remove('is-open');
-    }
-
-    function renderYears() {
-      syncData();
-      const years = Object.keys(dataMap).sort();
-      yearBar.innerHTML = '';
-
-      if (!years.length) {
-        yearBar.innerHTML = `<span style="font-size:12px;color:#64748b;">載入中...</span>`;
-        return;
-      }
-
-      years.forEach(yr => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'tr-ym-year-btn' + (yr === viewingYear ? ' active' : '');
-        btn.textContent = yr + '年';
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          viewingYear = yr;
-          renderYears();
-          renderMonths(yr);
-        };
-        yearBar.appendChild(btn);
-      });
-    }
-
-    function renderMonths(yr) {
-      const monthsObj = dataMap[yr] || {};
-      monthTitle.textContent = `${yr}年 1～12 月`;
-      monthBar.innerHTML = '';
-
-      let activeBtn = null;
-      for (let m = 1; m <= 12; m++) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        const optVal = monthsObj[m];
-        const isSelected = (yr === activeYear && m === activeMonth);
-
-        btn.className = 'tr-ym-month-btn' + (isSelected ? ' active' : '');
-        btn.textContent = m + '月';
-
-        if (optVal === undefined) {
-          btn.disabled = true;
-        } else {
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            activeYear = yr;
-            activeMonth = m;
-            triggerText.textContent = `${yr.slice(2)}年${String(m).padStart(2, '0')}月`;
-
-            // 觸發原本 select 的跳轉事件
-            selectEl.value = optVal;
-            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-            closePanel();
-          };
-        }
-
-        if (isSelected) activeBtn = btn;
-        monthBar.appendChild(btn);
-      }
-
-      monthWrap.classList.add('show');
-      if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      }
-    }
-
-    // 點擊「跳轉月份...」：先展開年份列，點選年份才顯示 1~12 月 Bar
-    trigger.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (panel.classList.contains('show')) {
-        closePanel();
-      } else {
-        viewingYear = null;
-        monthWrap.classList.remove('show');
-        renderYears();
-        panel.classList.add('show');
-        trigger.classList.add('is-open');
-      }
-    });
-
-    panel.addEventListener('click', e => e.stopPropagation());
-    document.addEventListener('click', closePanel);
-
-    // 監聽原本 select 動態載入月份選項
-    const observer = new MutationObserver(syncData);
-    observer.observe(selectEl, { childList: true });
-    syncData();
-  }
-
-  function init() {
-    const sel = findJumpSelect();
-    if (sel) {
-      mountTrainsYmBar(sel);
-      return;
-    }
-    const bodyObserver = new MutationObserver(() => {
-      const found = findJumpSelect();
-      if (found) {
-        mountTrainsYmBar(found);
-        bodyObserver.disconnect();
-      }
-    });
-    bodyObserver.observe(document.body, { childList: true, subtree: true });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
 
 <body>
     <header>
@@ -597,6 +529,417 @@
 
     <script src="js/trains.js"></script>
 
+    <!-- 🌟 日期檔案三層結構優化：1.基準檔 ➔ 2.跳轉月份(開啟時隱藏第一層與第三層) ➔ 3.貼齊的月份日期清單 -->
+    <script>
+    (function () {
+        const NATIVE_SCROLL_INTO_VIEW = Element.prototype.scrollIntoView;
+        let baseSlotEl = null;
+        let ymWrapperEl = null;
+        let boundBaseItem = null;
+        let baseAttrObserver = null;
+
+        // 取得元素排除 <select> 選項後的純文字，避免誤判外層容器
+        function getTextWithoutSelect(el) {
+            let text = '';
+            const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+                acceptNode: (node) => {
+                    if (node.parentElement && node.parentElement.closest('select')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            while (walker.nextNode()) {
+                text += walker.currentNode.nodeValue;
+            }
+            return text.trim();
+        }
+
+        // 確保 .panel-files 內的順序嚴格為：標題 -> 1.基準檔 -> 2.跳轉月份 -> 3.#file-list
+        function enforcePanelOrder() {
+            const panelFiles = document.querySelector('.panel-files');
+            const fileList = document.getElementById('file-list');
+            if (!panelFiles || !fileList) return;
+
+            if (ymWrapperEl && ymWrapperEl.parentNode !== panelFiles) {
+                panelFiles.insertBefore(ymWrapperEl, fileList);
+            }
+            if (baseSlotEl) {
+                const anchor = (ymWrapperEl && ymWrapperEl.parentNode === panelFiles) ? ymWrapperEl : fileList;
+                if (baseSlotEl.nextSibling !== anchor) {
+                    panelFiles.insertBefore(baseSlotEl, anchor);
+                }
+            }
+        }
+
+        // 清理 #file-list 頂部殘留的空白佔位容器，並將所有月份 sticky 標題歸零貼齊頂部
+        function fixFileListAlignment(fileList) {
+            if (!fileList) return;
+
+            for (const child of Array.from(fileList.children)) {
+                const cleanTxt = getTextWithoutSelect(child);
+                const hasMonthOrDate = /\d{2,4}\s*年\s*\d{1,2}\s*月/.test(cleanTxt) || /\d{2}\/\d{2}/.test(cleanTxt);
+                const hasSelect = child.tagName === 'SELECT' || !!child.querySelector('select');
+                const isBase = (cleanTxt.includes('基準檔') || cleanTxt.includes('全車次總表')) && !hasMonthOrDate;
+                const isDividerOrEmpty = !cleanTxt || child.tagName === 'HR';
+
+                if (!hasMonthOrDate && (hasSelect || isBase || isDividerOrEmpty)) {
+                    child.style.setProperty('display', 'none', 'important');
+                }
+            }
+
+            // 修正月份標題原本為閃避舊 select 所預留的 sticky top 高度，讓第三層與第二層緊密貼齊
+            fileList.querySelectorAll('*').forEach(el => {
+                if (el.style.display === 'none') return;
+                const cs = window.getComputedStyle(el);
+                if (cs.position === 'sticky' && cs.top !== '0px') {
+                    el.style.setProperty('top', '0px', 'important');
+                }
+            });
+        }
+
+        // 尋找 #file-list 內原本的「基準檔 / 全車次總表」項目
+        function findBaseItem(fileList) {
+            if (!fileList) return null;
+            for (const el of Array.from(fileList.children)) {
+                const txt = getTextWithoutSelect(el);
+                if ((txt.includes('基準檔') || txt.includes('全車次總表')) && !/\d{2}年\d{2}月/.test(txt)) {
+                    return el;
+                }
+            }
+            const candidates = fileList.querySelectorAll('div, button, li, a');
+            for (const el of candidates) {
+                const txt = getTextWithoutSelect(el);
+                if (el.children.length <= 3 && (txt.includes('基準檔') || txt.includes('全車次總表')) && !/\d{2}年\d{2}月/.test(txt)) {
+                    return el;
+                }
+            }
+            return null;
+        }
+
+        // 掛載第一層：最上方固定基準檔
+        function mountBaseFileSlot(origEl) {
+            if (!origEl || origEl === boundBaseItem) return;
+            boundBaseItem = origEl;
+
+            origEl.style.setProperty('display', 'none', 'important');
+
+            let titleText = '全車次總表';
+            let badgeText = '基準檔';
+            const spans = origEl.querySelectorAll('span');
+            if (spans.length >= 2) {
+                titleText = spans[0].textContent.trim() || titleText;
+                badgeText = spans[1].textContent.trim() || badgeText;
+            }
+
+            if (!baseSlotEl) {
+                baseSlotEl = document.createElement('div');
+                baseSlotEl.className = 'tr-base-slot';
+            }
+
+            baseSlotEl.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'tr-base-btn';
+            btn.innerHTML = `<span class="tr-base-title"></span><span class="tr-base-badge"></span>`;
+            btn.querySelector('.tr-base-title').textContent = titleText;
+            btn.querySelector('.tr-base-badge').textContent = badgeText;
+
+            const syncActiveState = () => {
+                const isAct = origEl.classList.contains('active') || origEl.classList.contains('selected');
+                btn.classList.toggle('active', isAct);
+            };
+            syncActiveState();
+
+            btn.addEventListener('click', function () {
+                origEl.click();
+                setTimeout(syncActiveState, 0);
+            });
+
+            if (baseAttrObserver) baseAttrObserver.disconnect();
+            baseAttrObserver = new MutationObserver(syncActiveState);
+            baseAttrObserver.observe(origEl, { attributes: true, attributeFilter: ['class'] });
+
+            baseSlotEl.appendChild(btn);
+            enforcePanelOrder();
+        }
+
+        function findJumpSelect() {
+            const selects = document.querySelectorAll('select');
+            for (const sel of selects) {
+                const opts = Array.from(sel.options);
+                const matched = opts.some(o =>
+                    /跳轉月份/.test(o.textContent) ||
+                    /\d{2,4}\s*年\s*\d{1,2}\s*月/.test(o.textContent)
+                );
+                if (matched) return sel;
+            }
+            return null;
+        }
+
+        function parseYearMonth(opt) {
+            const text = (opt.textContent || '').trim();
+            const val = String(opt.value || '').trim();
+            if (!val && /跳轉|請選擇|全部/.test(text)) return null;
+
+            let m = val.match(/(20\d{2})[-/_]?(\d{2})/);
+            if (m) return { year: m[1], month: parseInt(m[2], 10) };
+
+            m = text.match(/(\d{2,4})\s*年\s*(\d{1,2})\s*月/);
+            if (m) {
+                const yr = m[1].length === 2 ? '20' + m[1] : m[1];
+                return { year: yr, month: parseInt(m[2], 10) };
+            }
+            return null;
+        }
+
+        // 徹底隱藏原生 <select> 及其所屬的整個舊佔位外框
+        function hideNativeSelect(selectEl, fileList) {
+            selectEl.style.setProperty('display', 'none', 'important');
+            let node = selectEl.parentElement;
+            while (node && fileList && node !== fileList && fileList.contains(node)) {
+                const cleanTxt = getTextWithoutSelect(node);
+                const hasMonthOrDate = /\d{2,4}\s*年\s*\d{1,2}\s*月/.test(cleanTxt) || /\d{2}\/\d{2}/.test(cleanTxt);
+                if (!hasMonthOrDate) {
+                    node.style.setProperty('display', 'none', 'important');
+                    node = node.parentElement;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        // 掛載第二層：跳轉月份平面摺疊列 (展開時自動隱藏第一層與第三層)
+        function mountTrainsYmFlat(selectEl) {
+            if (!selectEl || selectEl.dataset.trYmMounted) return;
+            selectEl.dataset.trYmMounted = '1';
+
+            const fileList = document.getElementById('file-list');
+            hideNativeSelect(selectEl, fileList);
+
+            if (ymWrapperEl) ymWrapperEl.remove();
+
+            ymWrapperEl = document.createElement('div');
+            ymWrapperEl.className = 'tr-ym-wrapper';
+
+            const trigger = document.createElement('button');
+            trigger.type = 'button';
+            trigger.className = 'tr-ym-trigger';
+            trigger.innerHTML = `
+                <span class="tr-ym-trigger-left">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span class="tr-ym-trigger-text">跳轉月份...</span>
+                </span>
+                <span class="tr-ym-arrow">▸</span>
+            `;
+
+            const panel = document.createElement('div');
+            panel.className = 'tr-ym-panel';
+            panel.innerHTML = `
+                <div class="tr-ym-label">選擇年份</div>
+                <div class="tr-ym-year-bar"></div>
+                <div class="tr-ym-month-wrap">
+                    <div class="tr-ym-label tr-ym-month-title">選擇月份</div>
+                    <div class="tr-ym-month-grid"></div>
+                </div>
+            `;
+
+            ymWrapperEl.appendChild(trigger);
+            ymWrapperEl.appendChild(panel);
+            enforcePanelOrder();
+
+            const triggerText = trigger.querySelector('.tr-ym-trigger-text');
+            const triggerArrow = trigger.querySelector('.tr-ym-arrow');
+            const yearBar = panel.querySelector('.tr-ym-year-bar');
+            const monthWrap = panel.querySelector('.tr-ym-month-wrap');
+            const monthTitle = panel.querySelector('.tr-ym-month-title');
+            const monthGrid = panel.querySelector('.tr-ym-month-grid');
+
+            let dataMap = {};
+            let viewingYear = null;
+            let activeYear = null;
+            let activeMonth = null;
+            let restoreTimer = null;
+
+            function syncData() {
+                dataMap = {};
+                Array.from(selectEl.options).forEach(opt => {
+                    const ym = parseYearMonth(opt);
+                    if (!ym || ym.month < 1 || ym.month > 12) return;
+                    if (!dataMap[ym.year]) dataMap[ym.year] = {};
+                    dataMap[ym.year][ym.month] = opt.value;
+                });
+            }
+
+            // 🌟 開啟第二層：自動隱藏第一層(基準檔)與第三層(#file-list)
+            function openPanel() {
+                viewingYear = null;
+                monthWrap.classList.remove('show');
+                renderYears();
+                panel.classList.add('show');
+                trigger.classList.add('is-open');
+                triggerArrow.textContent = '▾';
+                ymWrapperEl.classList.add('is-expanded');
+                if (baseSlotEl) baseSlotEl.classList.add('is-hidden');
+                if (fileList) fileList.classList.add('is-hidden');
+            }
+
+            // 收合第二層：同步恢復顯示第一層與第三層
+            function closePanel() {
+                panel.classList.remove('show');
+                trigger.classList.remove('is-open');
+                triggerArrow.textContent = '▸';
+                ymWrapperEl.classList.remove('is-expanded');
+                if (baseSlotEl) baseSlotEl.classList.remove('is-hidden');
+                if (fileList) fileList.classList.remove('is-hidden');
+            }
+
+            function triggerFlatJump(optVal) {
+                closePanel();
+
+                if (restoreTimer) clearTimeout(restoreTimer);
+
+                // 攔截原生往上拉動的動畫，僅在 #file-list 內無動畫即時貼齊頂部定位
+                Element.prototype.scrollIntoView = function () {
+                    const list = document.getElementById('file-list');
+                    if (!list || !list.contains(this)) return;
+                    fixFileListAlignment(list);
+                    const listRect = list.getBoundingClientRect();
+                    const elRect = this.getBoundingClientRect();
+                    list.style.scrollBehavior = 'auto';
+                    list.scrollTop = Math.max(0, list.scrollTop + (elRect.top - listRect.top));
+                };
+
+                const nativeScrollTo = fileList ? fileList.scrollTo : null;
+                if (fileList && nativeScrollTo) {
+                    fileList.scrollTo = function (arg1) {
+                        if (arg1 && typeof arg1 === 'object') {
+                            nativeScrollTo.call(this, Object.assign({}, arg1, { behavior: 'auto' }));
+                        } else {
+                            nativeScrollTo.apply(this, arguments);
+                        }
+                    };
+                }
+
+                selectEl.value = optVal;
+                selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                fixFileListAlignment(fileList);
+                window.scrollTo(0, 0);
+
+                restoreTimer = setTimeout(() => {
+                    Element.prototype.scrollIntoView = NATIVE_SCROLL_INTO_VIEW;
+                    if (fileList && nativeScrollTo) {
+                        fileList.scrollTo = nativeScrollTo;
+                    }
+                    fixFileListAlignment(fileList);
+                }, 300);
+            }
+
+            function renderYears() {
+                syncData();
+                const years = Object.keys(dataMap).sort();
+                yearBar.innerHTML = '';
+
+                if (!years.length) {
+                    yearBar.innerHTML = `<span style="font-size:11px;color:#64748b;">載入中...</span>`;
+                    return;
+                }
+
+                years.forEach(yr => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'tr-ym-year-btn' + (yr === viewingYear ? ' active' : '');
+                    btn.textContent = yr + '年';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        viewingYear = yr;
+                        renderYears();
+                        renderMonths(yr);
+                    };
+                    yearBar.appendChild(btn);
+                });
+            }
+
+            function renderMonths(yr) {
+                const monthsObj = dataMap[yr] || {};
+                monthTitle.textContent = `${yr}年 (1～12月)`;
+                monthGrid.innerHTML = '';
+
+                for (let m = 1; m <= 12; m++) {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    const optVal = monthsObj[m];
+                    const isSelected = (yr === activeYear && m === activeMonth);
+
+                    btn.className = 'tr-ym-month-btn' + (isSelected ? ' active' : '');
+                    btn.textContent = m + '月';
+
+                    if (optVal === undefined) {
+                        btn.disabled = true;
+                    } else {
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            activeYear = yr;
+                            activeMonth = m;
+                            triggerText.textContent = `${yr.slice(2)}年${String(m).padStart(2, '0')}月`;
+                            triggerFlatJump(optVal);
+                        };
+                    }
+                    monthGrid.appendChild(btn);
+                }
+
+                monthWrap.classList.add('show');
+            }
+
+            trigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (panel.classList.contains('show')) {
+                    closePanel();
+                } else {
+                    openPanel();
+                }
+            });
+
+            panel.addEventListener('click', e => e.stopPropagation());
+            document.addEventListener('click', closePanel);
+
+            const observer = new MutationObserver(syncData);
+            observer.observe(selectEl, { childList: true });
+            syncData();
+        }
+
+        function scanAndMount() {
+            const fileList = document.getElementById('file-list');
+            if (fileList) {
+                const baseEl = findBaseItem(fileList);
+                if (baseEl && baseEl !== boundBaseItem) {
+                    mountBaseFileSlot(baseEl);
+                }
+            }
+            const sel = findJumpSelect();
+            if (sel && !sel.dataset.trYmMounted) {
+                mountTrainsYmFlat(sel);
+            }
+            enforcePanelOrder();
+            fixFileListAlignment(fileList);
+        }
+
+        function init() {
+            scanAndMount();
+            const fileList = document.getElementById('file-list') || document.body;
+            const listObserver = new MutationObserver(scanAndMount);
+            listObserver.observe(fileList, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
+    <!-- 車次清單即時搜尋腳本 -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('train-search-input');
@@ -604,17 +947,13 @@
 
             if (!searchInput || !trainListContainer) return;
 
-            // 監聽鍵盤輸入事件進行即時篩選
             searchInput.addEventListener('input', function(e) {
                 const keyword = e.target.value.trim().toLowerCase();
                 const trainItems = trainListContainer.querySelectorAll('.train-item');
                 let visibleCount = 0;
 
                 trainItems.forEach(item => {
-                    // 🌟 關鍵升級：不再只抓數字！改抓「整行文字 (包含號碼與車種)」
-                    // 這樣一來，搜 "111"、"區間"、"emu" 都能完美命中！
                     const itemText = item.textContent.trim().toLowerCase();
-                    
                     if (itemText.includes(keyword)) {
                         item.style.display = ''; 
                         visibleCount++;          
@@ -623,16 +962,12 @@
                     }
                 });
 
-                // 移除舊的「查無結果」提示
                 const oldNoResult = trainListContainer.querySelector('.no-search-result');
                 if (oldNoResult) oldNoResult.remove();
 
-                // 🌟 完美復刻圖2：若過濾後無任何匹配車次，顯示「無符合車次」
                 if (visibleCount === 0 && keyword !== '' && trainItems.length > 0) {
                     const noResultDiv = document.createElement('div');
                     noResultDiv.className = 'no-search-result'; 
-                    
-                    // 完全比照 D3 運行圖的低調灰色樣式
                     Object.assign(noResultDiv.style, {
                         color: '#888', 
                         padding: '12px 8px', 
@@ -641,20 +976,17 @@
                         width: '100%',
                         letterSpacing: '1px'
                     });
-                    
                     noResultDiv.textContent = '無符合車次';
                     trainListContainer.appendChild(noResultDiv);
                 }
             });
 
-            // 🟢 點擊左側「日期」或「車種過濾」時，自動清空搜尋框並恢復清單
             const fileList = document.getElementById('file-list');
             const typeFilter = document.getElementById('type-filter');
 
             const clearSearch = () => {
                 if (searchInput.value !== '') {
                     searchInput.value = '';
-                    // 模擬觸發一次輸入事件，讓被隱藏的火車重新顯示出來
                     searchInput.dispatchEvent(new Event('input'));
                 }
             };
