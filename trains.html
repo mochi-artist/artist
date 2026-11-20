@@ -148,6 +148,393 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
+<style>
+  /* 側邊欄極細透明卷軸優化 (不擠壓右側天數與車次數字) */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.25);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #f59e0b;
+  }
+
+  /* 🌟 兩段式年月跳轉器容器 (吸頂且符合 trains.html 深色風格) */
+  .tr-ym-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background-color: #0b1220;
+    padding: 4px 0 6px 0;
+  }
+
+  .tr-ym-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #131e32;
+    color: #e2e8f0;
+    border: 1px solid #26354d;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    box-sizing: border-box;
+  }
+
+  .tr-ym-trigger:hover,
+  .tr-ym-trigger.is-open {
+    border-color: #f59e0b;
+    background-color: #182640;
+  }
+
+  .tr-ym-arrow {
+    font-size: 11px;
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+  }
+
+  .tr-ym-trigger.is-open .tr-ym-arrow {
+    transform: rotate(180deg);
+    color: #f59e0b;
+  }
+
+  /* 展開的選擇面板 */
+  .tr-ym-panel {
+    display: none;
+    margin-top: 6px;
+    background-color: #0f172a;
+    border: 1px solid #2b3c57;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  }
+
+  .tr-ym-panel.show {
+    display: block;
+  }
+
+  .tr-ym-label {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* 第一層：年份 Bar */
+  .tr-ym-year-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tr-ym-year-bar::-webkit-scrollbar,
+  .tr-ym-month-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tr-ym-year-btn {
+    flex: 0 0 auto;
+    background-color: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tr-ym-year-btn:hover {
+    border-color: #f59e0b;
+    color: #ffffff;
+  }
+
+  .tr-ym-year-btn.active {
+    background-color: #f59e0b;
+    border-color: #f59e0b;
+    color: #0b1120;
+  }
+
+  /* 第二層：該年 1~12 月橫向 Bar */
+  .tr-ym-month-wrap {
+    display: none;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .tr-ym-month-wrap.show {
+    display: block;
+  }
+
+  .tr-ym-month-bar {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 2px 0 3px 0;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tr-ym-month-btn {
+    flex: 0 0 auto;
+    min-width: 40px;
+    background-color: #162236;
+    color: #e2e8f0;
+    border: 1px solid #2e405d;
+    border-radius: 6px;
+    padding: 5px 7px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .tr-ym-month-btn:hover:not(:disabled) {
+    background-color: #233554;
+    border-color: #f59e0b;
+    color: #ffffff;
+  }
+
+  .tr-ym-month-btn.active {
+    background-color: #f59e0b;
+    border-color: #f59e0b;
+    color: #0b1120;
+  }
+
+  .tr-ym-month-btn:disabled {
+    background-color: #0d1524;
+    border-color: #1a2436;
+    color: #475569;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>
+
+<script>
+(function () {
+  // 自動尋找「跳轉月份...」下拉選單
+  function findJumpSelect() {
+    const selects = document.querySelectorAll('select');
+    for (const sel of selects) {
+      const opts = Array.from(sel.options);
+      const matched = opts.some(o =>
+        /跳轉月份/.test(o.textContent) ||
+        /\d{2,4}\s*年\s*\d{1,2}\s*月/.test(o.textContent)
+      );
+      if (matched) return sel;
+    }
+    return null;
+  }
+
+  // 解析年份與月份 (同時支援 26年04月、2026年04月、2026-04、202604)
+  function parseYearMonth(opt) {
+    const text = (opt.textContent || '').trim();
+    const val = String(opt.value || '').trim();
+    if (!val && /跳轉|請選擇|全部/.test(text)) return null;
+
+    let m = val.match(/(20\d{2})[-/_]?(\d{2})/);
+    if (m) return { year: m[1], month: parseInt(m[2], 10) };
+
+    m = text.match(/(\d{2,4})\s*年\s*(\d{1,2})\s*月/);
+    if (m) {
+      const yr = m[1].length === 2 ? '20' + m[1] : m[1];
+      return { year: yr, month: parseInt(m[2], 10) };
+    }
+    return null;
+  }
+
+  function mountTrainsYmBar(selectEl) {
+    if (!selectEl || selectEl.dataset.trYmMounted) return;
+    selectEl.dataset.trYmMounted = '1';
+    selectEl.style.display = 'none';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'tr-ym-wrapper';
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'tr-ym-trigger';
+    trigger.innerHTML = `<span class="tr-ym-trigger-text">跳轉月份...</span><span class="tr-ym-arrow">▼</span>`;
+
+    const panel = document.createElement('div');
+    panel.className = 'tr-ym-panel';
+    panel.innerHTML = `
+      <div class="tr-ym-label"><span>先選擇年份</span></div>
+      <div class="tr-ym-year-bar"></div>
+      <div class="tr-ym-month-wrap">
+        <div class="tr-ym-label"><span class="tr-ym-month-title">選擇月份</span><span>左右滑動 ↔</span></div>
+        <div class="tr-ym-month-bar"></div>
+      </div>
+    `;
+
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(panel);
+    selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+
+    const triggerText = trigger.querySelector('.tr-ym-trigger-text');
+    const yearBar = panel.querySelector('.tr-ym-year-bar');
+    const monthWrap = panel.querySelector('.tr-ym-month-wrap');
+    const monthTitle = panel.querySelector('.tr-ym-month-title');
+    const monthBar = panel.querySelector('.tr-ym-month-bar');
+
+    // 電腦版滾輪移到 1~12 月 Bar 上可直接橫向捲動
+    monthBar.addEventListener('wheel', function (e) {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        monthBar.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
+    let dataMap = {}; // { "2026": { 4: optionValue, ... } }
+    let viewingYear = null;
+    let activeYear = null;
+    let activeMonth = null;
+
+    function syncData() {
+      dataMap = {};
+      Array.from(selectEl.options).forEach(opt => {
+        const ym = parseYearMonth(opt);
+        if (!ym || ym.month < 1 || ym.month > 12) return;
+        if (!dataMap[ym.year]) dataMap[ym.year] = {};
+        dataMap[ym.year][ym.month] = opt.value;
+      });
+    }
+
+    function closePanel() {
+      panel.classList.remove('show');
+      trigger.classList.remove('is-open');
+    }
+
+    function renderYears() {
+      syncData();
+      const years = Object.keys(dataMap).sort();
+      yearBar.innerHTML = '';
+
+      if (!years.length) {
+        yearBar.innerHTML = `<span style="font-size:12px;color:#64748b;">載入中...</span>`;
+        return;
+      }
+
+      years.forEach(yr => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tr-ym-year-btn' + (yr === viewingYear ? ' active' : '');
+        btn.textContent = yr + '年';
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          viewingYear = yr;
+          renderYears();
+          renderMonths(yr);
+        };
+        yearBar.appendChild(btn);
+      });
+    }
+
+    function renderMonths(yr) {
+      const monthsObj = dataMap[yr] || {};
+      monthTitle.textContent = `${yr}年 1～12 月`;
+      monthBar.innerHTML = '';
+
+      let activeBtn = null;
+      for (let m = 1; m <= 12; m++) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        const optVal = monthsObj[m];
+        const isSelected = (yr === activeYear && m === activeMonth);
+
+        btn.className = 'tr-ym-month-btn' + (isSelected ? ' active' : '');
+        btn.textContent = m + '月';
+
+        if (optVal === undefined) {
+          btn.disabled = true;
+        } else {
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            activeYear = yr;
+            activeMonth = m;
+            triggerText.textContent = `${yr.slice(2)}年${String(m).padStart(2, '0')}月`;
+
+            // 觸發原本 select 的跳轉事件
+            selectEl.value = optVal;
+            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            closePanel();
+          };
+        }
+
+        if (isSelected) activeBtn = btn;
+        monthBar.appendChild(btn);
+      }
+
+      monthWrap.classList.add('show');
+      if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
+
+    // 點擊「跳轉月份...」：先展開年份列，點選年份才顯示 1~12 月 Bar
+    trigger.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (panel.classList.contains('show')) {
+        closePanel();
+      } else {
+        viewingYear = null;
+        monthWrap.classList.remove('show');
+        renderYears();
+        panel.classList.add('show');
+        trigger.classList.add('is-open');
+      }
+    });
+
+    panel.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', closePanel);
+
+    // 監聽原本 select 動態載入月份選項
+    const observer = new MutationObserver(syncData);
+    observer.observe(selectEl, { childList: true });
+    syncData();
+  }
+
+  function init() {
+    const sel = findJumpSelect();
+    if (sel) {
+      mountTrainsYmBar(sel);
+      return;
+    }
+    const bodyObserver = new MutationObserver(() => {
+      const found = findJumpSelect();
+      if (found) {
+        mountTrainsYmBar(found);
+        bodyObserver.disconnect();
+      }
+    });
+    bodyObserver.observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
 <body>
     <header>
         <h1><span class="title-full">目前所有可讀取的台鐵時刻資料 </span>抓原作者車次檔案區</h1>
