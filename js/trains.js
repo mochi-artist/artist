@@ -21,14 +21,15 @@ const CAR_CLASS_MAP = {
     '1154': '柴客(專)',        '1155': '柴客(郵)',       '110K': '自強',
     '1270': '普通貨車',        '1280': '客迴',           '1281': '柴迴',
     '1282': '臨時客迴',        '12A0': '調車列車',       '12A1': '單機迴送',
-    '12B0': '試運轉',          '4200': '特種(戰)',       '5230': '特種(警)','0002': '山嵐號','0001': '海風號'
+    '12B0': '試運轉',          '4200': '特種(戰)',       '5230': '特種(警)',
+    '0001': '海風號',          '0002': '山嵐號'
 };
 
 // LineDir / Line 對照
 const LINE_DIR_MAP = { '1': '順行', '2': '逆行' };
 const LINE_MAP = { '0': '不經山海線', '1': '山線', '2': '海線', '3': '成追線', '4': '山海線' };
 
-const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '專列', '客迴'];
+const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '觀光列車', '專列', '客迴'];
 
 const CAR_CLASS_CATEGORY = {
     '110G': '新自強', '110H': '新自強',
@@ -40,6 +41,7 @@ const CAR_CLASS_CATEGORY = {
     '1131': '區間車', '1135': '區間車',
     '1132': '區間快',
     '1140': '普快車', '1141': '普快車', '1150': '普快車',
+    '0001': '觀光列車', '0002': '觀光列車',
     '1104': '專列',  '1112': '專列',  '1121': '專列', '1130': '專列',  '1134': '專列',  '1154': '專列',
 };
 
@@ -112,14 +114,14 @@ function findOverNightStation(timeInfos) {
 }
 
 // ==========================================
-// 💡 特殊車次日誌解析專區 (加入防呆機制，不怕斷線)
+// 💡 特殊車次日誌解析專區
 // ==========================================
 let specialTrainsByDate = {};
 
 async function loadSpecialTrainsLog() {
     try {
         const res = await fetch('scan_log.txt', { cache: 'no-store' });
-        if (!res.ok) return; // 如果找不到檔案，就安靜地跳過，不要當機
+        if (!res.ok) return;
         
         const text = await res.text();
         let currentDate = null;
@@ -131,9 +133,9 @@ async function loadSpecialTrainsLog() {
                 if (!specialTrainsByDate[currentDate]) specialTrainsByDate[currentDate] = new Set();
                 continue;
             }
-            if (currentDate && !line.includes('次讀取')) {
+            if (currentDate && !line.includes('次讀取') && !line.includes('次紀錄')) {
                 const trainMatch = line.match(/[\[［]([a-zA-Z0-9]+)[\]］]/);
-                if (trainMatch) specialTrainsByDate[currentDate].add(trainMatch[1]);
+                if (trainMatch) specialTrainsByDate[currentDate].add(trainMatch[1].trim());
             }
         }
     } catch (error) {
@@ -231,34 +233,38 @@ let activeTrain = null;
 let selectedType = null;
 let currentTrains = [];
 
+function extractTrainsFromRaw(rawData) {
+    if (Array.isArray(rawData)) return rawData;
+    if (rawData && rawData.TrainInfos) return rawData.TrainInfos;
+    if (rawData && rawData.Trains) return rawData.Trains;
+    return [];
+}
+
 async function loadFile(filename) {
     if (cache[filename]) return cache[filename];
+
+    const isMaster = filename === 'final_train_diagram.json';
+    const pathPrefix = isMaster ? '' : 'data/';
+    const myUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${pathPrefix}${filename}`;
+    const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${pathPrefix}${filename}`;
+
+    // 🌟 基準檔優先抓自己倉庫；每日日期檔優先抓原作者 billy1125，與 auto_scan.py 保持一致
+    const urls = isMaster ? [myUrl, billyUrl] : [billyUrl, myUrl];
     let rawData = null;
 
-    try {
-        const basePath = filename === 'final_train_diagram.json' ? '' : 'data/';
-        const myGithubUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${basePath}${filename}`;
-        const res = await fetch(myGithubUrl, { cache: 'no-store' });
-        if (!res.ok) throw new Error('您的 GitHub 無此檔案');
-        rawData = await res.json();
-    } catch (err1) {
+    for (const url of urls) {
         try {
-            const billyPath = filename === 'final_train_diagram.json' ? '' : 'data/';
-            const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${billyPath}${filename}`;
-            const res2 = await fetch(billyUrl, { cache: 'no-store' });
-            if (!res2.ok) throw new Error('Billy 也無此檔案');
-            rawData = await res2.json();
-        } catch (err2) {
-            return []; 
+            const res = await fetch(url, { cache: 'no-store' });
+            if (res.ok) {
+                rawData = await res.json();
+                break;
+            }
+        } catch (err) {
+            continue;
         }
     }
 
-    let trainArray = [];
-    if (Array.isArray(rawData)) trainArray = rawData;
-    else if (rawData && rawData.TrainInfos) trainArray = rawData.TrainInfos;
-    else if (rawData && rawData.Trains) trainArray = rawData.Trains;
-    
-    cache[filename] = trainArray;
+    cache[filename] = extractTrainsFromRaw(rawData);
     return cache[filename];
 }
 
@@ -273,9 +279,6 @@ function selectTrain(train, itemEl) {
     document.getElementById('detail-scroll').scrollTop = 0;
 }
 
-// ==========================================
-// 💡 CSS 魔法：保證左右對齊，死都不換行！
-// ==========================================
 const flexRowStyle = 'display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: space-between !important; align-items: center !important;';
 
 function renderFilterPanel(trains) {
@@ -361,7 +364,7 @@ function renderTrainList(trains) {
         const numA = parseInt(a.Train, 10) || 0;
         const numB = parseInt(b.Train, 10) || 0;
         if (numA !== numB) return numA - numB;
-        return a.Train.localeCompare(b.Train);
+        return String(a.Train).localeCompare(String(b.Train));
     }).forEach(train => {
         const frag = tpl('tpl-train-item');
         const el = frag.firstElementChild;
@@ -397,7 +400,26 @@ async function selectFile(filename, itemEl) {
     } else {
         const dateStr = filename.replace('.json', '');
         const specialSet = specialTrainsByDate[dateStr] || new Set();
-        currentTrains = allTrains.filter(t => specialSet.has(t.Train));
+        currentTrains = allTrains.filter(t => specialSet.has(String(t.Train ?? t.TrainNo ?? '').trim()));
+
+        // 若 scan_log.txt 內殘留僅存在於自己倉庫的舊紀錄，自動從自己倉庫補齊避免筆數落差
+        if (currentTrains.length < specialSet.size) {
+            const loadedIds = new Set(currentTrains.map(t => String(t.Train ?? t.TrainNo ?? '').trim()));
+            try {
+                const fallbackRes = await fetch(`https://raw.githubusercontent.com/mochi-artist/artist/main/data/${filename}`, { cache: 'no-store' });
+                if (fallbackRes.ok) {
+                    const fallbackTrains = extractTrainsFromRaw(await fallbackRes.json());
+                    fallbackTrains.forEach(t => {
+                        const tid = String(t.Train ?? t.TrainNo ?? '').trim();
+                        if (specialSet.has(tid) && !loadedIds.has(tid)) {
+                            currentTrains.push(t);
+                            loadedIds.add(tid);
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
+
         document.getElementById('status').textContent = `${filename} — 共 ${currentTrains.length} 筆`;
     }
 
@@ -409,7 +431,6 @@ async function selectFile(filename, itemEl) {
 // 💡 初始化與左側「月份資料夾」渲染
 // ==========================================
 async function init() {
-    // 💡 防呆機制：如果檔案突然讀不到，也不會讓整個畫面卡住當機！
     await loadSpecialTrainsLog();
 
     try {
@@ -450,7 +471,6 @@ async function init() {
 
     if (logDates.length === 0) {
         listEl.innerHTML += '<div class="panel-empty">無紀錄</div>';
-        // 就算沒紀錄，也把全車次總表點開
         masterEl.click();
         return;
     }
@@ -481,8 +501,8 @@ async function init() {
         jumpSelect.appendChild(new Option(`${shortYear}年${month}月`, monthKey));
 
         const headerEl = document.createElement('div');
-        // 💡 修改吸頂高度：原本 38px -> 調整為 54px，閃過手機胖胖下拉選單的高度，不再破圖！
-        headerEl.style.cssText = `padding: 10px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; position: sticky; top: 54px; z-index: 5; border-bottom: 1px solid #1e293b; ${flexRowStyle}`;
+        // 🌟 貼齊頂部 top: 0，不再懸浮遮住日期
+        headerEl.style.cssText = `padding: 10px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid #1e293b; ${flexRowStyle}`;
         
         headerEl.innerHTML = `
             <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span> 
@@ -544,13 +564,13 @@ async function init() {
             <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${daysLen}天▾</span>
         `;
 
-        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // 🌟 無動畫即時定位，避免往上拉動整頁
+        header.scrollIntoView({ behavior: 'auto', block: 'start' });
         jumpSelect.value = '';
     });
 
     document.getElementById('status').textContent = `${logDates.length} 個日期檔案 + 1 份基準檔`;
 
-    // 💡 終極優化：初始化完畢後，自動幫你點擊並載入「全車次總表」！
     masterEl.click();
 }
 
