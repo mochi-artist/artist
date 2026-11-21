@@ -178,6 +178,20 @@ function tpl(id) {
     return document.getElementById(id).content.cloneNode(true);
 }
 
+// 將 HH:MM:SS 轉為運行圖時刻表的半分鐘格式（HH:MM.0 / HH:MM.5）
+function formatHalfMinTime(timeStr) {
+    if (!timeStr) return '-';
+    const s = String(timeStr).trim();
+    if (!s) return '-';
+    if (/^\d{2}:\d{2}\.[05]$/.test(s)) return s;
+    const parts = s.split(':');
+    if (parts.length < 2) return s;
+    const hh = parts[0].padStart(2, '0');
+    const mm = parts[1].padStart(2, '0');
+    const sec = parts[2] ? parseInt(parts[2], 10) : 0;
+    return `${hh}:${mm}.${sec >= 30 ? '5' : '0'}`;
+}
+
 function renderDetail(train) {
     const detail = document.getElementById('detail');
     detail.innerHTML = '';
@@ -210,15 +224,51 @@ function renderDetail(train) {
     detail.appendChild(card);
 
     const section = tpl('tpl-time-section');
-    section.querySelector('.section-title').textContent = `TimeInfos — 時刻表（${(train.TimeInfos || []).length} 站）`;
+    const timeList = train.TimeInfos || [];
+    section.querySelector('.section-title').textContent = `TimeInfos — 時刻表（${timeList.length} 站）`;
     const timeTbody = section.querySelector('tbody');
-    (train.TimeInfos || []).forEach(t => {
+
+    timeList.forEach((t, idx) => {
         const row = tpl('tpl-time-row');
-        row.querySelector('.order').textContent = t.Order;
+        const arrEl = row.querySelector('.arr');
+        const depEl = row.querySelector('.dep');
+        const remarkEl = row.querySelector('.route');
+
+        const rawArr = (t.ARRTime || '').trim();
+        const rawDep = (t.DEPTime || '').trim();
+        const isFirst = idx === 0;
+        const isLast = idx === timeList.length - 1;
+
+        row.querySelector('.order').textContent = t.Order ?? (idx + 1);
         row.querySelector('.station').textContent = Route[t.Station]?.DSC ?? t.Station;
-        row.querySelector('.arr').textContent = t.ARRTime || '—';
-        row.querySelector('.dep').textContent = t.DEPTime || '—';
-        row.querySelector('.route').textContent = t.Route || '—';
+
+        if (isFirst) {
+            // 起站：到站與離站皆顯示時間
+            arrEl.textContent = formatHalfMinTime(rawArr || rawDep);
+            depEl.textContent = formatHalfMinTime(rawDep || rawArr);
+            remarkEl.textContent = '起站';
+            remarkEl.classList.add('remark-start');
+        } else if (isLast) {
+            // 終站：顯示到站與離站時間（若僅需顯示終點字樣可將「終站」改為「終點」）
+            arrEl.textContent = formatHalfMinTime(rawArr || rawDep);
+            depEl.textContent = formatHalfMinTime(rawDep || rawArr);
+            remarkEl.textContent = '終站';
+            remarkEl.classList.add('remark-end');
+        } else if (!rawArr || !rawDep || rawArr === rawDep) {
+            // 中間通過站：到站顯示 "-"，僅離站顯示通過時間
+            arrEl.textContent = '-';
+            arrEl.classList.add('arr-pass');
+            depEl.textContent = formatHalfMinTime(rawDep || rawArr);
+            remarkEl.textContent = '通過';
+            remarkEl.classList.add('remark-pass');
+        } else {
+            // 中間停靠站：同時顯示到站與離站時間
+            arrEl.textContent = formatHalfMinTime(rawArr);
+            depEl.textContent = formatHalfMinTime(rawDep);
+            remarkEl.textContent = '停靠';
+            remarkEl.classList.add('remark-stop');
+        }
+
         timeTbody.appendChild(row);
     });
     detail.appendChild(section);
