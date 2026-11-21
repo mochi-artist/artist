@@ -29,7 +29,10 @@ const CAR_CLASS_MAP = {
 const LINE_DIR_MAP = { '1': '順行', '2': '逆行' };
 const LINE_MAP = { '0': '不經山海線', '1': '山線', '2': '海線', '3': '成追線', '4': '山海線' };
 
-const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '觀光列車', '專列', '客迴'];
+const CATEGORY_ORDER = [
+    '新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光',
+    '區間車', '區間快', '普快車', '海風號', '山嵐號', '寶可夢(800型)', '專列', '客迴'
+];
 
 const CAR_CLASS_CATEGORY = {
     '110G': '新自強', '110H': '新自強',
@@ -41,16 +44,30 @@ const CAR_CLASS_CATEGORY = {
     '1131': '區間車', '1135': '區間車',
     '1132': '區間快',
     '1140': '普快車', '1141': '普快車', '1150': '普快車',
-    '0001': '觀光列車', '0002': '觀光列車',
+    '0001': '海風號',
+    '0002': '山嵐號',
     '1104': '專列',  '1112': '專列',  '1121': '專列', '1130': '專列',  '1134': '專列',  '1154': '專列',
 };
 
-function getTrainCategory(carClass) {
-    return CAR_CLASS_CATEGORY[carClass] || '客迴';
-}
-
 function getTrainId(t) {
     return String(t?.Train ?? t?.TrainNo ?? '').trim();
+}
+
+function isPokemon800(train) {
+    return getTrainId(train) === '6725' && String(train?.CarClass ?? '').trim().toUpperCase() === '110F';
+}
+
+function getTrainCarClassLabel(train) {
+    if (isPokemon800(train)) return '寶可夢(800型)';
+    const code = String(train?.CarClass ?? '').trim();
+    return CAR_CLASS_MAP[code] || code || '';
+}
+
+function getTrainCategory(train) {
+    if (typeof train === 'string') return CAR_CLASS_CATEGORY[train] || '客迴';
+    if (isPokemon800(train)) return '寶可夢(800型)';
+    const code = String(train?.CarClass ?? '').trim();
+    return CAR_CLASS_CATEGORY[code] || '客迴';
 }
 
 const KEYS_ZH = {
@@ -209,12 +226,12 @@ function setYN(td, v) {
     td.innerHTML = '<span style="color:#cbd5e1">—</span>';
 }
 
-function fillInfoVal(td, key, val) {
+function fillInfoVal(td, key, val, train = null) {
     if (key === 'Type') {
         const label = TRAIN_TYPE_MAP[val] || val;
         td.innerHTML = `<span style="color:#94a3b8;font-size:0.78rem">${val}</span> ${label}`;
     } else if (key === 'CarClass') {
-        const label = CAR_CLASS_MAP[val] || val;
+        const label = train ? getTrainCarClassLabel(train) : (CAR_CLASS_MAP[val] || val);
         td.innerHTML = `<span style="color:#94a3b8;font-size:0.78rem">${val}</span> ${label}`;
     } else if (key === 'LineDir') {
         td.textContent = LINE_DIR_MAP[val] || val;
@@ -253,7 +270,7 @@ function renderDetail(train) {
     const card = tpl('tpl-detail-card');
     const currentTrainId = getTrainId(train);
     card.querySelector('.train-num').textContent = currentTrainId;
-    card.querySelector('.type-badge').textContent = CAR_CLASS_MAP[train.CarClass] || train.CarClass || '';
+    card.querySelector('.type-badge').textContent = getTrainCarClassLabel(train);
     const infoTbody = card.querySelector('tbody');
 
     const displayObj = { ...train };
@@ -274,7 +291,7 @@ function renderDetail(train) {
             const row = tpl('tpl-info-row');
             row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
             row.querySelector('.info-val').textContent = '';
-            fillInfoVal(row.querySelector('.info-val'), k, displayVal);
+            fillInfoVal(row.querySelector('.info-val'), k, displayVal, train);
             infoTbody.appendChild(row);
         });
     detail.appendChild(card);
@@ -498,7 +515,7 @@ function renderFilterPanel(trains) {
     let overnightCount = 0;
 
     trains.forEach(t => {
-        const cat = getTrainCategory(t.CarClass);
+        const cat = getTrainCategory(t);
         counts[cat] = (counts[cat] || 0) + 1;
         if (cat !== '客迴' && findOverNightStation(t.TimeInfos) !== null) overnightCount++;
     });
@@ -558,9 +575,9 @@ function renderTrainList(trains) {
     let filtered = trains;
 
     if (selectedType === '跨夜正班') {
-        filtered = trains.filter(t => getTrainCategory(t.CarClass) !== '客迴' && findOverNightStation(t.TimeInfos) !== null);
+        filtered = trains.filter(t => getTrainCategory(t) !== '客迴' && findOverNightStation(t.TimeInfos) !== null);
     } else if (selectedType) {
-        filtered = trains.filter(t => getTrainCategory(t.CarClass) === selectedType);
+        filtered = trains.filter(t => getTrainCategory(t) === selectedType);
     }
 
     if (!filtered.length) {
