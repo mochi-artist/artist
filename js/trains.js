@@ -66,6 +66,61 @@ const IGNORE_KEYS = new Set(['BreastFeed', 'Package', 'Dinning', 'FoodSrv', 'Cri
 
 let Route = {};
 
+// 固定視為運轉停車的車站代碼（列車於此處停車時自動標記為「運轉停車」）
+const ALWAYS_OP_STOP_STATIONS = new Set(['2115', '3355', '5170', '5175', '5180']);
+let masterOpStops = {};
+
+async function loadMasterOpStops() {
+    const isLocalDev = ['localhost', '127.0.0.1'].includes(location.hostname) || /^192\.168\./.test(location.hostname);
+    const candidates = [];
+
+    // 1. 嘗試讀取 Revised_Epochs.json 取得目前最新已生效的改點代碼（例如 1151003）
+    try {
+        const epochUrl = isLocalDev
+            ? 'data all/Revised_Epochs.json'
+            : 'https://raw.githubusercontent.com/mochi-artist/artist/main/data%20all/Revised_Epochs.json';
+        const res = await fetch(epochUrl, { cache: 'no-store' });
+        if (res.ok) {
+            const epochs = await res.json();
+            if (Array.isArray(epochs) && epochs.length > 0) {
+                const now = new Date();
+                const todayInt = Number(
+                    `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`
+                );
+                const sorted = [...epochs].sort((a, b) => Number(a.date) - Number(b.date));
+                const activeEpochs = sorted.filter(e => Number(e.date) <= todayInt);
+                const latest = (activeEpochs.length > 0 ? activeEpochs : sorted).pop();
+                if (latest?.fileId) candidates.push(`OpStops/OpStops_${latest.fileId}.json`);
+            }
+        }
+    } catch (e) {}
+
+    // 2. 保底指定目前全車次總表使用的 OpStops_1151003.json
+    if (!candidates.includes('OpStops/OpStops_1151003.json')) {
+        candidates.push('OpStops/OpStops_1151003.json');
+    }
+
+    for (const relPath of candidates) {
+        const rawUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${relPath}`;
+        const urls = isLocalDev ? [relPath, rawUrl] : [rawUrl, relPath];
+        for (const url of urls) {
+            try {
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) continue;
+                const raw = await res.json();
+                const map = {};
+                Object.entries(raw || {}).forEach(([tid, stns]) => {
+                    if (Array.isArray(stns)) {
+                        map[String(tid).trim()] = new Set(stns.map(s => String(s).trim()));
+                    }
+                });
+                masterOpStops = map;
+                return;
+            } catch (e) {}
+        }
+    }
+}
+
 // ==========================================
 // 💡 精準計算「最靠近 00:00:00 的跨日車站」演算法
 // ==========================================
@@ -196,7 +251,8 @@ function renderDetail(train) {
     const detail = document.getElementById('detail');
     detail.innerHTML = '';
     const card = tpl('tpl-detail-card');
-    card.querySelector('.train-num').textContent = getTrainId(train);
+    const currentTrainId = getTrainId(train);
+    card.querySelector('.train-num').textContent = currentTrainId;
     card.querySelector('.type-badge').textContent = CAR_CLASS_MAP[train.CarClass] || train.CarClass || '';
     const infoTbody = card.querySelector('tbody');
 
@@ -225,6 +281,9 @@ function renderDetail(train) {
 
     const section = tpl('tpl-time-section');
     const timeList = train.TimeInfos || [];
+    const isMasterFile = activeFile === 'final_train_diagram.json';
+    const masterOpStopSet = isMasterFile ? (masterOpStops[currentTrainId] || null) : null;
+
     section.querySelector('.section-title').textContent = `TimeInfos — 時刻表（${timeList.length} 站）`;
     const timeTbody = section.querySelector('tbody');
 
@@ -234,13 +293,15 @@ function renderDetail(train) {
         const depEl = row.querySelector('.dep');
         const remarkEl = row.querySelector('.route');
 
+        const stnId = String(t.Station ?? '').trim();
         const rawArr = (t.ARRTime || '').trim();
         const rawDep = (t.DEPTime || '').trim();
         const isFirst = idx === 0;
         const isLast = idx === timeList.length - 1;
+        const isListedOpStop = masterOpStopSet ? masterOpStopSet.has(stnId) : false;
 
         row.querySelector('.order').textContent = t.Order ?? (idx + 1);
-        row.querySelector('.station').textContent = Route[t.Station]?.DSC ?? t.Station;
+        row.querySelector('.station').textContent = Route[stnId]?.DSC ?? t.Station;
 
         if (isFirst) {
             // 起站：到站與離站皆顯示時間
@@ -249,18 +310,30 @@ function renderDetail(train) {
             remarkEl.textContent = '起站';
             remarkEl.classList.add('remark-start');
         } else if (isLast) {
-            // 終站：顯示到站與離站時間（若僅需顯示終點字樣可將「終站」改為「終點」）
+            // 終站：顯示到站與離站時間
             arrEl.textContent = formatHalfMinTime(rawArr || rawDep);
             depEl.textContent = formatHalfMinTime(rawDep || rawArr);
             remarkEl.textContent = '終站';
             remarkEl.classList.add('remark-end');
+        } else if (isListedOpStop) {
+            // 全車次總表 OpStops 名單內明確指定的運轉停車
+            arrEl.textContent = formatHalfMinTime(rawArr || rawDep);
+            depEl.textContent = formatHalfMinTime(rawDep || rawArr);
+            remarkEl.textContent = '運轉停車';
+            remarkEl.classList.add('remark-opstop');
         } else if (!rawArr || !rawDep || rawArr === rawDep) {
-            // 中間通過站：到站顯示 "-"，僅離站顯示通過時間
+            // 中間通過站（含不停車通過 2115、3355、5170、5175、5180 的列車）
             arrEl.textContent = '-';
             arrEl.classList.add('arr-pass');
             depEl.textContent = formatHalfMinTime(rawDep || rawArr);
             remarkEl.textContent = '通過';
             remarkEl.classList.add('remark-pass');
+        } else if (ALWAYS_OP_STOP_STATIONS.has(stnId)) {
+            // 於 2115、3355、5170、5175、5180 實際停車
+            arrEl.textContent = formatHalfMinTime(rawArr);
+            depEl.textContent = formatHalfMinTime(rawDep);
+            remarkEl.textContent = '運轉停車';
+            remarkEl.classList.add('remark-opstop');
         } else {
             // 中間停靠站：同時顯示到站與離站時間
             arrEl.textContent = formatHalfMinTime(rawArr);
@@ -556,7 +629,10 @@ async function selectFile(filename, itemEl) {
 // 💡 初始化與左側「月份資料夾」渲染
 // ==========================================
 async function init() {
-    await loadSpecialTrainsLog();
+    await Promise.all([
+        loadSpecialTrainsLog(),
+        loadMasterOpStops()
+    ]);
 
     try {
         const r = await fetch('js/references/Route.json');
