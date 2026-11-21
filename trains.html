@@ -328,6 +328,13 @@
             border-color: #38bdf8;
         }
 
+        /* 時刻表備註狀態色（對應按鈕時刻表設定） */
+        .time-table td.remark-start { color: #0284c7; font-weight: 700; }
+        .time-table td.remark-stop  { color: #059669; font-weight: 700; }
+        .time-table td.remark-pass  { color: #d97706; font-weight: 700; }
+        .time-table td.remark-end   { color: #dc2626; font-weight: 700; }
+        .time-table td.arr-pass     { color: #94a3b8 !important; }
+
         @media screen and (max-width: 768px) {
             html, body {
                 overflow: hidden !important;
@@ -456,9 +463,9 @@
             
             .time-table th:nth-child(1), .time-table td:nth-child(1) { width: 10%; } 
             .time-table th:nth-child(2), .time-table td:nth-child(2) { width: 24%; } 
-            .time-table th:nth-child(3), .time-table td:nth-child(3) { width: 26%; } 
-            .time-table th:nth-child(4), .time-table td:nth-child(4) { width: 26%; } 
-            .time-table th:nth-child(5), .time-table td:nth-child(5) { width: 14%; } 
+            .time-table th:nth-child(3), .time-table td:nth-child(3) { width: 25%; } 
+            .time-table th:nth-child(4), .time-table td:nth-child(4) { width: 25%; } 
+            .time-table th:nth-child(5), .time-table td:nth-child(5) { width: 16%; }
 
             #detail-scroll {
                 padding-bottom: 60px !important; 
@@ -519,7 +526,7 @@
             <div class="section-title"></div>
             <div class="time-table-wrap">
                 <table class="time-table">
-                    <thead><tr><th>順序</th><th>車站名稱</th><th>到站</th><th>出發</th><th>路線</th></tr></thead>
+                    <thead><tr><th>順序</th><th>車站名稱</th><th>到站</th><th>離站</th><th>備註</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
