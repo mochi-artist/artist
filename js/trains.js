@@ -49,9 +49,13 @@ function getTrainCategory(carClass) {
     return CAR_CLASS_CATEGORY[carClass] || '客迴';
 }
 
+function getTrainId(t) {
+    return String(t?.Train ?? t?.TrainNo ?? '').trim();
+}
+
 const KEYS_ZH = {
     Type: '列車型態', Train: '車次',
-    Route: '路線', 
+    Route: '路線',
     LineDir: '行駛方向', Line: '經由路線', CarClass: '列車種類',
     ExtraTrain: '加班車', Everyday: '每日行駛',
     Note: '備註', CalculatedOverNightStn: '跨日車站代碼'
@@ -84,7 +88,7 @@ function findOverNightStation(timeInfos) {
     let prevSeconds = -1;
     let minDiff = Infinity;
     let closestStn = null;
-    
+
     for (const t of timeInfos) {
         const arrStr = t.ARRTime || t.DEPTime;
         const depStr = t.DEPTime || t.ARRTime;
@@ -96,9 +100,9 @@ function findOverNightStation(timeInfos) {
         }
         prevSeconds = Math.max(arrSec, depSec);
     }
-    
+
     if (!crossedMidnight) return null;
-    
+
     for (const t of timeInfos) {
         const arrStr = t.ARRTime || t.DEPTime;
         const depStr = t.DEPTime || t.ARRTime;
@@ -122,7 +126,7 @@ async function loadSpecialTrainsLog() {
     try {
         const res = await fetch('scan_log.txt', { cache: 'no-store' });
         if (!res.ok) return;
-        
+
         const text = await res.text();
         let currentDate = null;
         const lines = text.split('\n');
@@ -178,14 +182,14 @@ function renderDetail(train) {
     const detail = document.getElementById('detail');
     detail.innerHTML = '';
     const card = tpl('tpl-detail-card');
-    card.querySelector('.train-num').textContent = train.Train;
+    card.querySelector('.train-num').textContent = getTrainId(train);
     card.querySelector('.type-badge').textContent = CAR_CLASS_MAP[train.CarClass] || train.CarClass || '';
     const infoTbody = card.querySelector('tbody');
-    
+
     const displayObj = { ...train };
     delete displayObj.OverNightStn;
     delete displayObj.OverNightStationID;
-    
+
     const calculatedStn = findOverNightStation(train.TimeInfos);
     if (calculatedStn) displayObj.CalculatedOverNightStn = calculatedStn;
 
@@ -199,7 +203,7 @@ function renderDetail(train) {
             }
             const row = tpl('tpl-info-row');
             row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
-            row.querySelector('.info-val').textContent = ''; 
+            row.querySelector('.info-val').textContent = '';
             fillInfoVal(row.querySelector('.info-val'), k, displayVal);
             infoTbody.appendChild(row);
         });
@@ -223,11 +227,12 @@ function renderDetail(train) {
     spacer.style.height = '120px';
     spacer.style.width = '100%';
     spacer.style.opacity = '0';
-    spacer.style.pointerEvents = 'none'; 
+    spacer.style.pointerEvents = 'none';
     detail.appendChild(spacer);
 }
 
-const cache = {};
+const sourceCache = {};
+const matchedTrainsPromiseCache = {};
 let activeFile = null;
 let activeTrain = null;
 let selectedType = null;
@@ -240,18 +245,25 @@ function extractTrainsFromRaw(rawData) {
     return [];
 }
 
-async function loadFile(filename) {
-    if (cache[filename]) return cache[filename];
+// 依來源（'billy' 或 'my'）各自快取讀取 JSON
+async function fetchSourceTrains(source, filename) {
+    const cacheKey = `${source}:${filename}`;
+    if (sourceCache[cacheKey]) return sourceCache[cacheKey];
 
     const isMaster = filename === 'final_train_diagram.json';
     const pathPrefix = isMaster ? '' : 'data/';
-    const myUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${pathPrefix}${filename}`;
-    const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${pathPrefix}${filename}`;
+    const isLocalDev = ['localhost', '127.0.0.1'].includes(location.hostname) || /^192\.168\./.test(location.hostname);
 
-    // 🌟 基準檔優先抓自己倉庫；每日日期檔優先抓原作者 billy1125，與 auto_scan.py 保持一致
-    const urls = isMaster ? [myUrl, billyUrl] : [billyUrl, myUrl];
+    let urls;
+    if (source === 'billy') {
+        urls = [`https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${pathPrefix}${filename}`];
+    } else {
+        const rawMyUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${pathPrefix}${filename}`;
+        const localUrl = `${pathPrefix}${filename}`;
+        urls = isLocalDev ? [localUrl, rawMyUrl] : [rawMyUrl, localUrl];
+    }
+
     let rawData = null;
-
     for (const url of urls) {
         try {
             const res = await fetch(url, { cache: 'no-store' });
@@ -264,14 +276,88 @@ async function loadFile(filename) {
         }
     }
 
-    cache[filename] = extractTrainsFromRaw(rawData);
-    return cache[filename];
+    sourceCache[cacheKey] = extractTrainsFromRaw(rawData);
+    return sourceCache[cacheKey];
+}
+
+// 🌟 將抓到的車次之 CarClass 與 TimeInfos（停靠站與到站／出發時間）改為你 data/ 裡的日期資料
+function applyMyDataOverrides(train, myTrainMap) {
+    const tid = getTrainId(train);
+    const myTrain = myTrainMap.get(tid);
+    if (!myTrain) return train;
+
+    const merged = { ...train };
+    if (myTrain.CarClass !== undefined && myTrain.CarClass !== '') {
+        merged.CarClass = myTrain.CarClass;
+    }
+
+    const myTimeInfos = myTrain.TimeInfos || myTrain.Timetables;
+    if (Array.isArray(myTimeInfos) && myTimeInfos.length > 0) {
+        merged.TimeInfos = myTimeInfos;
+    }
+
+    return merged;
+}
+
+// 🌟 單一事實來源：左側「幾車」與右側「車次清單」共用同一份抓取與覆寫後的結果
+function getMatchedTrains(filename) {
+    if (matchedTrainsPromiseCache[filename]) return matchedTrainsPromiseCache[filename];
+
+    matchedTrainsPromiseCache[filename] = (async () => {
+        if (filename === 'final_train_diagram.json') {
+            const myMaster = await fetchSourceTrains('my', filename);
+            if (myMaster.length > 0) return myMaster;
+            return await fetchSourceTrains('billy', filename);
+        }
+
+        // 同時讀取原作者 billy1125 與你自己的 data/ 日期檔
+        const [billyTrains, myTrains] = await Promise.all([
+            fetchSourceTrains('billy', filename),
+            fetchSourceTrains('my', filename)
+        ]);
+
+        const myTrainMap = new Map();
+        myTrains.forEach(t => {
+            const tid = getTrainId(t);
+            if (tid) myTrainMap.set(tid, t);
+        });
+
+        const dateStr = filename.replace('.json', '');
+        const specialSet = specialTrainsByDate[dateStr] || new Set();
+
+        const matched = [];
+        const loadedIds = new Set();
+
+        // 1. 先從原作者檔抓出符合 scan_log.txt 的特殊車次，並以你 data/ 內的 CarClass 與 TimeInfos 覆寫
+        billyTrains.forEach(t => {
+            const tid = getTrainId(t);
+            if (tid && specialSet.has(tid) && !loadedIds.has(tid)) {
+                matched.push(applyMyDataOverrides(t, myTrainMap));
+                loadedIds.add(tid);
+            }
+        });
+
+        // 2. 若原作者檔缺少 scan_log.txt 內殘留的車次，從你的 data/ 補齊
+        if (matched.length < specialSet.size) {
+            myTrains.forEach(t => {
+                const tid = getTrainId(t);
+                if (tid && specialSet.has(tid) && !loadedIds.has(tid)) {
+                    matched.push(t);
+                    loadedIds.add(tid);
+                }
+            });
+        }
+
+        return matched;
+    })();
+
+    return matchedTrainsPromiseCache[filename];
 }
 
 function selectTrain(train, itemEl) {
     document.querySelectorAll('.train-item').forEach(el => el.classList.remove('active'));
     itemEl.classList.add('active');
-    activeTrain = train.Train;
+    activeTrain = getTrainId(train);
     document.getElementById('placeholder').style.display = 'none';
     const detail = document.getElementById('detail');
     detail.style.display = 'block';
@@ -347,7 +433,7 @@ function renderFilterPanel(trains) {
 function renderTrainList(trains) {
     const listEl = document.getElementById('train-list');
     let filtered = trains;
-    
+
     if (selectedType === '跨夜正班') {
         filtered = trains.filter(t => getTrainCategory(t.CarClass) !== '客迴' && findOverNightStation(t.TimeInfos) !== null);
     } else if (selectedType) {
@@ -361,19 +447,22 @@ function renderTrainList(trains) {
     listEl.innerHTML = '';
 
     [...filtered].sort((a, b) => {
-        const numA = parseInt(a.Train, 10) || 0;
-        const numB = parseInt(b.Train, 10) || 0;
+        const idA = getTrainId(a);
+        const idB = getTrainId(b);
+        const numA = parseInt(idA, 10) || 0;
+        const numB = parseInt(idB, 10) || 0;
         if (numA !== numB) return numA - numB;
-        return String(a.Train).localeCompare(String(b.Train));
+        return idA.localeCompare(idB);
     }).forEach(train => {
+        const tid = getTrainId(train);
         const frag = tpl('tpl-train-item');
         const el = frag.firstElementChild;
         el.style.cssText = `padding: 10px 4px !important; ${flexRowStyle}`;
         el.innerHTML = `
-            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">${train.Train}</span>
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">${tid}</span>
             <span style="color: #94a3b8; white-space: nowrap; flex-shrink: 0; font-size: 0.7rem;">${(train.TimeInfos || []).length}站</span>
         `;
-        if (train.Train === activeTrain) el.classList.add('active');
+        if (tid === activeTrain) el.classList.add('active');
         el.addEventListener('click', () => selectTrain(train, el));
         listEl.appendChild(el);
     });
@@ -382,7 +471,7 @@ function renderTrainList(trains) {
 async function selectFile(filename, itemEl) {
     document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
     if (itemEl) itemEl.classList.add('active');
-    
+
     activeFile = filename;
     activeTrain = null;
 
@@ -392,34 +481,20 @@ async function selectFile(filename, itemEl) {
     document.getElementById('detail').style.display = 'none';
 
     selectedType = null;
-    let allTrains = await loadFile(filename);
-    
+    const trains = await getMatchedTrains(filename);
+
+    // 立即把左側「幾車」同步為實際抓到的車次數量
+    if (filename !== 'final_train_diagram.json' && itemEl) {
+        const countSpan = itemEl.querySelector('.file-count');
+        if (countSpan) countSpan.textContent = `${trains.length}車`;
+    }
+
+    if (activeFile !== filename) return;
+
+    currentTrains = trains;
     if (filename === 'final_train_diagram.json') {
-        currentTrains = allTrains;
         document.getElementById('status').textContent = `全車次總表 — 共 ${currentTrains.length} 筆`;
     } else {
-        const dateStr = filename.replace('.json', '');
-        const specialSet = specialTrainsByDate[dateStr] || new Set();
-        currentTrains = allTrains.filter(t => specialSet.has(String(t.Train ?? t.TrainNo ?? '').trim()));
-
-        // 若 scan_log.txt 內殘留僅存在於自己倉庫的舊紀錄，自動從自己倉庫補齊避免筆數落差
-        if (currentTrains.length < specialSet.size) {
-            const loadedIds = new Set(currentTrains.map(t => String(t.Train ?? t.TrainNo ?? '').trim()));
-            try {
-                const fallbackRes = await fetch(`https://raw.githubusercontent.com/mochi-artist/artist/main/data/${filename}`, { cache: 'no-store' });
-                if (fallbackRes.ok) {
-                    const fallbackTrains = extractTrainsFromRaw(await fallbackRes.json());
-                    fallbackTrains.forEach(t => {
-                        const tid = String(t.Train ?? t.TrainNo ?? '').trim();
-                        if (specialSet.has(tid) && !loadedIds.has(tid)) {
-                            currentTrains.push(t);
-                            loadedIds.add(tid);
-                        }
-                    });
-                }
-            } catch (e) {}
-        }
-
         document.getElementById('status').textContent = `${filename} — 共 ${currentTrains.length} 筆`;
     }
 
@@ -446,6 +521,26 @@ async function init() {
     const monthElements = {};
     const jumpSelect = document.createElement('select');
 
+    // 展開月份時，背景批次核對該月所有日期的實際車次數量
+    async function syncMonthCounts(monthKey) {
+        const group = monthElements[monthKey];
+        if (!group || group.synced) return;
+        group.synced = true;
+
+        const queue = [...group.dayItems];
+        const worker = async () => {
+            while (queue.length > 0) {
+                const item = queue.shift();
+                try {
+                    const trains = await getMatchedTrains(item.filename);
+                    item.countEl.textContent = `${trains.length}車`;
+                } catch (e) {}
+            }
+        };
+        const workers = Array.from({ length: Math.min(5, queue.length) }, () => worker());
+        await Promise.all(workers);
+    }
+
     // 1. 全車次總表
     const masterEl = document.createElement('div');
     masterEl.className = 'file-item';
@@ -459,7 +554,7 @@ async function init() {
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
             group.header.innerHTML = `
-                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span> 
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span>
                 <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${group.daysLen}天▸</span>
             `;
         });
@@ -477,7 +572,7 @@ async function init() {
 
     const groups = {};
     logDates.forEach(dateStr => {
-        const monthKey = dateStr.slice(0, 6); 
+        const monthKey = dateStr.slice(0, 6);
         if (!groups[monthKey]) groups[monthKey] = [];
         groups[monthKey].push(dateStr);
     });
@@ -494,38 +589,42 @@ async function init() {
     listEl.appendChild(jumpContainer);
 
     Object.keys(groups).sort().forEach(monthKey => {
-        const shortYear = monthKey.slice(2, 4); 
+        const shortYear = monthKey.slice(2, 4);
         const month = monthKey.slice(4, 6);
         const days = groups[monthKey];
 
         jumpSelect.appendChild(new Option(`${shortYear}年${month}月`, monthKey));
 
         const headerEl = document.createElement('div');
-        // 🌟 貼齊頂部 top: 0，不再懸浮遮住日期
         headerEl.style.cssText = `padding: 10px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid #1e293b; ${flexRowStyle}`;
-        
+
         headerEl.innerHTML = `
-            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span> 
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
             <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${days.length}天▸</span>
         `;
 
         const containerEl = document.createElement('div');
-        containerEl.style.display = 'none'; 
+        containerEl.style.display = 'none';
+
+        const dayItems = [];
 
         headerEl.addEventListener('click', () => {
             const isExpanded = containerEl.style.display !== 'none';
             containerEl.style.display = isExpanded ? 'none' : 'block';
             headerEl.innerHTML = `
-                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span> 
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
                 <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${days.length}天${isExpanded ? '▸' : '▾'}</span>
             `;
+            if (!isExpanded) {
+                syncMonthCounts(monthKey);
+            }
         });
 
         listEl.appendChild(headerEl);
 
         days.forEach(dateStr => {
-            const filename = `${dateStr}.json`; 
-            const formatted = `${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`; 
+            const filename = `${dateStr}.json`;
+            const formatted = `${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`;
             const countInLog = specialTrainsByDate[dateStr].size;
 
             const el = document.createElement('div');
@@ -535,14 +634,25 @@ async function init() {
                 <span class="file-date" style="white-space: nowrap; flex-shrink: 1; overflow: hidden; font-size: 0.75rem;">${formatted}</span>
                 <span class="file-count" style="white-space: nowrap; flex-shrink: 0; font-size: 0.7rem; color: #94a3b8;">${countInLog}車</span>
             `;
-            
+
+            const countEl = el.querySelector('.file-count');
+            dayItems.push({ filename, countEl });
+
             el.addEventListener('click', () => selectFile(filename, el));
             containerEl.appendChild(el);
         });
 
         listEl.appendChild(containerEl);
 
-        monthElements[monthKey] = { header: headerEl, container: containerEl, shortYear, month, daysLen: days.length };
+        monthElements[monthKey] = {
+            header: headerEl,
+            container: containerEl,
+            shortYear,
+            month,
+            daysLen: days.length,
+            dayItems,
+            synced: false
+        };
     });
 
     jumpSelect.addEventListener('change', (e) => {
@@ -552,7 +662,7 @@ async function init() {
         Object.values(monthElements).forEach(group => {
             group.container.style.display = 'none';
             group.header.innerHTML = `
-                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span> 
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span>
                 <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${group.daysLen}天▸</span>
             `;
         });
@@ -560,11 +670,11 @@ async function init() {
         const { header, container, shortYear, month, daysLen } = monthElements[targetKey];
         container.style.display = 'block';
         header.innerHTML = `
-            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span> 
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
             <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${daysLen}天▾</span>
         `;
 
-        // 🌟 無動畫即時定位，避免往上拉動整頁
+        syncMonthCounts(targetKey);
         header.scrollIntoView({ behavior: 'auto', block: 'start' });
         jumpSelect.value = '';
     });
