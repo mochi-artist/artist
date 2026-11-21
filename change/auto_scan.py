@@ -1,354 +1,637 @@
-# -*- coding: utf-8 -*-
-import requests
-import json
-import os
-import time
-import datetime
-import re
-from collections import defaultdict
+// Type：列車型態（1=定期 2=加開 3=郵輪 4=專列）
+const TRAIN_TYPE_MAP = {
+    '1': '定期', '2': '加開', '3': '郵輪', '4': '專列'
+};
 
-# ================= 設定區 =================
-FORCE_REBUILD = False
+// CarClass：列車種類代碼表（V1.5）
+const CAR_CLASS_MAP = {
+    '1100': '自強',           '1101': '自強(太,障)',    '1102': '自強(腳,障)',
+    '1103': '自強(障)',        '1104': '自強(專)',       '1105': '自強(郵)',
+    '1106': '自強(商專)',      '1107': '自強(普,障)',    '1108': '自強(PP障)',
+    '1109': '自強(PP親)',      '110A': '自強(PP障12)',   '110B': '自強(E12)',
+    '110C': '自強(E3)',        '110D': '自強(D28)',      '110E': '自強(D29)',
+    '110F': '自強(D31)',       '110G': '自強(3000障)',   '110H': '自強(3000親障)',
+    '1110': '莒光',            '1111': '莒光(障)',       '1112': '莒光(專)',
+    '1113': '莒光(郵)',        '1114': '莒光(腳)',       '1115': '莒光(腳,障)',
+    '1120': '復興',            '1121': '復興(專)',       '1122': '復興(郵)',
+    '1130': '電車(專)',        '1131': '區間車',         '1132': '區間快',
+    '1133': '電車(郵)',        '1134': '兩鐵(專)',       '1135': '區間車(腳,障)',
+    '1140': '普快車',          '1141': '柴快車',
+    '1150': '普通車(專)',      '1151': '普通車',         '1152': '行包專車',
+    '1154': '柴客(專)',        '1155': '柴客(郵)',       '110K': '自強',
+    '1270': '普通貨車',        '1280': '客迴',           '1281': '柴迴',
+    '1282': '臨時客迴',        '12A0': '調車列車',       '12A1': '單機迴送',
+    '12B0': '試運轉',          '4200': '特種(戰)',       '5230': '特種(警)',
+    '0001': '海風號',          '0002': '山嵐號'
+};
 
-HISTORY_FILE = "scan_history.json"
-LOG_FILE = "scan_log.txt"
+// LineDir / Line 對照
+const LINE_DIR_MAP = { '1': '順行', '2': '逆行' };
+const LINE_MAP = { '0': '不經山海線', '1': '山線', '2': '海線', '3': '成追線', '4': '山海線' };
 
-# 🕒 強制使用台灣時間 (UTC+8)，動態設定起始掃描日為「今日」
-TW_TZ = datetime.timezone(datetime.timedelta(hours=8))
-START_DATE = int(datetime.datetime.now(TW_TZ).strftime("%Y%m%d"))
+const CATEGORY_ORDER = ['新自強', '太魯閣', '普悠瑪', '自強', '柴聯自強', '莒光', '區間車', '區間快', '普快車', '觀光列車', '專列', '客迴'];
 
-# 🧠 你這邊的基準檔 (大腦) 路徑設定
-ROOT_MASTER_FILE = "final_train_diagram.json"  # 根目錄 (現役基準檔)
-FUTURE_BRAIN_DIR = "data all"                  # 未來改點基準檔資料夾
+const CAR_CLASS_CATEGORY = {
+    '110G': '新自強', '110H': '新自強',
+    '1101': '太魯閣',
+    '1107': '普悠瑪',
+    '1100': '自強',  '1102': '自強',  '1103': '自強', '1105': '自強',  '1106': '自強',  '1108': '自強',  '1109': '自強', '110A': '自強',  '110B': '自強',  '110C': '自強',  '110D': '自強', '110E': '自強',  '110K': '自強',
+    '110F': '柴聯自強',
+    '1110': '莒光',  '1111': '莒光', '1113': '莒光',  '1114': '莒光',  '1115': '莒光',
+    '1131': '區間車', '1135': '區間車',
+    '1132': '區間快',
+    '1140': '普快車', '1141': '普快車', '1150': '普快車',
+    '0001': '觀光列車', '0002': '觀光列車',
+    '1104': '專列',  '1112': '專列',  '1121': '專列', '1130': '專列',  '1134': '專列',  '1154': '專列',
+};
 
-STATION_DB_FILE = "SVG_Y_Axis.json"
-CAR_KIND_DB_FILE = "CarKind.json"
-BILLY_REF_URL = "https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/js/references/"
-
-# 🌟 黃金排除名單
-EXCLUDE_PREFIXES = ["29", "47", "48", "4008", "49"]
-EXCLUDE_KEYWORDS = ["(林)", "(高)"]
-TARGETS = [("billy1125", "billy1125.github.io", "data")]
-
-CHINESE_NAME_MAP = {
-    "taroko": "太魯閣", "kuaimu": "檜木", "puyuma": "普悠瑪",
-    "zhongxing": "中興號", "direct": "直達車", "tze_chiang": "自強",
-    "alishan_local": "阿里山號", "tze_chiang_diesel": "柴自強",
-    "emu1200": "紅斑馬", "emu300": "EMU300", "emu3000": "騰雲座",
-    "chu_kuang": "莒光", "chushan1": "祝山", "chushan2": "祝山",
-    "skip_stop": "跳站", "local": "區間", "alishan": "阿里山",
-    "all_stop": "站站停", "local_express": "區快", "fu_hsing": "復興",
-    "ordinary": "普快", "theme": "主題", "special": "專車", "others": "其他"
+function getTrainCategory(carClass) {
+    return CAR_CLASS_CATEGORY[carClass] || '客迴';
 }
 
-def get_filename_date(filename):
-    """僅解析標準 8 碼日期檔名 (YYYYMMDD.json)，其他格式回傳 0"""
-    stem = filename.replace(".json", "")
-    if len(stem) == 8 and stem.isdigit():
-        return int(stem)
-    return 0
+const KEYS_ZH = {
+    Type: '列車型態', Train: '車次',
+    Route: '路線',
+    LineDir: '行駛方向', Line: '經由路線', CarClass: '列車種類',
+    ExtraTrain: '加班車', Everyday: '每日行駛',
+    Note: '備註', CalculatedOverNightStn: '跨日車站代碼'
+};
 
-def fetch_json(url):
-    try:
-        res = requests.get(url, timeout=15)
-        return res.json() if res.status_code == 200 else None
-    except Exception:
-        return None
+const YN_KEYS = new Set(['ExtraTrain', 'Everyday']);
+const IGNORE_KEYS = new Set(['BreastFeed', 'Package', 'Dinning', 'FoodSrv', 'Cripple', 'Bike', 'NoteEng', 'OverNightStn', 'OverNightStationID']);
 
-def extract_train_list(data):
-    if isinstance(data, list):
-        return data
-    if isinstance(data, dict):
-        for key in ["TrainInfos", "TrainTimetables", "Trains", "data", "records", "result"]:
-            if key in data and isinstance(data[key], list):
-                return data[key]
-        if "Train" in data or "TrainNo" in data:
-            return [data]
-    return []
+let Route = {};
 
-def load_db(filename):
-    if os.path.exists(filename):
-        try:
-            with open(filename, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception:
-            pass
-    print(f"☁️ 正在從雲端下載字典: {filename} ...")
-    url = BILLY_REF_URL + filename
-    data = fetch_json(url)
-    if data:
-        return data
-    return {}
+// ==========================================
+// 💡 精準計算「最靠近 00:00:00 的跨日車站」演算法
+// ==========================================
+function timeToSeconds(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseInt(parts[2] || 0, 10);
+}
 
-def train_sort_key(train_obj):
-    tid = str(train_obj.get("Train", train_obj.get("TrainNo", "0")))
-    match = re.match(r"^(\d+)([a-zA-Z]*)", tid)
-    if match:
-        return (int(match.group(1)), match.group(2))
-    return (float('inf'), tid)
+function timeToMidnightDiff(timeStr) {
+    if (!timeStr) return Infinity;
+    const sec = timeToSeconds(timeStr);
+    if (sec > 12 * 3600) return 86400 - sec;
+    return sec;
+}
 
-def main():
-    # 🔒 鎖定工作目錄在專案根目錄
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    base_dir = os.path.dirname(script_dir) if os.path.basename(script_dir) == "change" else script_dir
-    os.chdir(base_dir)
+function findOverNightStation(timeInfos) {
+    if (!timeInfos || timeInfos.length === 0) return null;
+    let crossedMidnight = false;
+    let prevSeconds = -1;
+    let minDiff = Infinity;
+    let closestStn = null;
 
-    now_str = datetime.datetime.now(TW_TZ).strftime("%Y-%m-%d %H:%M:%S")
-    print(f"🕒 執行時間 (台灣時間): {now_str}")
-    print(f"📅 掃描起始日期: {START_DATE} 起（僅抓取 billy1125.github.io 之日期檔）")
+    for (const t of timeInfos) {
+        const arrStr = t.ARRTime || t.DEPTime;
+        const depStr = t.DEPTime || t.ARRTime;
+        if (!arrStr || !depStr) continue;
+        const arrSec = timeToSeconds(arrStr);
+        const depSec = timeToSeconds(depStr);
+        if (prevSeconds !== -1 && (arrSec < prevSeconds || depSec < arrSec)) {
+            crossedMidnight = true;
+        }
+        prevSeconds = Math.max(arrSec, depSec);
+    }
 
-    s_db = load_db(STATION_DB_FILE)
-    station_map = {}
-    for k, v in s_db.items():
-        if isinstance(v, list):
-            for st in v:
-                if "ID" in st and "DSC" in st:
-                    station_map[str(st["ID"])] = st["DSC"]
-    c_db = load_db(CAR_KIND_DB_FILE)
-    c_map = {str(k): v for k, v in c_db.items()}
+    if (!crossedMidnight) return null;
 
-    # ========================================================
-    # 🧠 1. 載入本地基準檔與未來改點大腦
-    # ========================================================
-    print("\n🧠 正在載入本地基準檔與時空菜單...")
+    for (const t of timeInfos) {
+        const arrStr = t.ARRTime || t.DEPTime;
+        const depStr = t.DEPTime || t.ARRTime;
+        const arrDiff = timeToMidnightDiff(arrStr);
+        const depDiff = timeToMidnightDiff(depStr);
+        const localMinDiff = Math.min(arrDiff, depDiff);
+        if (localMinDiff < minDiff) {
+            minDiff = localMinDiff;
+            closestStn = t.Station;
+        }
+    }
+    return closestStn;
+}
 
-    root_master_ids = set()
-    if os.path.exists(ROOT_MASTER_FILE):
-        try:
-            with open(ROOT_MASTER_FILE, 'r', encoding='utf-8') as f:
-                data = extract_train_list(json.load(f))
-                for t in data:
-                    if isinstance(t, dict):
-                        tid = str(t.get("Train", t.get("TrainNo", ""))).strip()
-                        if tid:
-                            root_master_ids.add(tid)
-            print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
-        except Exception as e:
-            print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗: {e}")
+// ==========================================
+// 💡 特殊車次日誌解析專區
+// ==========================================
+let specialTrainsByDate = {};
 
-    future_masters = {}
-    revised_epochs = []
+async function loadSpecialTrainsLog() {
+    try {
+        const res = await fetch('scan_log.txt', { cache: 'no-store' });
+        if (!res.ok) return;
 
-    if os.path.exists(FUTURE_BRAIN_DIR):
-        for fname in os.listdir(FUTURE_BRAIN_DIR):
-            if fname.startswith("final_train_diagram_") and fname.endswith(".json"):
-                match = re.search(r"(\d{7})", fname)
-                if match:
-                    roc_date_str = match.group(1)
-                    g_year = int(roc_date_str[:3]) + 1911
-                    g_date = int(f"{g_year}{roc_date_str[3:]}")
+        const text = await res.text();
+        let currentDate = null;
+        const lines = text.split('\n');
+        for (const line of lines) {
+            const dateMatch = line.match(/日期:\s*(\d{8})/);
+            if (dateMatch) {
+                currentDate = dateMatch[1];
+                if (!specialTrainsByDate[currentDate]) specialTrainsByDate[currentDate] = new Set();
+                continue;
+            }
+            if (currentDate && !line.includes('次讀取') && !line.includes('次紀錄')) {
+                const trainMatch = line.match(/[\[［]([a-zA-Z0-9]+)[\]］]/);
+                if (trainMatch) specialTrainsByDate[currentDate].add(trainMatch[1].trim());
+            }
+        }
+    } catch (error) {
+        console.warn('scan_log.txt 讀取警告:', error);
+    }
+}
 
-                    filepath = os.path.join(FUTURE_BRAIN_DIR, fname)
-                    try:
-                        ids_set = set()
-                        with open(filepath, 'r', encoding='utf-8') as f:
-                            data = extract_train_list(json.load(f))
-                            for t in data:
-                                if isinstance(t, dict):
-                                    tid = str(t.get("Train", t.get("TrainNo", ""))).strip()
-                                    if tid:
-                                        ids_set.add(tid)
-                        future_masters[g_date] = ids_set
-                        revised_epochs.append({"date": g_date, "fileId": roc_date_str})
-                        print(f"  ✅ [未來大腦] {fname} (生效日: {g_date}) - 共 {len(ids_set)} 筆")
-                    except Exception:
-                        pass
+function setYN(td, v) {
+    if (v === 'Y') { td.innerHTML = '<span class="badge badge-green">是</span>'; return; }
+    if (v === 'N') { td.innerHTML = '<span class="badge badge-red">否</span>'; return; }
+    if (v) { td.innerHTML = `<span class="badge badge-gray">${v}</span>`; return; }
+    td.innerHTML = '<span style="color:#cbd5e1">—</span>';
+}
 
-    if revised_epochs:
-        revised_epochs.sort(key=lambda x: x["date"])
-        os.makedirs(FUTURE_BRAIN_DIR, exist_ok=True)
-        try:
-            with open(os.path.join(FUTURE_BRAIN_DIR, "Revised_Epochs.json"), "w", encoding="utf-8") as f:
-                json.dump(revised_epochs, f, ensure_ascii=False, indent=2)
-            print(f"  ✅ 成功產生時空菜單: {FUTURE_BRAIN_DIR}/Revised_Epochs.json (共 {len(revised_epochs)} 個結界)")
-        except Exception:
-            pass
+function fillInfoVal(td, key, val) {
+    if (key === 'Type') {
+        const label = TRAIN_TYPE_MAP[val] || val;
+        td.innerHTML = `<span style="color:#94a3b8;font-size:0.78rem">${val}</span> ${label}`;
+    } else if (key === 'CarClass') {
+        const label = CAR_CLASS_MAP[val] || val;
+        td.innerHTML = `<span style="color:#94a3b8;font-size:0.78rem">${val}</span> ${label}`;
+    } else if (key === 'LineDir') {
+        td.textContent = LINE_DIR_MAP[val] || val;
+    } else if (key === 'Line') {
+        td.textContent = LINE_MAP[val] || val;
+    } else if (YN_KEYS.has(key)) {
+        setYN(td, val);
+    } else if (val && val !== '') {
+        td.textContent = val;
+    } else {
+        td.innerHTML = '<span style="color:#cbd5e1">—</span>';
+    }
+}
 
-    # ========================================================
-    # 🚀 2. 純抓取 billy1125.github.io（完全不看本地 data/）
-    # ========================================================
-    files_to_process = {}
-    print(f"\n📡 正在純抓取 billy1125.github.io 最新日期檔 ({START_DATE} 起)...")
+function tpl(id) {
+    return document.getElementById(id).content.cloneNode(true);
+}
 
-    headers = {}
-    gh_token = os.environ.get("GITHUB_TOKEN")
-    if gh_token:
-        headers["Authorization"] = f"Bearer {gh_token}"
+function renderDetail(train) {
+    const detail = document.getElementById('detail');
+    detail.innerHTML = '';
+    const card = tpl('tpl-detail-card');
+    card.querySelector('.train-num').textContent = train.Train;
+    card.querySelector('.type-badge').textContent = CAR_CLASS_MAP[train.CarClass] || train.CarClass || '';
+    const infoTbody = card.querySelector('tbody');
 
-    for user, repo, path in TARGETS:
-        try:
-            res = requests.get(
-                f"https://api.github.com/repos/{user}/{repo}/contents/{path}",
-                headers=headers,
-                timeout=15
-            )
-            if res.status_code != 200:
-                print(f"  ❌ 讀取 {user}/{repo} 目錄失敗 (HTTP {res.status_code})")
-                continue
+    const displayObj = { ...train };
+    delete displayObj.OverNightStn;
+    delete displayObj.OverNightStationID;
 
-            github_files = res.json()
-            if not isinstance(github_files, list):
-                continue
+    const calculatedStn = findOverNightStation(train.TimeInfos);
+    if (calculatedStn) displayObj.CalculatedOverNightStn = calculatedStn;
 
-            target_files = [
-                f for f in github_files
-                if f.get("name", "").endswith(".json") and get_filename_date(f["name"]) >= START_DATE
-            ]
-            target_files.sort(key=lambda f: get_filename_date(f["name"]))
+    Object.entries(displayObj)
+        .filter(([k, v]) => !((k === 'TimeInfos') || IGNORE_KEYS.has(k)))
+        .forEach(([k, v]) => {
+            let displayVal = v;
+            if (k === 'CalculatedOverNightStn') {
+                const stnName = Route[v]?.DSC || '';
+                displayVal = stnName ? `${v} ${stnName}` : v;
+            }
+            const row = tpl('tpl-info-row');
+            row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
+            row.querySelector('.info-val').textContent = '';
+            fillInfoVal(row.querySelector('.info-val'), k, displayVal);
+            infoTbody.appendChild(row);
+        });
+    detail.appendChild(card);
 
-            for file in target_files:
-                fdate = get_filename_date(file["name"])
-                raw = fetch_json(file["download_url"])
-                if raw:
-                    files_to_process[fdate] = raw
-                time.sleep(0.05)
-        except Exception as e:
-            print(f"  ❌ 抓取 {user}/{repo} 發生錯誤: {e}")
-            continue
+    const section = tpl('tpl-time-section');
+    section.querySelector('.section-title').textContent = `TimeInfos — 時刻表（${(train.TimeInfos || []).length} 站）`;
+    const timeTbody = section.querySelector('tbody');
+    (train.TimeInfos || []).forEach(t => {
+        const row = tpl('tpl-time-row');
+        row.querySelector('.order').textContent = t.Order;
+        row.querySelector('.station').textContent = Route[t.Station]?.DSC ?? t.Station;
+        row.querySelector('.arr').textContent = t.ARRTime || '—';
+        row.querySelector('.dep').textContent = t.DEPTime || '—';
+        row.querySelector('.route').textContent = t.Route || '—';
+        timeTbody.appendChild(row);
+    });
+    detail.appendChild(section);
 
-    print(f"  ➜ 雲端抓取完成！共取得 {len(files_to_process)} 天 ({START_DATE} 起) 的原作者日期檔。")
+    const spacer = document.createElement('div');
+    spacer.style.height = '120px';
+    spacer.style.width = '100%';
+    spacer.style.opacity = '0';
+    spacer.style.pointerEvents = 'none';
+    detail.appendChild(spacer);
+}
 
-    # ========================================================
-    # 🔍 3. 智慧時空對位、篩選特殊車次 & 自動對帳清理已消失舊車次
-    # ========================================================
-    history_data = {"runs": [], "seen": [], "records": {}}
-    if FORCE_REBUILD:
-        print("\n⚠️ [洗腦模式開啟] 已忽略舊有記憶，將進行重新分析！")
-    elif os.path.exists(HISTORY_FILE):
-        try:
-            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                if "runs" in data:
-                    history_data = data
-        except Exception:
-            pass
+const cache = {};
+const matchedTrainsPromiseCache = {};
+let activeFile = null;
+let activeTrain = null;
+let selectedType = null;
+let currentTrains = [];
 
-    seen_set = set(history_data["seen"])
-    new_findings_by_date = defaultdict(list)
-    new_count = 0
-    removed_count = 0
+function extractTrainsFromRaw(rawData) {
+    if (Array.isArray(rawData)) return rawData;
+    if (rawData && rawData.TrainInfos) return rawData.TrainInfos;
+    if (rawData && rawData.Trains) return rawData.Trains;
+    return [];
+}
 
-    print("\n🔍 正在比對基準檔，篩選特殊車次並對帳清理已消失車次...")
-    for fdate, raw in sorted(files_to_process.items()):
-        applicable_dates = [d for d in future_masters.keys() if d <= fdate]
-        if applicable_dates:
-            best_date = max(applicable_dates)
-            current_master_ids = future_masters[best_date]
-        else:
-            current_master_ids = root_master_ids
+async function loadFile(filename) {
+    if (cache[filename]) return cache[filename];
 
-        daily_data = extract_train_list(raw)
-        valid_tids_today = set()
+    const isMaster = filename === 'final_train_diagram.json';
+    const pathPrefix = isMaster ? '' : 'data/';
+    const myUrl = `https://raw.githubusercontent.com/mochi-artist/artist/main/${pathPrefix}${filename}`;
+    const billyUrl = `https://raw.githubusercontent.com/billy1125/billy1125.github.io/main/${pathPrefix}${filename}`;
 
-        for train in daily_data:
-            if not isinstance(train, dict):
-                continue
-            tid = str(train.get("Train", train.get("TrainNo", ""))).strip()
+    // 基準檔優先抓自己倉庫；每日日期檔優先抓原作者 billy1125
+    const urls = isMaster ? [myUrl, billyUrl] : [billyUrl, myUrl];
+    let rawData = null;
 
-            if (not tid or tid in current_master_ids or
-                any(tid.startswith(p) for p in EXCLUDE_PREFIXES) or
-                any(k in tid for k in EXCLUDE_KEYWORDS)):
-                continue
+    for (const url of urls) {
+        try {
+            const res = await fetch(url, { cache: 'no-store' });
+            if (res.ok) {
+                rawData = await res.json();
+                break;
+            }
+        } catch (err) {
+            continue;
+        }
+    }
 
-            valid_tids_today.add(tid)
-            uid = f"{fdate}_{tid}"
-            if uid not in seen_set:
-                new_findings_by_date[fdate].append(train)
-                seen_set.add(uid)
-                new_count += 1
+    cache[filename] = extractTrainsFromRaw(rawData);
+    return cache[filename];
+}
 
-        # 🧹 自動對帳：若舊紀錄內有已不在當日原作者檔的車次，自動移除並釋放記憶（未來再出現仍可重抓）
-        date_str = str(fdate)
-        if date_str in history_data["records"]:
-            for rt in list(history_data["records"][date_str].keys()):
-                kept_lines = []
-                for line in history_data["records"][date_str][rt]:
-                    m = re.search(r"\[([^\]]+)\]", line)
-                    rec_tid = m.group(1).strip() if m else ""
-                    if rec_tid and rec_tid in valid_tids_today:
-                        kept_lines.append(line)
-                    else:
-                        removed_count += 1
-                        if rec_tid:
-                            seen_set.discard(f"{fdate}_{rec_tid}")
-                            print(f"  🧹 [{date_str}] 清除已移除之舊車次: {rec_tid}")
-                if kept_lines:
-                    history_data["records"][date_str][rt] = kept_lines
-                else:
-                    del history_data["records"][date_str][rt]
-            if not history_data["records"][date_str]:
-                del history_data["records"][date_str]
+// 🌟 單一事實來源：左側「幾車」與右側「車次清單」共用同一份實際抓取結果（含 Promise 快取不重複請求）
+function getMatchedTrains(filename) {
+    if (matchedTrainsPromiseCache[filename]) return matchedTrainsPromiseCache[filename];
 
-    # ========================================================
-    # 📝 4. 寫入 scan_log.txt 與歷史記憶
-    # ========================================================
-    if new_count > 0 or removed_count > 0 or FORCE_REBUILD:
-        history_data["seen"] = list(seen_set)
-        if new_count > 0:
-            history_data["runs"].append({
-                "time": now_str,
-                "total_seen": len(seen_set),
-                "new_added": new_count
-            })
+    matchedTrainsPromiseCache[filename] = (async () => {
+        const allTrains = await loadFile(filename);
+        if (filename === 'final_train_diagram.json') return allTrains;
 
-        for date_key in sorted(new_findings_by_date.keys()):
-            trains = new_findings_by_date[date_key]
-            trains.sort(key=train_sort_key)
-            date_str = str(date_key)
-            if date_str not in history_data["records"]:
-                history_data["records"][date_str] = {}
-            history_data["records"][date_str][now_str] = []
+        const dateStr = filename.replace('.json', '');
+        const specialSet = specialTrainsByDate[dateStr] || new Set();
+        const matched = allTrains.filter(t => specialSet.has(String(t.Train ?? t.TrainNo ?? '').trim()));
 
-            for t in trains:
-                tid = t.get("Train", t.get("TrainNo", "?"))
-                code = str(t.get("CarClass", t.get("Type", "?")))
-                eng = c_map.get(code, "others")
-                chi = CHINESE_NAME_MAP.get(eng, eng)
+        if (matched.length < specialSet.size) {
+            const loadedIds = new Set(matched.map(t => String(t.Train ?? t.TrainNo ?? '').trim()));
+            try {
+                const fallbackRes = await fetch(`https://raw.githubusercontent.com/mochi-artist/artist/main/data/${filename}`, { cache: 'no-store' });
+                if (fallbackRes.ok) {
+                    const fallbackTrains = extractTrainsFromRaw(await fallbackRes.json());
+                    fallbackTrains.forEach(t => {
+                        const tid = String(t.Train ?? t.TrainNo ?? '').trim();
+                        if (specialSet.has(tid) && !loadedIds.has(tid)) {
+                            matched.push(t);
+                            loadedIds.add(tid);
+                        }
+                    });
+                }
+            } catch (e) {}
+        }
 
-                st, end = "?", "?"
-                tts = t.get("TimeInfos", t.get("Timetables", []))
-                if tts:
-                    st = station_map.get(str(tts[0].get("Station")), str(tts[0].get("Station")))
-                    end = station_map.get(str(tts[-1].get("Station")), str(tts[-1].get("Station")))
-                history_data["records"][date_str][now_str].append(f"  ➜ [{tid}] {chi} {code} ({st} ➝ {end})")
+        return matched;
+    })();
 
-        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(history_data, f, ensure_ascii=False, indent=2)
+    return matchedTrainsPromiseCache[filename];
+}
 
-        log_lines = ["========================================", "🕒 掃描歷史摘要 (動態大腦模式):"]
-        run_map = {}
-        for idx, r in enumerate(history_data["runs"], 1):
-            total_seen = r.get('total_seen', 0)
-            new_added = r.get('new_added', 0)
-            if idx == 1 or new_added == total_seen:
-                log_lines.append(f"  [{idx}] {r['time']} (共發現 {total_seen} 筆特殊車次)")
-            else:
-                log_lines.append(f"  [{idx}] {r['time']} (共發現 {total_seen} 筆特殊車次) (新增 {new_added} 筆)")
-            run_map[r['time']] = idx
-        log_lines.append("========================================\n")
+function selectTrain(train, itemEl) {
+    document.querySelectorAll('.train-item').forEach(el => el.classList.remove('active'));
+    itemEl.classList.add('active');
+    activeTrain = train.Train;
+    document.getElementById('placeholder').style.display = 'none';
+    const detail = document.getElementById('detail');
+    detail.style.display = 'block';
+    renderDetail(train);
+    document.getElementById('detail-scroll').scrollTop = 0;
+}
 
-        for date_str in sorted(history_data["records"].keys(), key=lambda x: int(x)):
-            total_for_date = sum(len(history_data["records"][date_str][rt]) for rt in history_data["records"][date_str])
-            new_for_date = len(new_findings_by_date.get(int(date_str), []))
+const flexRowStyle = 'display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: space-between !important; align-items: center !important;';
 
-            log_lines.append(f"📅 日期: {date_str}")
-            if new_for_date > 0 and not FORCE_REBUILD:
-                log_lines.append(f"   📊 總計: {total_for_date} 筆特殊車次 (本次掃描新增 {new_for_date} 筆)")
-            else:
-                log_lines.append(f"   📊 總計: {total_for_date} 筆特殊車次")
+function renderFilterPanel(trains) {
+    const filterEl = document.getElementById('type-filter');
+    filterEl.innerHTML = '';
 
-            for run_time in sorted(history_data["records"][date_str].keys()):
-                run_idx = run_map.get(run_time, "?")
-                log_lines.append(f"  --- [第 {run_idx} 次紀錄] {run_time} ---")
-                log_lines.extend(history_data["records"][date_str][run_time])
-            log_lines.append("")
+    const counts = {};
+    let overnightCount = 0;
 
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
-            f.write("\n".join(log_lines))
+    trains.forEach(t => {
+        const cat = getTrainCategory(t.CarClass);
+        counts[cat] = (counts[cat] || 0) + 1;
+        if (cat !== '客迴' && findOverNightStation(t.TimeInfos) !== null) overnightCount++;
+    });
 
-        print(f"\n✅ 完成！新增 {new_count} 筆、清理過時 {removed_count} 筆，已同步更新 {LOG_FILE}")
-    else:
-        print("\n💤 本次無新發現，亦無需清理過時紀錄。")
+    const allFrag = tpl('tpl-filter-item');
+    const allEl = allFrag.firstElementChild;
+    allEl.style.cssText = `padding: 10px 4px !important; ${flexRowStyle}`;
+    allEl.innerHTML = `
+        <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">全部</span>
+        <span style="color: #94a3b8; white-space: nowrap; flex-shrink: 0; font-size: 0.7rem;">${trains.length}</span>
+    `;
+    if (selectedType === null) allEl.classList.add('active');
+    allEl.addEventListener('click', () => {
+        selectedType = null;
+        renderFilterPanel(currentTrains);
+        renderTrainList(currentTrains);
+    });
+    filterEl.appendChild(allEl);
 
-if __name__ == "__main__":
-    main()
+    CATEGORY_ORDER.filter(cat => counts[cat]).forEach(cat => {
+        const frag = tpl('tpl-filter-item');
+        const el = frag.firstElementChild;
+        el.style.cssText = `padding: 10px 4px !important; ${flexRowStyle}`;
+        el.innerHTML = `
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">${cat}</span>
+            <span style="color: #94a3b8; white-space: nowrap; flex-shrink: 0; font-size: 0.7rem;">${counts[cat]}</span>
+        `;
+        if (selectedType === cat) el.classList.add('active');
+        el.addEventListener('click', () => {
+            selectedType = cat;
+            renderFilterPanel(currentTrains);
+            renderTrainList(currentTrains);
+        });
+        filterEl.appendChild(el);
+    });
+
+    if (overnightCount > 0) {
+        const frag = tpl('tpl-filter-item');
+        const el = frag.firstElementChild;
+        el.style.cssText = `padding: 10px 4px !important; ${flexRowStyle}`;
+        el.innerHTML = `
+            <span style="color: #eab308; white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">跨夜正班</span>
+            <span style="color: #94a3b8; white-space: nowrap; flex-shrink: 0; font-size: 0.7rem;">${overnightCount}</span>
+        `;
+        if (selectedType === '跨夜正班') el.classList.add('active');
+        el.addEventListener('click', () => {
+            selectedType = '跨夜正班';
+            renderFilterPanel(currentTrains);
+            renderTrainList(currentTrains);
+        });
+        filterEl.appendChild(el);
+    }
+}
+
+function renderTrainList(trains) {
+    const listEl = document.getElementById('train-list');
+    let filtered = trains;
+
+    if (selectedType === '跨夜正班') {
+        filtered = trains.filter(t => getTrainCategory(t.CarClass) !== '客迴' && findOverNightStation(t.TimeInfos) !== null);
+    } else if (selectedType) {
+        filtered = trains.filter(t => getTrainCategory(t.CarClass) === selectedType);
+    }
+
+    if (!filtered.length) {
+        listEl.innerHTML = '<div class="panel-empty">無資料</div>';
+        return;
+    }
+    listEl.innerHTML = '';
+
+    [...filtered].sort((a, b) => {
+        const numA = parseInt(a.Train, 10) || 0;
+        const numB = parseInt(b.Train, 10) || 0;
+        if (numA !== numB) return numA - numB;
+        return String(a.Train).localeCompare(String(b.Train));
+    }).forEach(train => {
+        const frag = tpl('tpl-train-item');
+        const el = frag.firstElementChild;
+        el.style.cssText = `padding: 10px 4px !important; ${flexRowStyle}`;
+        el.innerHTML = `
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem;">${train.Train}</span>
+            <span style="color: #94a3b8; white-space: nowrap; flex-shrink: 0; font-size: 0.7rem;">${(train.TimeInfos || []).length}站</span>
+        `;
+        if (train.Train === activeTrain) el.classList.add('active');
+        el.addEventListener('click', () => selectTrain(train, el));
+        listEl.appendChild(el);
+    });
+}
+
+async function selectFile(filename, itemEl) {
+    document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+    if (itemEl) itemEl.classList.add('active');
+
+    activeFile = filename;
+    activeTrain = null;
+
+    document.getElementById('train-list').innerHTML = '<div class="panel-empty"><span class="loading-dots">載入中</span></div>';
+    document.getElementById('type-filter').innerHTML = '<div class="panel-empty">—</div>';
+    document.getElementById('placeholder').style.display = 'flex';
+    document.getElementById('detail').style.display = 'none';
+
+    selectedType = null;
+    const trains = await getMatchedTrains(filename);
+
+    // 無論是否切換到其他日期，先即時把該日期的「幾車」更新成實際車次數量
+    if (filename !== 'final_train_diagram.json' && itemEl) {
+        const countSpan = itemEl.querySelector('.file-count');
+        if (countSpan) countSpan.textContent = `${trains.length}車`;
+    }
+
+    // 避免快速連續點擊日期時，較慢的舊請求覆蓋目前畫面
+    if (activeFile !== filename) return;
+
+    currentTrains = trains;
+    if (filename === 'final_train_diagram.json') {
+        document.getElementById('status').textContent = `全車次總表 — 共 ${currentTrains.length} 筆`;
+    } else {
+        document.getElementById('status').textContent = `${filename} — 共 ${currentTrains.length} 筆`;
+    }
+
+    renderFilterPanel(currentTrains);
+    renderTrainList(currentTrains);
+}
+
+// ==========================================
+// 💡 初始化與左側「月份資料夾」渲染
+// ==========================================
+async function init() {
+    await loadSpecialTrainsLog();
+
+    try {
+        const r = await fetch('js/references/Route.json');
+        if (r.ok) Route = await r.json();
+    } catch (e) {
+        console.warn('路線資料載入警告', e);
+    }
+
+    const listEl = document.getElementById('file-list');
+    listEl.innerHTML = '';
+
+    const monthElements = {};
+    const jumpSelect = document.createElement('select');
+
+    // 🌟 展開月份時，背景批次核對該月所有日期的實際車次數量（限制 5 併發，不卡頓且順便快取）
+    async function syncMonthCounts(monthKey) {
+        const group = monthElements[monthKey];
+        if (!group || group.synced) return;
+        group.synced = true;
+
+        const queue = [...group.dayItems];
+        const worker = async () => {
+            while (queue.length > 0) {
+                const item = queue.shift();
+                try {
+                    const trains = await getMatchedTrains(item.filename);
+                    item.countEl.textContent = `${trains.length}車`;
+                } catch (e) {}
+            }
+        };
+        const workers = Array.from({ length: Math.min(5, queue.length) }, () => worker());
+        await Promise.all(workers);
+    }
+
+    // 1. 全車次總表
+    const masterEl = document.createElement('div');
+    masterEl.className = 'file-item';
+    masterEl.style.cssText = `padding: 12px 4px !important; ${flexRowStyle}`;
+    masterEl.innerHTML = `
+        <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden; font-size: 0.75rem; color: #e2e8f0;">全車次總表</span>
+        <span style="white-space: nowrap; flex-shrink: 0; font-size: 0.7rem; color: #eab308;">基準檔</span>
+    `;
+    masterEl.addEventListener('click', () => {
+        selectFile('final_train_diagram.json', masterEl);
+        Object.values(monthElements).forEach(group => {
+            group.container.style.display = 'none';
+            group.header.innerHTML = `
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span>
+                <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${group.daysLen}天▸</span>
+            `;
+        });
+        jumpSelect.value = '';
+    });
+    listEl.appendChild(masterEl);
+
+    const logDates = Object.keys(specialTrainsByDate).sort();
+
+    if (logDates.length === 0) {
+        listEl.innerHTML += '<div class="panel-empty">無紀錄</div>';
+        masterEl.click();
+        return;
+    }
+
+    const groups = {};
+    logDates.forEach(dateStr => {
+        const monthKey = dateStr.slice(0, 6);
+        if (!groups[monthKey]) groups[monthKey] = [];
+        groups[monthKey].push(dateStr);
+    });
+
+    const jumpContainer = document.createElement('div');
+    jumpContainer.style.cssText = 'padding: 6px 4px; background-color: #0f172a; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid #1e293b;';
+    jumpSelect.style.cssText = 'width: 100%; padding: 4px 2px; font-size: 0.75rem; background-color: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 2px; outline: none;';
+
+    const defaultOpt = document.createElement('option');
+    defaultOpt.textContent = '跳轉月份...';
+    defaultOpt.value = '';
+    jumpSelect.appendChild(defaultOpt);
+    jumpContainer.appendChild(jumpSelect);
+    listEl.appendChild(jumpContainer);
+
+    Object.keys(groups).sort().forEach(monthKey => {
+        const shortYear = monthKey.slice(2, 4);
+        const month = monthKey.slice(4, 6);
+        const days = groups[monthKey];
+
+        jumpSelect.appendChild(new Option(`${shortYear}年${month}月`, monthKey));
+
+        const headerEl = document.createElement('div');
+        headerEl.style.cssText = `padding: 10px 4px; background-color: #0f172a; color: #e2e8f0; font-size: 0.75rem; font-weight: bold; cursor: pointer; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid #1e293b; ${flexRowStyle}`;
+
+        headerEl.innerHTML = `
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
+            <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${days.length}天▸</span>
+        `;
+
+        const containerEl = document.createElement('div');
+        containerEl.style.display = 'none';
+
+        const dayItems = [];
+
+        headerEl.addEventListener('click', () => {
+            const isExpanded = containerEl.style.display !== 'none';
+            containerEl.style.display = isExpanded ? 'none' : 'block';
+            headerEl.innerHTML = `
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
+                <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${days.length}天${isExpanded ? '▸' : '▾'}</span>
+            `;
+            if (!isExpanded) {
+                syncMonthCounts(monthKey);
+            }
+        });
+
+        listEl.appendChild(headerEl);
+
+        days.forEach(dateStr => {
+            const filename = `${dateStr}.json`;
+            const formatted = `${dateStr.slice(4, 6)}/${dateStr.slice(6, 8)}`;
+            const countInLog = specialTrainsByDate[dateStr].size;
+
+            const el = document.createElement('div');
+            el.className = 'file-item';
+            el.style.cssText = `padding: 10px 4px !important; padding-left: 10px !important; ${flexRowStyle}`;
+            el.innerHTML = `
+                <span class="file-date" style="white-space: nowrap; flex-shrink: 1; overflow: hidden; font-size: 0.75rem;">${formatted}</span>
+                <span class="file-count" style="white-space: nowrap; flex-shrink: 0; font-size: 0.7rem; color: #94a3b8;">${countInLog}車</span>
+            `;
+
+            const countEl = el.querySelector('.file-count');
+            dayItems.push({ filename, countEl });
+
+            el.addEventListener('click', () => selectFile(filename, el));
+            containerEl.appendChild(el);
+        });
+
+        listEl.appendChild(containerEl);
+
+        monthElements[monthKey] = {
+            header: headerEl,
+            container: containerEl,
+            shortYear,
+            month,
+            daysLen: days.length,
+            dayItems,
+            synced: false
+        };
+    });
+
+    jumpSelect.addEventListener('change', (e) => {
+        const targetKey = e.target.value;
+        if (!targetKey || !monthElements[targetKey]) return;
+
+        Object.values(monthElements).forEach(group => {
+            group.container.style.display = 'none';
+            group.header.innerHTML = `
+                <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${group.shortYear}年${group.month}月</span>
+                <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${group.daysLen}天▸</span>
+            `;
+        });
+
+        const { header, container, shortYear, month, daysLen } = monthElements[targetKey];
+        container.style.display = 'block';
+        header.innerHTML = `
+            <span style="white-space: nowrap; flex-shrink: 1; overflow: hidden;">${shortYear}年${month}月</span>
+            <span style="color:#94a3b8; font-size:0.7rem; font-weight:normal; white-space: nowrap; flex-shrink: 0;">${daysLen}天▾</span>
+        `;
+
+        syncMonthCounts(targetKey);
+        header.scrollIntoView({ behavior: 'auto', block: 'start' });
+        jumpSelect.value = '';
+    });
+
+    document.getElementById('status').textContent = `${logDates.length} 個日期檔案 + 1 份基準檔`;
+
+    masterEl.click();
+}
+
+init().catch(err => {
+    document.getElementById('file-list').innerHTML = `<div class="panel-empty">載入失敗：${err.message}</div>`;
+});
