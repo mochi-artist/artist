@@ -83,6 +83,18 @@ const IGNORE_KEYS = new Set(['BreastFeed', 'Package', 'Dinning', 'FoodSrv', 'Cri
 
 let Route = {};
 
+// 自訂特殊車站代碼對照（補齊 Route.json 未收錄代碼）
+const CUSTOM_STATION_NAMES = {
+    '1001': '台北(環島)'
+};
+
+// 統一轉換站名：優先套用自訂代碼，並將「臺」全部改為「台」
+function getStationName(stationCode) {
+    const code = String(stationCode ?? '').trim();
+    const rawName = CUSTOM_STATION_NAMES[code] ?? Route[code]?.DSC ?? code;
+    return String(rawName).trim().replace(/臺/g, '台');
+}
+
 // 固定視為運轉停車的車站代碼（列車於此處停車時自動標記為「運轉停車」）
 const ALWAYS_OP_STOP_STATIONS = new Set(['2115', '3355', '5170', '5175', '5180']);
 let masterOpStops = {};
@@ -285,8 +297,8 @@ function renderDetail(train) {
         .forEach(([k, v]) => {
             let displayVal = v;
             if (k === 'CalculatedOverNightStn') {
-                const stnName = Route[v]?.DSC || '';
-                displayVal = stnName ? `${v} ${stnName}` : v;
+                const stnName = getStationName(v);
+                displayVal = (stnName && stnName !== String(v).trim()) ? `${v} ${stnName}` : v;
             }
             const row = tpl('tpl-info-row');
             row.querySelector('.info-key').textContent = KEYS_ZH[k] || k;
@@ -318,7 +330,7 @@ function renderDetail(train) {
         const isListedOpStop = masterOpStopSet ? masterOpStopSet.has(stnId) : false;
 
         row.querySelector('.order').textContent = t.Order ?? (idx + 1);
-        row.querySelector('.station').textContent = Route[stnId]?.DSC ?? t.Station;
+        row.querySelector('.station').textContent = getStationName(stnId);
 
         if (isFirst) {
             // 起站：到站與離站皆顯示時間
