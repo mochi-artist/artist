@@ -16,11 +16,8 @@ LOG_FILE = "scan_log.txt"
 # 🕒 強制使用台灣時間 (UTC+8)
 TW_TZ = datetime.timezone(datetime.timedelta(hours=8))
 
-# 👇 暫時指定起始日期（填 8 碼 YYYYMMDD）
-START_DATE = 20260101
-
 # 👇 之後要恢復自動抓「今日」，把上面那行註解掉、打開下面這行即可
-# START_DATE = int(datetime.datetime.now(TW_TZ).strftime("%Y%m%d"))
+START_DATE = int(datetime.datetime.now(TW_TZ).strftime("%Y%m%d"))
 
 # 🧠 你這邊的基準檔 (大腦) 路徑設定
 ROOT_MASTER_FILE = "final_train_diagram.json"  # 根目錄 (現役基準檔)
