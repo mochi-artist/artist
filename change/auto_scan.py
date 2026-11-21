@@ -8,7 +8,6 @@ import re
 from collections import defaultdict
 
 # ================= 設定區 =================
-# 💥 洗腦重建開關：請設為 False！這樣機器人才會記住歷史，並算出「新增」了幾筆車次！
 FORCE_REBUILD = False
 
 HISTORY_FILE = "scan_history.json"
@@ -89,7 +88,7 @@ def train_sort_key(train_obj):
     return (float('inf'), tid)
 
 def main():
-    # 🔒 鎖定工作目錄在專案根目錄，避免放在 change/ 底下導致找不到根目錄基準檔
+    # 🔒 鎖定工作目錄在專案根目錄
     script_dir = os.path.dirname(os.path.abspath(__file__))
     base_dir = os.path.dirname(script_dir) if os.path.basename(script_dir) == "change" else script_dir
     os.chdir(base_dir)
@@ -109,7 +108,7 @@ def main():
     c_map = {str(k): v for k, v in c_db.items()}
 
     # ========================================================
-    # 🧠 1. 載入你這邊的基準檔 (現役大腦 + 未來改點大腦)
+    # 🧠 1. 載入本地基準檔與未來改點大腦
     # ========================================================
     print("\n🧠 正在載入本地基準檔與時空菜單...")
 
@@ -126,8 +125,6 @@ def main():
             print(f"  ✅ [基底大腦] {ROOT_MASTER_FILE} - 共 {len(root_master_ids)} 筆")
         except Exception as e:
             print(f"  ❌ 讀取 {ROOT_MASTER_FILE} 失敗: {e}")
-    else:
-        print(f"  ⚠️ 找不到根目錄基準檔: {ROOT_MASTER_FILE}")
 
     future_masters = {}
     revised_epochs = []
@@ -171,7 +168,7 @@ def main():
     # 🚀 2. 純抓取 billy1125.github.io（完全不看本地 data/）
     # ========================================================
     files_to_process = {}
-    print(f"\n📡 正在純抓取 billy1125.github.io 最新日期檔 ({START_DATE} 起，不讀取本地 data/)...")
+    print(f"\n📡 正在純抓取 billy1125.github.io 最新日期檔 ({START_DATE} 起)...")
 
     headers = {}
     gh_token = os.environ.get("GITHUB_TOKEN")
@@ -191,7 +188,6 @@ def main():
 
             github_files = res.json()
             if not isinstance(github_files, list):
-                print(f"  ❌ API 回傳格式異常: {github_files}")
                 continue
 
             target_files = [
@@ -213,7 +209,7 @@ def main():
     print(f"  ➜ 雲端抓取完成！共取得 {len(files_to_process)} 天 ({START_DATE} 起) 的原作者日期檔。")
 
     # ========================================================
-    # 🔍 3. 智慧時空對位與排除基準檔車次
+    # 🔍 3. 智慧時空對位、篩選特殊車次 & 自動對帳清理已消失舊車次
     # ========================================================
     history_data = {"runs": [], "seen": [], "records": {}}
     if FORCE_REBUILD:
@@ -230,8 +226,9 @@ def main():
     seen_set = set(history_data["seen"])
     new_findings_by_date = defaultdict(list)
     new_count = 0
+    removed_count = 0
 
-    print("\n🔍 正在比對基準檔，篩選特殊車次...")
+    print("\n🔍 正在比對基準檔，篩選特殊車次並對帳清理已消失車次...")
     for fdate, raw in sorted(files_to_process.items()):
         applicable_dates = [d for d in future_masters.keys() if d <= fdate]
         if applicable_dates:
@@ -241,6 +238,8 @@ def main():
             current_master_ids = root_master_ids
 
         daily_data = extract_train_list(raw)
+        valid_tids_today = set()
+
         for train in daily_data:
             if not isinstance(train, dict):
                 continue
@@ -251,23 +250,46 @@ def main():
                 any(k in tid for k in EXCLUDE_KEYWORDS)):
                 continue
 
+            valid_tids_today.add(tid)
             uid = f"{fdate}_{tid}"
             if uid not in seen_set:
                 new_findings_by_date[fdate].append(train)
                 seen_set.add(uid)
                 new_count += 1
 
+        # 🧹 自動對帳：若舊紀錄內有已不在當日原作者檔的車次，自動移除並釋放記憶（未來再出現仍可重抓）
+        date_str = str(fdate)
+        if date_str in history_data["records"]:
+            for rt in list(history_data["records"][date_str].keys()):
+                kept_lines = []
+                for line in history_data["records"][date_str][rt]:
+                    m = re.search(r"\[([^\]]+)\]", line)
+                    rec_tid = m.group(1).strip() if m else ""
+                    if rec_tid and rec_tid in valid_tids_today:
+                        kept_lines.append(line)
+                    else:
+                        removed_count += 1
+                        if rec_tid:
+                            seen_set.discard(f"{fdate}_{rec_tid}")
+                            print(f"  🧹 [{date_str}] 清除已移除之舊車次: {rec_tid}")
+                if kept_lines:
+                    history_data["records"][date_str][rt] = kept_lines
+                else:
+                    del history_data["records"][date_str][rt]
+            if not history_data["records"][date_str]:
+                del history_data["records"][date_str]
+
     # ========================================================
     # 📝 4. 寫入 scan_log.txt 與歷史記憶
     # ========================================================
-    if new_count > 0 or FORCE_REBUILD:
+    if new_count > 0 or removed_count > 0 or FORCE_REBUILD:
+        history_data["seen"] = list(seen_set)
         if new_count > 0:
             history_data["runs"].append({
                 "time": now_str,
                 "total_seen": len(seen_set),
                 "new_added": new_count
             })
-            history_data["seen"] = list(seen_set)
 
         for date_key in sorted(new_findings_by_date.keys()):
             trains = new_findings_by_date[date_key]
@@ -324,9 +346,9 @@ def main():
         with open(LOG_FILE, "w", encoding="utf-8") as f:
             f.write("\n".join(log_lines))
 
-        print(f"\n✅ 成功！已將 {new_count} 筆新資料寫入 {LOG_FILE}")
+        print(f"\n✅ 完成！新增 {new_count} 筆、清理過時 {removed_count} 筆，已同步更新 {LOG_FILE}")
     else:
-        print("\n💤 本次無新發現。")
+        print("\n💤 本次無新發現，亦無需清理過時紀錄。")
 
 if __name__ == "__main__":
     main()
