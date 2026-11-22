@@ -90,7 +90,7 @@ function calculate_space_time(train, line_kind) {
 }
 
 
-// 查詢車次會「停靠與通過」的所有車站 (支援富岡基地-北湖、潮州機廠-潮州、潮州基地-潮州額外支線)
+// 查詢車次會「停靠與通過」的所有車站 (支援樹調-樹林、富岡基地-北湖、潮州機廠-潮州、潮州基地-潮州額外支線)
 function find_passing_stations(timetable, line, line_dir) {
     const start_station = String(timetable[0]['Station']).replace('_LOOP', '');
     let raw_end_station = String(timetable[timetable.length - 1]['Station']);
@@ -101,8 +101,11 @@ function find_passing_stations(timetable, line, line_dir) {
     let station = start_station;
     let km = 0.0;
 
-    // 取得乾淨的停靠站序列（去除 _LOOP），並用 target_idx 依序追蹤下一站目標
-    let stations = timetable.map(item => String(item['Station']).replace('_LOOP', ''));
+    // 取得乾淨的停靠站序列（去除 _LOOP，並將 1001 正規化為 1000 供尋路比對），用 target_idx 依序追蹤下一站目標
+    let stations = timetable.map(item => {
+        const st = String(item['Station']).replace('_LOOP', '');
+        return st === '1001' ? '1000' : st;
+    });
     let visited_raw_stations = new Set();
     let target_idx = 1;
 
@@ -137,13 +140,13 @@ function find_passing_stations(timetable, line, line_dir) {
     if (stations.length > 1) {
         const first_target = stations[1];
         if (start_station === '7120') {
-            line_dir = '2'; // 蘇澳(7120) -> 蘇澳新(7130)
+            line_dir = '2'; // 蘇澳(7120) -> 蘇澳新(7130) 固定先走 CCW('2')
+        } else if (start_station === '1045') {
+            line_dir = '1'; // 樹調(1045) -> 樹林(1040) 固定先走 CW('1')
         } else if (start_station === '1145') {
             line_dir = '2'; // 富岡基地(1145) -> 北湖(1150) 固定先走 CCW('2')
         } else if (start_station === '5998' || start_station === '5999') {
             line_dir = '1'; // 潮州機廠(5998) / 潮州基地(5999) -> 潮州(5050) 固定先走 CW('1')
-        } else if (start_station === '1045') {
-            line_dir = /^(09[0-9]{2}|10[0-4]0|[67][0-9]{3})$/.test(first_target) ? '1' : '2';
         } else if (isCoastSt(start_station)) {
             if ((isCoastSt(first_target) && parseInt(first_target) > parseInt(start_station)) || first_target === '2260' || isMountSt(first_target) || first_target === '3350' || first_target === '3360') {
                 line_dir = '2'; // 海線南下
@@ -223,8 +226,11 @@ function find_passing_stations(timetable, line, line_dir) {
 
         if (!isRetry) {
             // ==========================================
-            // 🚦 0. 基地/機廠端點出發保護 (1145 富岡基地、5998 潮州機廠、5999 潮州基地)
+            // 🚦 0. 基地/機廠端點出發保護 (1045 樹調、1145 富岡基地、5998 潮州機廠、5999 潮州基地)
             // ==========================================
+            if (curr === '1045' && prev_st !== '1040') {
+                return { st: '1040', km: parseFloat(Route['1045']?.CW_KM || 1.8), forceDir: '1', allowReverse: true };
+            }
             if (curr === '1145' && prev_st !== '1150') {
                 return { st: '1150', km: parseFloat(Route['1145']?.CCW_KM || 1.4), forceDir: '2', allowReverse: true };
             }
@@ -237,7 +243,7 @@ function find_passing_stations(timetable, line, line_dir) {
             // 🚦 1. 蘇澳新 (7130)：蘇澳支線 / 北迴線(往花蓮) / 宜蘭線(往宜蘭) 三叉與折返點
             // ==========================================
             if (curr === '7130') {
-                if ((next_target === '7120' || remaining.includes('7120')) && prev_st !== '7120') {
+                if (next_target === '7120' && prev_st !== '7120') {
                     return { st: '7120', km: parseFloat(Route['7130'].CW_BRANCH_KM || 3.4), forceDir: '1', allowReverse: true };
                 }
                 if (/^(70[0-9]0|71[01]0|6[0-9]{3}|5[0-9]{3})$/.test(next_target) && (prev_st !== '7110' || isCurrentTimetableStop)) {
@@ -299,26 +305,33 @@ function find_passing_stations(timetable, line, line_dir) {
             // ==========================================
             // 🚦 4. 樹林 (1040) & 北湖 (1150)：調車場與富岡基地額外路線分岔口
             // ==========================================
-            if (curr === '1040' && isCurrentTimetableStop) {
-                if (/^(09[0-9]{2}|10[0-3]0|[67][0-9]{3})$/.test(next_target)) {
+            // 🌟 樹林 (1040)：三叉路口 (1045 樹調支線 / 1030 浮洲北上 / 1050 南樹林南下)
+            if (curr === '1040') {
+                // (a) 轉入樹調 (1045) 支線
+                if (next_target === '1045' && prev_st !== '1045') {
+                    return { st: '1045', km: parseFloat(Route['1040'].CCW_BRANCH_KM || 1.8), forceDir: '2', allowReverse: true };
+                }
+                // (b) 往北主線 (浮洲 1030 ~ 台北 / 基隆 / 東部)
+                if (/^(09[0-9]{2}|10[0-3]0|[67][0-9]{3})$/.test(next_target) && (prev_st !== '1030' || isCurrentTimetableStop)) {
                     return { st: '1030', km: parseFloat(Route['1040'].CW_KM || 2.9), forceDir: '1', allowReverse: true };
                 }
-                if (/^(10[4-9][05]|1[12][0-9]{2}|[2-5][0-9]{3})$/.test(next_target)) {
-                    return { st: '1045', km: parseFloat(Route['1040'].CCW_KM || 1.8), forceDir: '2', allowReverse: true };
+                // (c) 往南主線 (南樹林 1050 ~ 桃園 / 新竹 / 中南部)
+                if (/^(10[5-9][05]|1[12][0-9]{2}|[2-5][0-9]{3})$/.test(next_target) && (prev_st !== '1050' || isCurrentTimetableStop)) {
+                    return { st: '1050', km: parseFloat(Route['1040'].CCW_KM || 2.0), forceDir: '2', allowReverse: true };
                 }
             }
 
             // 🌟 北湖 (1150)：三叉路口 (1145 富岡基地額外路線 / 1140 新富北上 / 1160 湖口南下)
             if (curr === '1150') {
                 // (a) 轉入富岡基地 (1145) 額外路線
-                if ((next_target === '1145' || remaining.includes('1145')) && prev_st !== '1145') {
+                if (next_target === '1145' && prev_st !== '1145') {
                     return { st: '1145', km: parseFloat(Route['1150'].CW_BRANCH_KM || 1.4), forceDir: '1', allowReverse: true };
                 }
-                // (b) 往北主線 (新富 1140 / 富岡 1130 ~ 樹林/台北/宜蘭)
-                if (/^(09[0-9]{2}|10[0-9]{2}|11[0-4]0|[67][0-9]{3})$/.test(next_target) && (prev_st !== '1140' || isCurrentTimetableStop)) {
+                // (b) 往北主線 (新富 1140 / 富岡 1130 / 平鎮 1105 ~ 樹林 / 台北 / 宜蘭)
+                if (/^(09[0-9]{2}|10[0-9]{2}|1105|11[0-4]0|[67][0-9]{3})$/.test(next_target) && (prev_st !== '1140' || isCurrentTimetableStop)) {
                     return { st: '1140', km: parseFloat(Route['1150'].CW_KM || 1.6), forceDir: '1', allowReverse: true };
                 }
-                // (c) 往南主線 (湖口 1160 ~ 新竹/中南部)
+                // (c) 往南主線 (湖口 1160 ~ 新竹 / 中南部)
                 if (/^(11[6-9][0-9]|12[0-9]{2}|[2-5][0-9]{3})$/.test(next_target) && (prev_st !== '1160' || isCurrentTimetableStop)) {
                     return { st: '1160', km: parseFloat(Route['1150'].CCW_KM || 2.5), forceDir: '2', allowReverse: true };
                 }
@@ -334,7 +347,7 @@ function find_passing_stations(timetable, line, line_dir) {
                 if (/^(1195|12[1-5]0|[2-5][0-9]{3})$/.test(next_target) && (prev_st !== '1195' || isCurrentTimetableStop)) {
                     return { st: '1195', km: parseFloat(Route['1190'].CCW_KM || 0.2), forceDir: '2', allowReverse: true };
                 }
-                if (/^(09[0-9]{2}|10[0-9]{2}|11[0-8][05])$/.test(next_target) && (prev_st !== '1180' || isCurrentTimetableStop)) {
+                if (/^(09[0-9]{2}|10[0-9]{2}|11[0-8][05]|[67][0-9]{3})$/.test(next_target) && (prev_st !== '1180' || isCurrentTimetableStop)) {
                     return { st: '1180', km: parseFloat(Route['1190'].CW_KM || 4.2), forceDir: '1', allowReverse: true };
                 }
             }
@@ -454,13 +467,13 @@ function find_passing_stations(timetable, line, line_dir) {
 
             // 🌟 潮州 (5050)：四叉路口 (5998 潮州機廠額外路線 / 5999 潮州基地額外路線 / 5040 竹田北上 / 5060 崁頂南下)
             if (curr === '5050') {
-                // (a) 轉入潮州機廠 (5998) 額外路線
-                if ((next_target === '5998' || remaining.includes('5998')) && prev_st !== '5998') {
+                // (a) 轉入潮州機廠 (5998) 額外路線（掛於 CCW_BRANCH）
+                if (next_target === '5998' && prev_st !== '5998') {
                     return { st: '5998', km: parseFloat(Route['5050'].CCW_BRANCH_KM || 1.6), forceDir: '2', allowReverse: true };
                 }
-                // (b) 轉入潮州基地 (5999) 額外路線
-                if ((next_target === '5999' || remaining.includes('5999')) && prev_st !== '5999') {
-                    return { st: '5999', km: parseFloat(Route['5050'].CW_BRANCH_KM || 1.8), forceDir: '2', allowReverse: true };
+                // (b) 轉入潮州基地 (5999) 額外路線（掛於 CW_BRANCH）
+                if (next_target === '5999' && prev_st !== '5999') {
+                    return { st: '5999', km: parseFloat(Route['5050'].CW_BRANCH_KM || 1.8), forceDir: '1', allowReverse: true };
                 }
                 // (c) 往北/往西主線 (竹田 5040 ~ 屏東 5000 / 高雄 / 台南 / 西部幹線)
                 if (/^(09[0-9]{2}|[1-4][0-9]{3}|50[0-4]0)$/.test(next_target) && (prev_st !== '5040' || isCurrentTimetableStop)) {
@@ -483,11 +496,11 @@ function find_passing_stations(timetable, line, line_dir) {
             }
         }
 
-        // 標準路段導航 (在 1150 北湖與 5050 潮州預設走主線 CW/CCW，避免一般海線車次誤入基地支線)
+        // 標準路段導航 (在 1040 樹林、1150 北湖與 5050 潮州預設走主線 CW/CCW，避免一般海線車次誤入基地/調車場支線)
         if (dir === '2') {
             let branch = Route[curr].CCW_BRANCH || '';
             if (branch !== '') {
-                if (curr === '1150' || curr === '5050') { n_st = Route[curr].CCW; d_km = parseFloat(Route[curr].CCW_KM||0); }
+                if (curr === '1040' || curr === '1150' || curr === '5050') { n_st = Route[curr].CCW; d_km = parseFloat(Route[curr].CCW_KM||0); }
                 else if (curr === '7360') { n_st = (end_station === '7362') ? '7361' : ccw_fallback; d_km = (end_station === '7362') ? parseFloat(Route[curr].CCW_BRANCH_KM||0) : parseFloat(Route[curr].CCW_KM||Route[curr].CCW_BRANCH_KM||0); }
                 else if (curr === '3430') { n_st = jiji ? '3431' : ccw_fallback; d_km = jiji ? parseFloat(Route[curr].CCW_BRANCH_KM||0) : parseFloat(Route[curr].CCW_KM||Route[curr].CCW_BRANCH_KM||0); }
                 else if (curr === '4270') { n_st = shalun ? '4271' : ccw_fallback; d_km = shalun ? parseFloat(Route[curr].CCW_BRANCH_KM||0) : parseFloat(Route[curr].CCW_KM||Route[curr].CCW_BRANCH_KM||0); }
@@ -498,13 +511,17 @@ function find_passing_stations(timetable, line, line_dir) {
         } else if (dir === '1') {
             let branch = Route[curr].CW_BRANCH || '';
             if (branch !== '') {
-                if (curr === '1150' || curr === '5050') { n_st = Route[curr].CW; d_km = parseFloat(Route[curr].CW_KM||0); }
+                if (curr === '1040' || curr === '1150' || curr === '5050') { n_st = Route[curr].CW; d_km = parseFloat(Route[curr].CW_KM||0); }
                 else if (curr === '0920') { n_st = Route[curr].CW_BRANCH; d_km = parseFloat(Route[curr].CW_BRANCH_KM||0); }
                 else if (curr === '7130') { n_st = (end_station === '7120') ? '7120' : '7110'; d_km = (end_station === '7120') ? parseFloat(Route[curr].CW_BRANCH_KM||0) : parseFloat(Route[curr].CW_KM||0); }
                 else if (curr === '1190' || curr === '1193') {
                     if (neiwan) {
                         if (curr === '1190') { n_st = '1191'; d_km = parseFloat(Route[curr].CW_BRANCH_KM||0); }
-                        else { n_st = (end_station === '1208' || end_station === '1203') ? '1201' : '1194'; d_km = parseFloat(Route[curr].CW_BRANCH_KM||0); }
+                        else {
+                            const toNeiwan = /^120[1-8]$/.test(end_station);
+                            n_st = toNeiwan ? '1201' : '1194';
+                            d_km = toNeiwan ? parseFloat(Route[curr].CW_KM||0) : parseFloat(Route[curr].CW_BRANCH_KM||0);
+                        }
                     } else { n_st = '1180'; d_km = parseFloat(Route[curr].CW_KM||0); }
                 }
                 else if (curr === '7330') { n_st = pingxi ? '7331' : '7320'; d_km = pingxi ? parseFloat(Route[curr].CW_BRANCH_KM||0) : parseFloat(Route[curr].CW_KM||0); }
