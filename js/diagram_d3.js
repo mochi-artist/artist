@@ -1623,7 +1623,7 @@ function _init_ui_panels() {
             });
             toggleBtn.textContent = '✕';
             toggleBtn.style.background = '#c5221f';
-            _renderSearchResults('', searchResults);
+            _renderSearchResults(searchInput.value.trim(), searchResults); // 👈 原本是 ''，改為讀取目前輸入值
         } else {
             panelBody.style.opacity = '0'; 
             panelBody.style.transform = 'translateY(12px)';
