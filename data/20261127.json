@@ -271791,6 +271791,92 @@
           "Order": "15"
         }
       ]
+    },
+    {
+      "Train": "5260",
+      "CarClass": "1101",
+      "Line": "0",
+      "LineDir": "0",
+      "TimeInfos": [
+        {
+          "Station": "1040",
+          "ARRTime": "19:57:00",
+          "DEPTime": "20:03:00",
+          "Order": "1"
+        },
+        {
+          "Station": "1020",
+          "ARRTime": "20:10:00",
+          "DEPTime": "20:12:00",
+          "Order": "2"
+        },
+        {
+          "Station": "1000",
+          "ARRTime": "20:20:00",
+          "DEPTime": "20:25:00",
+          "Order": "3"
+        },
+        {
+          "Station": "0990",
+          "ARRTime": "20:31:00",
+          "DEPTime": "20:32:00",
+          "Order": "4"
+        },
+        {
+          "Station": "0930",
+          "ARRTime": "20:46:00",
+          "DEPTime": "20:48:00",
+          "Order": "5"
+        },
+        {
+          "Station": "7190",
+          "ARRTime": "21:43:00",
+          "DEPTime": "21:45:00",
+          "Order": "6"
+        },
+        {
+          "Station": "7160",
+          "ARRTime": "21:51:00",
+          "DEPTime": "21:53:00",
+          "Order": "7"
+        },
+        {
+          "Station": "7000",
+          "ARRTime": "22:49:00",
+          "DEPTime": "22:52:00",
+          "Order": "8"
+        },
+        {
+          "Station": "6110",
+          "ARRTime": "23:40:00",
+          "DEPTime": "23:42:00",
+          "Order": "9"
+        },
+        {
+          "Station": "6070",
+          "ARRTime": "23:57:00",
+          "DEPTime": "23:59:00",
+          "Order": "10"
+        },
+        {
+          "Station": "6050",
+          "ARRTime": "00:08:00",
+          "DEPTime": "00:10:00",
+          "Order": "11"
+        },
+        {
+          "Station": "6020",
+          "ARRTime": "00:21:00",
+          "DEPTime": "00:23:00",
+          "Order": "12"
+        },
+        {
+          "Station": "6000",
+          "ARRTime": "00:35:00",
+          "DEPTime": "00:35:00",
+          "Order": "13"
+        }
+      ]
     }
   ]
 }
