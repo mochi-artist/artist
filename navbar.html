@@ -1,3 +1,10 @@
+<style>
+    /* 🌟 改點按鈕文字置頂設定區（以後改點只需改引號內的文字） */
+    #nav-revised-text::after {
+        content: "20261229改點(全車次版)";
+    }
+</style>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
         <a class="navbar-brand" href="./">麻糬運行圖</a>
@@ -62,7 +69,7 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="index.html?mode=revised" id="nav-toggle-revised" style="color: #ef4444; font-weight: bold;">
-                        <i class="fa-solid fa-calendar-plus" style="display: inline-block; width: 16px; text-align: center; margin-right: 4px;"></i>20261003改點(全車次版)
+                        <i class="fa-solid fa-calendar-plus" style="display: inline-block; width: 16px; text-align: center; margin-right: 4px;"></i><span id="nav-revised-text"></span>
                     </a>
                 </li>
                 <li class="nav-item">
