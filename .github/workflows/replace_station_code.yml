@@ -1,0 +1,88 @@
+name: 批次替換車站代碼
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_folder:
+        description: '要修改的資料夾'
+        required: true
+        type: choice
+        default: 'all'
+        options:
+          - 'all'
+          - 'data'
+          - 'data all'
+      old_code:
+        description: '舊車站代碼 (xxxx；若留空則直接套用 py 內的 STATION_MAP)'
+        required: false
+        type: string
+        default: ''
+      new_code:
+        description: '新 4 位數車站代碼 (若留空則直接套用 py 內的 STATION_MAP)'
+        required: false
+        type: string
+        default: ''
+      dry_run:
+        description: '僅預覽影響筆數，不實際寫入檔案'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  replace-station:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 檢出專案程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 執行車站代碼替換腳本
+        env:
+          TARGET_FOLDER: ${{ inputs.target_folder }}
+          OLD_CODE: ${{ inputs.old_code }}
+          NEW_CODE: ${{ inputs.new_code }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          ARGS=(--target "$TARGET_FOLDER" --yes)
+          if [ -n "$OLD_CODE" ] || [ -n "$NEW_CODE" ]; then
+            ARGS+=(--old "$OLD_CODE" --new "$NEW_CODE")
+          fi
+          if [ "$DRY_RUN" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          python change/replace_station_code.py "${ARGS[@]}"
+
+      - name: 自動提交並推送變更
+        if: ${{ inputs.dry_run != true }}
+        env:
+          TARGET_FOLDER: ${{ inputs.target_folder }}
+          OLD_CODE: ${{ inputs.old_code }}
+          NEW_CODE: ${{ inputs.new_code }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          [ -d "data" ] && git add "data"
+          [ -d "data all" ] && git add "data all"
+
+          if git diff --cached --quiet; then
+            echo "沒有任何檔案變更，跳過 commit。"
+            exit 0
+          fi
+
+          MSG="chore: 批次替換車站代碼 (${TARGET_FOLDER})"
+          if [ -n "$OLD_CODE" ] && [ -n "$NEW_CODE" ]; then
+            MSG="chore: 替換車站代碼 ${OLD_CODE} -> ${NEW_CODE} (${TARGET_FOLDER})"
+          fi
+
+          git commit -m "$MSG"
+          git pull --rebase
+          git push
