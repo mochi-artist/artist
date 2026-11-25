@@ -73,7 +73,7 @@
     "KM": "40.9",
     "CCW": "1050",
     "CW": "1030",
-    "CCW_BRANCH": "1045",
+    "CCW_BRANCH": "1998",
     "CW_BRANCH": "",
     "CHENG_ZHUI_CCW": "1050",
     "CHENG_ZHUI_CW": "1030",
@@ -84,7 +84,7 @@
     "CHENG_ZHUI_CCW_KM": "2.0",
     "CHENG_ZHUI_CW_KM": "2.9"
   },
-  "1045": {
+  "1998": {
     "DSC": "樹調",
     "ORDER": "16",
     "KM": "42.7",
