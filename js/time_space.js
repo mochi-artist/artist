@@ -141,7 +141,7 @@ function find_passing_stations(timetable, line, line_dir) {
         const first_target = stations[1];
         if (start_station === '7120') {
             line_dir = '2'; // 蘇澳(7120) -> 蘇澳新(7130) 固定先走 CCW('2')
-        } else if (start_station === '1045') {
+        } else if (start_station === '1998') {
             line_dir = '1'; // 樹調(1045) -> 樹林(1040) 固定先走 CW('1')
         } else if (start_station === '1145') {
             line_dir = '2'; // 富岡基地(1145) -> 北湖(1150) 固定先走 CCW('2')
@@ -228,8 +228,8 @@ function find_passing_stations(timetable, line, line_dir) {
             // ==========================================
             // 🚦 0. 基地/機廠端點出發保護 (1045 樹調、1145 富岡基地、5998 潮州機廠、5999 潮州基地)
             // ==========================================
-            if (curr === '1045' && prev_st !== '1040') {
-                return { st: '1040', km: parseFloat(Route['1045']?.CW_KM || 1.8), forceDir: '1', allowReverse: true };
+            if (curr === '1998' && prev_st !== '1040') {
+                return { st: '1040', km: parseFloat(Route['1998']?.CW_KM || 1.8), forceDir: '1', allowReverse: true };
             }
             if (curr === '1145' && prev_st !== '1150') {
                 return { st: '1150', km: parseFloat(Route['1145']?.CCW_KM || 1.4), forceDir: '2', allowReverse: true };
@@ -308,8 +308,8 @@ function find_passing_stations(timetable, line, line_dir) {
             // 🌟 樹林 (1040)：三叉路口 (1045 樹調支線 / 1030 浮洲北上 / 1050 南樹林南下)
             if (curr === '1040') {
                 // (a) 轉入樹調 (1045) 支線
-                if (next_target === '1045' && prev_st !== '1045') {
-                    return { st: '1045', km: parseFloat(Route['1040'].CCW_BRANCH_KM || 1.8), forceDir: '2', allowReverse: true };
+                if (next_target === '1998' && prev_st !== '1998') {
+                    return { st: '1998', km: parseFloat(Route['1040'].CCW_BRANCH_KM || 1.8), forceDir: '2', allowReverse: true };
                 }
                 // (b) 往北主線 (浮洲 1030 ~ 台北 / 基隆 / 東部)
                 if (/^(09[0-9]{2}|10[0-3]0|[67][0-9]{3})$/.test(next_target) && (prev_st !== '1030' || isCurrentTimetableStop)) {
