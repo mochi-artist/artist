@@ -951,7 +951,7 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
     try {
         const baseId = pathId.replace(/-End\d*/g, '');
         const hasSpecialChars = /[a-zA-Z\u4e00-\u9fa5]/.test(display_train_no);
-        const railyards = hasSpecialChars ? [] : ['1045', '1145', '5999'];
+        const railyards = hasSpecialChars ? [] : ['1998', '1145', '5999'];
 
         const d3TrainData = _trainDataMap.get(pathId) || _trainDataMap.get(baseId);
         if (!d3TrainData || !d3TrainData.rawData) throw new Error("無法取得該車次的繪圖原始資料");
