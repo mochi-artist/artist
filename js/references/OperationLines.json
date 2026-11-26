@@ -106,5 +106,11 @@
         "FOLDER": "cz",
         "PREFIX": "CZ_",
         "MAX_X_AXIS": 3718
+    },
+    "LINE_ES": {
+        "NAME": "東部幹線+南迴線",
+        "FOLDER": "ES",
+        "PREFIX": "ES_",
+        "MAX_X_AXIS": 9904
     }
 }
