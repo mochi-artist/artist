@@ -54406,62 +54406,6 @@
     },
     {
       "Type": "1",
-      "Train": "230",
-      "BreastFeed": "N",
-      "Route": "",
-      "Package": "N",
-      "OverNightStn": "",
-      "LineDir": "1",
-      "Line": "0",
-      "Dinning": "N",
-      "FoodSrv": "N",
-      "Cripple": "N",
-      "CarClass": "110G",
-      "Bike": "N",
-      "ExtraTrain": "N",
-      "Everyday": "N",
-      "Note": "五六日停",
-      "NoteEng": "",
-      "TimeInfos": [
-        {
-          "Route": "",
-          "Station": "7000",
-          "Order": "1",
-          "ARRTime": "16:43:00",
-          "DEPTime": "16:43:00"
-        },
-        {
-          "Route": "",
-          "Station": "6250",
-          "Order": "2",
-          "ARRTime": "16:47:30",
-          "DEPTime": "16:48:30"
-        },
-        {
-          "Route": "",
-          "Station": "6240",
-          "Order": "3",
-          "ARRTime": "16:55:00",
-          "DEPTime": "16:56:00"
-        },
-        {
-          "Route": "",
-          "Station": "6230",
-          "Order": "4",
-          "ARRTime": "16:58:00",
-          "DEPTime": "16:58:00"
-        },
-        {
-          "Route": "",
-          "Station": "6220",
-          "Order": "5",
-          "ARRTime": "17:01:00",
-          "DEPTime": "17:01:00"
-        }
-      ]
-    },
-    {
-      "Type": "1",
       "Train": "231",
       "BreastFeed": "N",
       "Route": "",
