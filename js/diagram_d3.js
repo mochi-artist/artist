@@ -39,6 +39,87 @@ let _isMultiSelectMode = false;
 let _isTimetableMode = false; 
 let _currentLineKind = null;
 
+// ==========================================
+// 🌟 運轉停車自動比對模組（對照 TRA-Timetable-Data 既有停靠站）
+// ==========================================
+const FRIEND_DATA_BASE_URL = 'https://raw.githubusercontent.com/mochi-artist/TRA-Timetable-Data/main/Timetable-Json/';
+
+function getFriendJsonUrl(dateStr) {
+    if (!FRIEND_DATA_BASE_URL || !dateStr) return null;
+    const digits = String(dateStr).replace(/\D/g, '');
+    if (digits.length !== 8) return null;
+    const dashed = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+    return `${FRIEND_DATA_BASE_URL}${dashed}.json`;
+}
+
+// 站碼正規化（相容 1001/1000、1045/1998 與 _LOOP）
+function _normalizeStopId(st) {
+    const clean = String(st ?? '').trim().replace(/_LOOP$/, '');
+    if (clean === '1001') return '1000';
+    if (clean === '1045') return '1998';
+    return clean;
+}
+
+// 解析朋友 JSON ➔ Map<車次, Set<既有停靠站代碼>>（同時相容台鐵官方與 TDX 格式）
+function _buildFriendStopsMap(friendData) {
+    const map = new Map();
+    if (!friendData) return map;
+    const list = Array.isArray(friendData)
+        ? friendData
+        : (friendData.TrainInfos || friendData.TrainTimetables || friendData.Trains || []);
+
+    for (const t of list) {
+        const tid = String(t.Train ?? t.TrainNo ?? t.TrainInfo?.TrainNo ?? '').trim();
+        const infos = t.TimeInfos || t.StopTimes || t.Timetables;
+        if (!tid || !Array.isArray(infos)) continue;
+
+        const stopSet = new Set();
+        for (const ti of infos) {
+            const st = _normalizeStopId(ti.Station ?? ti.StationID);
+            if (st) stopSet.add(st);
+        }
+        if (stopSet.size > 0) map.set(tid, stopSet);
+    }
+    return map;
+}
+
+// 統一判定是否為「運轉停車」（畫布星星與時刻表備註共用）
+function _isOpStopStation(trainNo, stationId, isStopping = true) {
+    const baseNo = String(trainNo ?? '').replace(/-End\d*$/g, '').trim();
+    const rawSt = String(stationId ?? '').trim();
+    const cleanSt = _normalizeStopId(rawSt);
+
+    // 調車場一律不標運轉停車
+    const railyardSet = new Set(['1998', '1045', '1145', '5998', '5999']);
+    if (railyardSet.has(cleanSt)) return false;
+
+    // 1. 保留原本 OpStops_*.json 名單
+    const myOpStops = window._opStopsData ? (window._opStopsData[baseNo] || []) : [];
+    if (myOpStops.some(s => String(s).trim() === rawSt || _normalizeStopId(s) === cleanSt)) {
+        return true;
+    }
+
+    // 以下規則必須為實際停車（到站 !== 離站）
+    if (!isStopping) return false;
+
+    // 2. 固定號誌站停車
+    const specialOpStopStations = new Set(['2115', '3355', '5170', '5175', '5180']);
+    if (specialOpStopStations.has(cleanSt)) return true;
+
+    // 3. 比對朋友倉庫既有停靠站：該車次存在於朋友資料，且多出來的停靠站 ➔ 運轉停車
+    if (window._friendStopsMap && window._friendStopsMap.has(baseNo)) {
+        const terminals = window._trainTerminalsMap?.get(baseNo);
+        if (terminals && (cleanSt === terminals.origin || cleanSt === terminals.dest)) {
+            return false;
+        }
+        const friendStops = window._friendStopsMap.get(baseNo);
+        if (!friendStops.has(cleanSt)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 // 🌟 110F 專車替換規則 (依據圖表設定，同步至前端)
 const TEMP_110F_RULES = {
@@ -1076,11 +1157,8 @@ async function _showTimetable(pathId, display_train_no, clickY, targetContainerI
             else {
                 let timeObj = exactTimes[stop.id] || exactTimes[cleanStopId];
                 let isStopping = timeObj ? (timeObj.arr !== timeObj.dep) : (stop.arrTime !== stop.depTime);
-                const baseTrainNo = original_train_no.replace(/-End$/, '');
-                const myOpStops = window._opStopsData ? (window._opStopsData[baseTrainNo] || []) : [];
-                const specialOpStopStations = ['2115', '3355', '5170', '5175', '5180'];
                 
-                if (myOpStops.includes(String(stop.id)) || myOpStops.includes(cleanStopId) || (specialOpStopStations.includes(cleanStopId) && isStopping)) {
+                if (_isOpStopStation(original_train_no, stop.id, isStopping)) {
                     stop.remark = "運轉停車";
                 } else {
                     stop.remark = isStopping ? "停靠" : "通過";
@@ -2341,15 +2419,52 @@ function draw_train_path(all_trains_data, realtime_trains) {
             });
         };
 
-        // 🌟 雙管齊下：同時抓取星星與總表
+        const friendJsonUrl = (!revisedJson && currentRenderDate)
+            ? getFriendJsonUrl(currentRenderDate)
+            : null;
+
+        // 🌟 三管齊下：同時抓取星星名單、基準總表、朋友當日原始停靠表
         Promise.all([
             (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl) ? fetchSafe(opStopsUrl) : Promise.resolve(window._opStopsData),
-            fetchSafe(masterDiagramUrl)
-        ]).then(([opStopsData, masterData]) => {
+            fetchSafe(masterDiagramUrl),
+            (friendJsonUrl && window._currentFriendJsonUrl !== friendJsonUrl) ? fetchSafe(friendJsonUrl) : Promise.resolve(window._friendRawData || null)
+        ]).then(([opStopsData, masterData, friendData]) => {
             
             if (opStopsUrl && window._currentOpStopsUrl !== opStopsUrl && opStopsData) {
                 window._opStopsData = opStopsData; 
                 window._currentOpStopsUrl = opStopsUrl;
+            }
+
+            // 建立朋友既有停靠站對照表
+            if (friendJsonUrl) {
+                if (window._currentFriendJsonUrl !== friendJsonUrl) {
+                    window._friendRawData = friendData;
+                    window._currentFriendJsonUrl = friendJsonUrl;
+                    window._friendStopsMap = _buildFriendStopsMap(friendData);
+                    if (friendData) {
+                        console.log(`✅ 朋友原始停靠表 (${friendJsonUrl}) 載入成功，共 ${window._friendStopsMap.size} 筆車次`);
+                    }
+                }
+            } else {
+                window._friendStopsMap = new Map();
+            }
+
+            // 建立目前車次的起終點表（排除起終點誤畫星星）
+            const railyardIds = new Set(['1998', '1045', '1145', '5998', '5999']);
+            window._trainTerminalsMap = new Map();
+            if (window._rawTrainData && Array.isArray(window._rawTrainData.TrainInfos)) {
+                for (const t of window._rawTrainData.TrainInfos) {
+                    const tid = String(t.Train ?? t.TrainNo ?? '').trim();
+                    const infos = t.TimeInfos || t.Timetables;
+                    if (!tid || !Array.isArray(infos)) continue;
+                    const valid = infos.filter(ti => !railyardIds.has(_normalizeStopId(ti.Station)));
+                    if (valid.length > 0) {
+                        window._trainTerminalsMap.set(tid, {
+                            origin: _normalizeStopId(valid[0].Station),
+                            dest: _normalizeStopId(valid[valid.length - 1].Station)
+                        });
+                    }
+                }
             }
 
             // 解析總表，建立白名單
@@ -2433,7 +2548,7 @@ function set_path(lk, train_no, train_kind, value) {
         const [, id2, time2, loc2] = value[i+1];
 
         if (id1 === id2 && time1 !== time2) {
-            if (myOpStops.includes(String(id1))) {
+            if (_isOpStopStation(train_no, id1, true)) {
                 let arr_x = time1 * 10 - 1200 * DiagramHours[0] + 50;
                 let dep_x = time2 * 10 - 1200 * DiagramHours[0] + 50;
                 
